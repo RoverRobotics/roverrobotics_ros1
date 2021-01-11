@@ -12,6 +12,8 @@ find_package(catkin REQUIRED COMPONENTS
   nav_msgs
   tf2
   roverrobotics_driver_msgs
+  pluginlib
+  serial
 )
 
 generate_messages(
@@ -24,7 +26,7 @@ generate_messages(
 
 catkin_package(
   INCLUDE_DIRS include
-  CATKIN_DEPENDS message_runtime roverrobotics_driver_msgs sensor_msgs ds4_driver
+  CATKIN_DEPENDS message_runtime pluginlib roscpp std_msgs roverrobotics_driver_msgs sensor_msgs serial ds4_driver
 )
 
 ###########
@@ -36,11 +38,16 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_library(odom_control src/odom_control.cpp)
+##add_library(odom_control src/odom_control.cpp)
 
-add_executable(openrover_driver_node src/openrover_driver.cpp)
-add_dependencies(openrover_driver_node roverrobotics_driver_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
-target_link_libraries(openrover_driver_node ${catkin_LIBRARIES} odom_control)
+add_executable(roverrobotics_driver_node src/ros_top_node.cpp
+                                src/protocol_base.cpp
+                                src/protocol_pro.cpp
+                                src/protocol_zero.cpp
+                                src/comm_manager.cpp
+                                src/utils.cpp)
+add_dependencies(roverrobotics_driver_node roverrobotics_driver_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
+##target_link_libraries(roverrobotics_driver_node ${catkin_LIBRARIES} odom_control)
 
 
 #############
@@ -48,13 +55,14 @@ target_link_libraries(openrover_driver_node ${catkin_LIBRARIES} odom_control)
 #############
 
 ## Mark executables and/or libraries for installation
-install(TARGETS openrover_driver_node
+install(TARGETS roverrobotics_driver_node
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-install(TARGETS odom_control
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-)
+##Install Linked Library
+##install(TARGETS odom_control
+##  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+##)
 
 ## Copy launch files
 install(DIRECTORY launch/
@@ -68,11 +76,19 @@ install(DIRECTORY config/
   FILES_MATCHING PATTERN "*.yaml"
 )
 
+## Copy header files
 install(DIRECTORY include/${PROJECT_NAME}/
    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
    FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp"
 )
 
-catkin_install_python(PROGRAMS scripts/diagnostics.py
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/
-)
+## Copy any python scripts
+##catkin_install_python(PROGRAMS scripts/diagnostics.py
+##  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/
+##)
+
+#############
+## Testing ##
+#############
+
+# TODO
