@@ -15,5 +15,6 @@
 
 int main(int argc, char* argv[])
 {
-    
+    /*clearly a syntax error*/
+    x = 5; 
 }
