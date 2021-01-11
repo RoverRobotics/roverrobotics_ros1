@@ -11,22 +11,30 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   nav_msgs
   tf2
-  roverrobotics_driver_msgs
+  ##roverrobotics_driver_msgs
   pluginlib
-  serial
+  ##serial
 )
 
-generate_messages(
-   DEPENDENCIES
-   std_msgs
-   geometry_msgs
-   nav_msgs
-   roverrobotics_driver_msgs
-)
+##generate_messages(
+##   DEPENDENCIES
+##   std_msgs
+##   geometry_msgs
+##   nav_msgs
+   ##roverrobotics_driver_msgs
+##)
 
 catkin_package(
   INCLUDE_DIRS include
-  CATKIN_DEPENDS message_runtime pluginlib roscpp std_msgs roverrobotics_driver_msgs sensor_msgs serial ds4_driver
+  CATKIN_DEPENDS 
+  message_runtime 
+  pluginlib 
+  roscpp 
+  std_msgs 
+  ##roverrobotics_driver_msgs 
+  sensor_msgs 
+  ##serial 
+  ds4_driver
 )
 
 ###########
@@ -45,7 +53,7 @@ add_library(support_lib src/protocol_base.cpp
                          src/utils.cpp)
 
 add_executable(roverrobotics_driver_node src/ros_top_node.cpp)
-add_dependencies(roverrobotics_driver_node roverrobotics_driver_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
+##add_dependencies(roverrobotics_driver_node roverrobotics_driver_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
 target_link_libraries(roverrobotics_driver_node ${catkin_LIBRARIES} support_lib)
 
 
