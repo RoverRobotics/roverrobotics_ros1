@@ -38,16 +38,17 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-##add_library(odom_control src/odom_control.cpp)
+add_library(support_lib src/protocol_base.cpp
+                         src/protocol_pro.cpp
+                         src/protocol_zero.cpp
+                         src/comm_manager.cpp
+                         src/utils.cpp)
 
-add_executable(roverrobotics_driver_node src/ros_top_node.cpp
-                                src/protocol_base.cpp
-                                src/protocol_pro.cpp
-                                src/protocol_zero.cpp
-                                src/comm_manager.cpp
-                                src/utils.cpp)
-add_dependencies(roverrobotics_driver_node roverrobotics_driver_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
-##target_link_libraries(roverrobotics_driver_node ${catkin_LIBRARIES} odom_control)
+add_executable(roverrobotics_driver_node src/ros_top_node.cpp)
+add_dependencies(roverrobotics_driver_node 
+                                
+                                roverrobotics_driver_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
+##target_link_libraries(roverrobotics_driver_node ${catkin_LIBRARIES} support_lib)
 
 
 #############
@@ -60,9 +61,9 @@ install(TARGETS roverrobotics_driver_node
 )
 
 ##Install Linked Library
-##install(TARGETS odom_control
-##  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-##)
+install(TARGETS support_lib
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+)
 
 ## Copy launch files
 install(DIRECTORY launch/
