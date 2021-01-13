@@ -13,6 +13,7 @@ class RoverRobotics::BaseProtocolObject {
     virtual void register_state_response_cb(boost::function<int(void)> _f);
     virtual void register_comm_manager();
 
+   
     privated : double trimvalue;
     comm_manager_t comm_manager;
     mutex comm_manager_mutex;
