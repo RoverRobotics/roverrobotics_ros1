@@ -12,8 +12,6 @@ class RoverRobotics::BaseProtocolObject {
     virtual void unpack_robot_response();
     virtual void register_state_response_cb(boost::function<int(void)> _f);
     virtual void register_comm_manager();
-    void setTrim(double) {}
-    double getTrim() {}
 
     privated : double trimvalue;
     comm_manager_t comm_manager;
