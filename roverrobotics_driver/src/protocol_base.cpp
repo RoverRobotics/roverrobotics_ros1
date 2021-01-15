@@ -8,18 +8,11 @@ class RoverRobotics::BaseProtocolObject {
     virtual void translate_send_estop();
     virtual void translate_send_state_request();
     virtual void translate_send_robot_info_request();
+    virtual void translate_send_speed()
     virtual void handle_unsupported_ros_message();
     virtual void unpack_robot_response();
     virtual void register_state_response_cb(boost::function<int(void)> _f);
     virtual void register_comm_manager();
-    void setTrim(double value) {
-        trimvalue = value;
-    }
-    double getTrim() {
-        return trimvalue;
-    }
-
-    //These are not accessible from derived class
    private:
     double trimvalue;
     comm_manager_t comm_manager;

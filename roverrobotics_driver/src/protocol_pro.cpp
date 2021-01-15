@@ -31,6 +31,10 @@ void translate_send_state_request(){
     write_buffer[6] = (char)255 - (write_buffer[1] + write_buffer[2] + write_buffer[3] + write_buffer[4] + write_buffer[5]) % 255;
 }
 
+void translate_send_speed(double linearx, double angularz){
+
+}
+
 void translate_send_robot_info_request(){
     //TODO:
 }
@@ -38,6 +42,10 @@ void translate_send_robot_info_request(){
 void unpack_robot_response(){
     //TODO: get robot response from comm manager
     //decode
+}
+
+void register_state_response_cb(){
+    
 }
 
 }  // namespace RoverRobotics
