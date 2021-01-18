@@ -20,16 +20,24 @@ class ROSWrapper {
     //
     std::unique_ptr<BaseProtocolObject> robot_;
     //Pub Sub
-    ros::Subscriber speed_command_subscriber_;
-    ros::Publisher robot_status_publisher_;
+    ros::Subscriber speed_command_subscriber_;  //listen to cmd_vel inputs
+
+    ros::Subscriber robot_info_subscriber;      //listen to robot_info request
+    ros::Publisher robot_info_publisher;        //publish robot_unique info
+
+    ros::Subscriber robot_status_subscriber;    //listen to user togglable inputs i.e estop
+    ros::Publisher robot_status_publisher_;     //publish robot state (battery, estop_status, speed)
+    
 
     //parameter variables
-    std::string speed_topic_;
-    std::string motor_status_topic_;
-    int robot_status_frequency;
+    std::string ros_speed_topic_;
+    std::string robot_status_topic_;
+    float robot_status_frequency;
+    std::string robot_info_request_topic_;
+    std::string robot_info_topic_;
     std::string robot_type_;
     //Timer
-    ros::Timer motor_status_timer_;
+    ros::Timer robot_status_timer_;
 
    public:
     ROSWrapper(ros::NodeHandle* nh) {
@@ -47,20 +55,29 @@ class ROSWrapper {
         }
 
         // Check if launch files have parameters set; Otherwise use hardcoded values
-        if (!ros::param::get("~speed_topic", speed_topic_)) {
+        if (!ros::param::get("~speed_topic", ros_speed_topic_)) {
             speed_topic_ = "/cmd_vel";
         }
-        if (!ros::param::get("~motor_status_topic", speed_topic_)) {
-            speed_topic_ = "/status";
+        if (!ros::param::get("~status_topic", robot_status_topic_)) {
+            robot_status_topic_ = "~/status";
         }
-        if (!ros::param::get("~robot_status_frequency", robot_status_frequency)) {
-            robot_status_frequency = 5.0;
+        if (!ros::param::get("~status_frequency", robot_status_frequency)) {
+            robot_status_frequency = 1.00;
         }
-        
+        if (!ros::param::get("~info_request_topic", robot_info_request_topic_)) {
+            robot_info_request_topic_ = "/robot_request_info";
+        }
+        if (!ros::param::get("~info_topic", robot_info_topic_)) {
+            robot_info_topic_ = "~/robot_unique_info";
+        }
 
         speed_command_subscriber_ = nh->subscribe(speed_topic_, 10, &ROSWrapper::callbackSpeedCommand, this);
-        robot_status_publisher_ = nh->advertise<diagnostic_msgs::DiagnosticStatus>(motor_status_topic_, 10);
-        motor_status_timer_ = nh->createTimer(ros::Duration(1.0 / robot_status_frequency), &ROSWrapper::publishRobotStatus, this);
+        robot_info_subscriber = nh->subscribe(robot_info_request_topic_, 10, &ROSWrapper::callbackInfo, this);      //listen to robot_info request
+        ros::Publisher robot_info_publisher;        //publish robot_unique info
+        ros::Subscriber robot_status_subscriber;    //listen to user togglable inputs i.e estop
+        robot_status_publisher_ = nh->advertise<diagnostic_msgs::DiagnosticStatus>(robot_status_topic_, 10);
+        robot_status_timer_ = nh->createTimer(ros::Duration(1.0 / robot_status_frequency), &ROSWrapper::publishRobotStatus, this);
+    
     }
 
     void publishRobotStatus(const ros::TimerEvent& event) {

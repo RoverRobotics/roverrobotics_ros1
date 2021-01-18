@@ -7,7 +7,7 @@ void ProProtocolObject::update_drivetrim(double value) {
     setTrim(value);
 }
 void translate_send_estop() {
-    const MOTOR_NEUTRAL = 125;
+    const int MOTOR_NEUTRAL = 125;
     unsigned char write_buffer[SERIAL_OUT_PACKAGE_LENGTH];
     write_buffer[0] = SERIAL_START_BYTE;
     write_buffer[1] = (unsigned char)MOTOR_NEUTRAL;  // left motor
@@ -32,11 +32,15 @@ void translate_send_state_request(){
 }
 
 void translate_send_speed(double linearx, double angularz){
+    // rightmotor = linearx + 0.5 * angularz;
+    // leftmotor = linearx - 0.5 * angularz;
 
 }
 
+
 void translate_send_robot_info_request(){
     //TODO:
+    
 }
 
 void unpack_robot_response(){
