@@ -1,19 +1,9 @@
 #include "protocol_base.h"
 #include "protocol_pro.h"
 #include "protocol_zero.h"
+#include "robot_info.hpp"
 #include "ros/ros.h"
-
-// #include <fcntl.h>
-// #include <sys/ioctl.h>
-// #include <termios.h>
-
-// #include <cmath>
-// #include <ctime>
-// #include <fstream>
-// #include <iostream>
-// #include <string>
-// #include <vector>
-
+#include "status_data.hpp"
 namespace RoverRobotics {
 class ROSWrapper {
    private:
@@ -21,16 +11,19 @@ class ROSWrapper {
     std::unique_ptr<BaseProtocolObject> robot_;
     //Pub Sub
     ros::Subscriber speed_command_subscriber_;  //listen to cmd_vel inputs
+    ros::Subscriber estop_trigger_subscriber_;  //listen to cmd_vel inputs
+    ros::Subscriber estop_reset_subscriber_;    //listen to cmd_vel inputs
 
-    ros::Subscriber robot_info_subscriber;      //listen to robot_info request
-    ros::Publisher robot_info_publisher;        //publish robot_unique info
+    ros::Subscriber robot_info_subscriber;  //listen to robot_info request
+    ros::Publisher robot_info_publisher;    //publish robot_unique info
 
-    ros::Subscriber robot_status_subscriber;    //listen to user togglable inputs i.e estop
-    ros::Publisher robot_status_publisher_;     //publish robot state (battery, estop_status, speed)
-    
+    ros::Subscriber robot_status_subscriber;  //listen to user togglable inputs i.e estop
+    ros::Publisher robot_status_publisher_;   //publish robot state (battery, estop_status, speed)
 
     //parameter variables
-    std::string ros_speed_topic_;
+    std::string speed_topic_;
+    std::string estop_trigger_topic_;
+    std::string estop_reset_topic_;
     std::string robot_status_topic_;
     float robot_status_frequency;
     std::string robot_info_request_topic_;
@@ -55,8 +48,14 @@ class ROSWrapper {
         }
 
         // Check if launch files have parameters set; Otherwise use hardcoded values
-        if (!ros::param::get("~speed_topic", ros_speed_topic_)) {
+        if (!ros::param::get("~speed_topic", speed_topic_)) {
             speed_topic_ = "/cmd_vel";
+        }
+        if (!ros::param::get("~estop_trigger_topic", estop_trigger_topic_)) {
+            estop_trigger_topic_ = "/estop_trigger";
+        }
+        if (!ros::param::get("~estop_reset_topic", estop_reset_topic_)) {
+            estop_reset_topic_ = "/estop_reset";
         }
         if (!ros::param::get("~status_topic", robot_status_topic_)) {
             robot_status_topic_ = "~/status";
@@ -72,30 +71,52 @@ class ROSWrapper {
         }
 
         speed_command_subscriber_ = nh->subscribe(speed_topic_, 10, &ROSWrapper::callbackSpeedCommand, this);
-        robot_info_subscriber = nh->subscribe(robot_info_request_topic_, 10, &ROSWrapper::callbackInfo, this);      //listen to robot_info request
-        ros::Publisher robot_info_publisher;        //publish robot_unique info
-        ros::Subscriber robot_status_subscriber;    //listen to user togglable inputs i.e estop
+        estop_trigger_subscriber_ = nh->subscribe(estop_trigger_topic_, 10, &ROSWrapper::callbackEstopTrigger, this);
+        estop_reset_subscriber_ = nh->subscribe(estop_reset_topic_, 10, &ROSWrapper::callbackEstopReset, this);
+        robot_info_subscriber = nh->subscribe(robot_info_request_topic_, 10, &ROSWrapper::callbackInfo, this);    //listen to robot_info request
+        robot_info_publisher = nh_priv_.advertise<std_msgs::Int32MultiArray>(robot_info_topic_, 1);               //publish robot_unique info
+        // robot_status_subscriber = nh->subscribe(robot_status_topic_, 10, &ROSWrapper::callbackInfo, this);  //listen to user togglable inputs i.e estop
         robot_status_publisher_ = nh->advertise<diagnostic_msgs::DiagnosticStatus>(robot_status_topic_, 10);
         robot_status_timer_ = nh->createTimer(ros::Duration(1.0 / robot_status_frequency), &ROSWrapper::publishRobotStatus, this);
-    
+        ROS_INFO("Subscribers and Publishers are running...");
     }
 
     void publishRobotStatus(const ros::TimerEvent& event) {
-        //get robot status from RobotObject
-        robot_->translate_send_robot_info_request();
-        //return value from protocol layer ?
-        robot_status_publisher_.publish("some status");
+        statusData data = robot_->translate_send_robot_status_request();
+        std_msgs::Int32MultiArray robot_status;
+        robot_status.data.clear();
+        robot_status.data.push_back(data->time);
+        robot_status.data.push_back(data->motor1_id);
+        robot_status.data.push_back(data->motor2_id);
+
+        robot_status_publisher_.publish(motor_speeds_msg);
+        ROS_INFO("publishing some robot info")
+    }
+
+    void publishRobotInfo(const ros::TimerEvent& event) {
+        robotInfo data = robot_->translate_send_robot_info_request();
+
+        std_msgs::Int32MultiArray robot_info;
+        robot_info.data.clear();
+        robot_info.data.push_back(data->time);
+        robot_info.data.push_back(data->motor1_id);
+        robot_info.data.push_back(data->motor2_id);
+
+        robot_info_publisher.publish(robot_info);
+        ROS_INFO("publishing some robot info")
     }
     //call everytime speed_topic_ get data
     void callbackSpeedCommand(const geometry_msgs::Twist& msg) {
         robot_->translate_send_speed(msg.linear.x, msg.angular.z);
+        ROS_INFO("sent %f %f to the robot", msg.linear.x, msg.angular.z)
     }
-    bool callbackEStop(std_srvs::Trigger::Request& req, std_srvs::Trigger::Response& res) {
+    void callbackEstopTrigger(const std_msgs::Bool::ConstPtr& msg) {
         robot_->translate_send_estop();
         res.success = true;
         res.message = "E-stop service triggered";
         return true;
     }
+    void callbackEstopReset(const std_msgs::Bool::ConstPtr& msg)
 };
 
 }  // namespace RoverRobotics

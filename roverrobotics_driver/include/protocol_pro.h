@@ -5,6 +5,7 @@ class ProProtocolObject;
 }
 class RoverRobotics::ProProtocolObject public virtual RoverRobotics::BaseProtocolObject {
    public:
+    ProProtocolObject();
     void update_drivetrim(double);
     void translate_send_estop();
     void translate_send_state_request();
