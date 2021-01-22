@@ -13,8 +13,6 @@ class RoverRobotics::ZeroProtocolObject public virtual RoverRobotics::ZeroProtoc
     void unpack_robot_response();
     void register_state_response_cb(boost::function<int(void)> _f);
     void register_comm_manager();
-    void setTrim(double) {}
-    double getTrim() {}
 
    private:
     double trimvalue;
