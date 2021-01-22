@@ -3,10 +3,10 @@
 #include "status_data.hpp"
 #include "robot_info.hpp"
 
-ProProtocolObject(){
+RoverRobotics::ProProtocolObject::ProProtocolObject(){
     
 }
-~ProProtocolObject(){
+RoverRobotics::ProProtocolObject::~ProProtocolObject(){
     
 }
 void RoverRobotics::ProProtocolObject::update_drivetrim(double value) {
@@ -45,10 +45,10 @@ void RoverRobotics::ProProtocolObject::translate_send_robot_info_request() {
     //TODO:
 }
 
-void RoverRobotics::ProProtocolObject:::unpack_robot_response() {
+void RoverRobotics::ProProtocolObject::unpack_robot_response() {
     //TODO: get robot response from comm manager
     //decode
 }
 
-statusData RoverRobotics::ProProtocolObject::register_state_response_cb() {
-}
+// statusData RoverRobotics::ProProtocolObject::register_state_response_cb() {
+// }
