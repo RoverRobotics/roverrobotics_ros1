@@ -17,7 +17,7 @@ CommManager::CommManager(const std::string &device, float baudRate) {
     ret_write = pthread_create(&write_Thread, NULL, &writeThread(), NULL);
     ret_read = pthread_create(&read_Thread, NULL, &readThread(), NULL);
 }
-void connect(std::string port) {
+void CommManager::connect(std::string port) {
     serial_port = open(port, O_RDWR);
     if (serial_port < 0) {
         printf("Error %i from open: %s\n", errno, strerror(errno));

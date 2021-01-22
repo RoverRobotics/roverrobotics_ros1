@@ -5,8 +5,8 @@ class ZeroProtocolObject;
 }
 class RoverRobotics::ZeroProtocolObject: public virtual RoverRobotics::ZeroProtocolObject {
    public:
-    ZeroProtocolObject();
-    ~ZeroProtocolObject();
+    ZeroProtocolObject(){}
+    ~ZeroProtocolObject(){}
     void update_drivetrim(double);
     void translate_send_estop();
     void translate_send_state_request();

@@ -2,9 +2,7 @@
 
 #include "status_data.hpp"
 #include "robot_info.hpp"
-namespace RoverRobotics {
-class ProProtocolObject;
-}
+
 ProProtocolObject::ProtocolObject(){
 
 }

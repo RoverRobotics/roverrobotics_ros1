@@ -6,8 +6,8 @@ class BaseProtocolObject;
 }
 class RoverRobotics::BaseProtocolObject {
    public:
-    virtual ProtocolObject();
-    virtual ~ProtocolObject();
+    virtual ProtocolObject() {}
+    virtual ~ProtocolObject() {}
     virtual void update_drivetrim();
     virtual void translate_send_estop();
     virtual void translate_send_speed();
