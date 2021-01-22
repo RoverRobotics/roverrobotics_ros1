@@ -8,10 +8,10 @@ This is the serial communication layer to the robot .
 #include <stdio.h>
 #include <stdlib.h>
 #include <termios.h>
-#include <time.h>
 #include <unistd.h>
 
 #include <cassert>
+#include <ctime>
 #include <iostream>
 #include <string>
 
@@ -27,7 +27,7 @@ class RoverRobotics::CommManager {
     static void *writeThread_helper(void *context);
     void *readThread(void *arg);
     void *writeThread(std::string msg);
-    void connect(const char &device);
+    void connect(char &device);
     void disconnect();
 
    private:
