@@ -1,13 +1,11 @@
 #include "protocol_pro.hpp"
 
-#include "status_data.hpp"
 #include "robot_info.hpp"
+#include "status_data.hpp"
 
-RoverRobotics::ProProtocolObject::ProProtocolObject(){
-    
+RoverRobotics::ProProtocolObject::ProProtocolObject() {
 }
-RoverRobotics::ProProtocolObject::~ProProtocolObject(){
-    
+RoverRobotics::ProProtocolObject::~ProProtocolObject() {
 }
 void RoverRobotics::ProProtocolObject::update_drivetrim(double value) {
     trimvalue = value;
@@ -38,7 +36,6 @@ void RoverRobotics::ProProtocolObject::translate_send_state_request() {
 }
 
 void RoverRobotics::ProProtocolObject::translate_send_speed(double linearx, double angularz) {
-    
 }
 
 void RoverRobotics::ProProtocolObject::translate_send_robot_info_request() {
