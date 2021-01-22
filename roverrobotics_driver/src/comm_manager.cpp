@@ -2,20 +2,20 @@
 
 void RoverRobotics::CommManager::*readThread(void *arg) {
     clock_t t;
-    std::cout << t.clock() << std::endl;
+    printf("Time %d", t.clock());
 }
 static void *readThread_helper(void *context) {
     return ((RoverRobotics::CommManager *)context)->readThread();
 }
 void RoverRobotics::CommManager::*writeThread(std::string msg) {
     clock_t t;
-    std::cout << t.clock() << std::endl;
+    printf("Time %d", t.clock());
 }
 static void *writeThread_helper(void *context) {
     return ((RoverRobotics::CommManager *)context)->writeThread();
 }
 RoverRobotics::CommManager::CommManager() {}
-RoverRobotics::CommManager::CommManager(const std::string &device, float baudRate) {
+RoverRobotics::CommManager::CommManager(const char &device, float baudRate) {
     pthread_t write_Thread;
     int ret_write;
     pthread_t read_Thread;
@@ -25,7 +25,7 @@ RoverRobotics::CommManager::CommManager(const std::string &device, float baudRat
 }
 RoverRobotics::CommManager::~CommManager() {}
 
-void RoverRobotics::CommManager::connect(const std::string &device) {
+void RoverRobotics::CommManager::connect(const char &device) {
     serial_device = open(device, O_RDWR);
     if (serial_device < 0) {
         //printf("Error %i from open: %s\n", errno, strerror(errno));

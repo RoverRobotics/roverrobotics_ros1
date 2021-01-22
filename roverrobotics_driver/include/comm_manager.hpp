@@ -21,13 +21,13 @@ class CommManager;
 class RoverRobotics::CommManager {
    public:
     CommManager();
-    CommManager(const std::string &device, float baudRate);
+    CommManager(const char &device, float baudRate);
     ~CommManager();
     static void *readThread_helper(void *context);
     static void *writeThread_helper(void *context);
     void *readThread(void *arg);
     void *writeThread(std::string msg);
-    void connect(const std::string &device);
+    void connect(const char &device);
     void disconnect();
 
    private:
