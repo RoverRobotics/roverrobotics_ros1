@@ -1,13 +1,16 @@
+#include <stdio.h>
+
 #include "protocol_base.h"
 #include "protocol_pro.h"
 #include "protocol_zero.h"
 #include "robot_info.hpp"
-#include <stdio.h>
 #include "ros/ros.h"
 #include "status_data.hpp"
 
 namespace RoverRobotics {
-class ROSWrapper {
+class ROSWrapper;
+}
+class RoverRobotics::ROSWrapper {
    private:
     //
     std::unique_ptr<BaseProtocolObject> robot_;
@@ -48,7 +51,6 @@ class ROSWrapper {
 
     callbackEstopReset(const std_msgs::Bool::ConstPtr& msg);
 }
-};  // namespace RoverRobotics
 
 RoverRobotics::ROSWrapper(ros::NodeHandle* nh) {
     estop_state = false;
@@ -103,12 +105,11 @@ RoverRobotics::ROSWrapper(ros::NodeHandle* nh) {
 }
 
 void RoverRobotics::publishRobotStatus(const ros::TimerEvent& event) {
-    if (!robot_.isConnected())
-    {
-      ROS_FATAL("Unexpectedly disconnected from serial port.");
-      robot_status_timer_.stop();
-      ros::shutdown();
-      return;
+    if (!robot_.isConnected()) {
+        ROS_FATAL("Unexpectedly disconnected from serial port.");
+        robot_status_timer_.stop();
+        ros::shutdown();
+        return;
     }
     statusData data = robot_->translate_send_robot_status_request();
     std_msgs::Int32MultiArray robot_status;
@@ -138,12 +139,11 @@ void RoverRobotics::publishRobotStatus(const ros::TimerEvent& event) {
 }
 
 void RoverRobotics::publishRobotInfo() {
-    if (!robot_.isConnected())
-    {
-      ROS_FATAL("Unexpectedly disconnected from serial port.");
-      robot_status_timer_.stop();
-      ros::shutdown();
-      return;
+    if (!robot_.isConnected()) {
+        ROS_FATAL("Unexpectedly disconnected from serial port.");
+        robot_status_timer_.stop();
+        ros::shutdown();
+        return;
     }
     robotInfo data = robot_->translate_send_robot_info_request();
     std_msgs::Int32MultiArray robot_info;
