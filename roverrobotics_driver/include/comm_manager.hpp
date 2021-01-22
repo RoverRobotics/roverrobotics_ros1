@@ -10,7 +10,7 @@ This is the serial communication layer to the robot .
 #include <termios.h>
 #include <time.h>
 #include <unistd.h>
-
+#include <iostream> 
 #include <cassert>
 #include <string>
 
