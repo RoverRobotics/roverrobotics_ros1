@@ -17,5 +17,11 @@ struct statusData {
     float motor2_temp;
     float motor3_temp;
     float motor4_temp;
-    float sys_power;
+    float battery_voltage;
+    float power;
+    float charge_status;
+    float mos1_temp;
+    float mos2_temp;
+    float mos3_temp;
+    float mos4_temp;
 };

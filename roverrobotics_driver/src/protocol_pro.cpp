@@ -1,7 +1,7 @@
 #include "protocol_pro.h"
 
-#include "status_data.hpp"
 #include "robot_info.hpp"
+#include "status_data.hpp"
 namespace RoverRobotics {
 
 void update_drivetrim(double value) {
@@ -33,7 +33,6 @@ void translate_send_state_request() {
 }
 
 void translate_send_speed(double linearx, double angularz) {
-    
 }
 
 void translate_send_robot_info_request() {
