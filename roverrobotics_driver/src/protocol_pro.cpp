@@ -6,7 +6,7 @@ namespace RoverRobotics {
 class ProProtocolObject;
 }
 void update_drivetrim(double value) {
-    setTrim(value);
+    trimvalue = value;
 }
 void translate_send_estop() {
     // const int MOTOR_NEUTRAL = 125;

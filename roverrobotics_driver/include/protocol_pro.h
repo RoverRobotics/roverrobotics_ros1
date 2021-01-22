@@ -1,4 +1,5 @@
 #include "protocol_base.h"
+#include "comm_manager.h"
 
 namespace RoverRobotics {
 class ProProtocolObject;
