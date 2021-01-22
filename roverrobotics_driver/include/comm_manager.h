@@ -11,7 +11,7 @@ This is the serial communication layer to the robot .
 #include <termios.h>
 #include <unistd.h>
 #include <time.h>
-#include <string.h>
+#include <string>
 #include <cassert>
 namespace RoverRobotics {
 class CommManager;
