@@ -19,6 +19,7 @@ class CommManager;
 }
 class RoverRobotics::CommManager {
    public:
+    CommManager();
     CommManager(const std::string &device, float baudRate);
     ~CommManager();
     void *readThread(void *arg);

@@ -9,7 +9,7 @@ void RoverRobotics::CommManager::*writeThread(std::string msg) {
     clock_t t;
     std::cout << t.clock() << std::endl;
 }
-}
+RoverRobotics::CommManager::CommManager(){}
 RoverRobotics::CommManager::CommManager(const std::string &device, float baudRate) {
     pthread_t write_Thread;
     int ret_write;
