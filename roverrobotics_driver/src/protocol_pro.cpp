@@ -3,14 +3,14 @@
 #include "status_data.hpp"
 #include "robot_info.hpp"
 
-ProtocolObject(){
-
+ProProtocolObject(){
+    
 }
-~ProtocolObject(){
+~ProProtocolObject(){
     
 }
 void update_drivetrim(double value) {
-    trimvalue = value;
+    RoverRobotics::ProProtocolObject::trimvalue = value;
 }
 void translate_send_estop() {
     // const int MOTOR_NEUTRAL = 125;
