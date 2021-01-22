@@ -15,8 +15,8 @@ RoverRobotics::CommManager::CommManager(const std::string &device, float baudRat
     int ret_write;
     pthread_t read_Thread;
     int ret_read;
-    ret_write = pthread_create(&write_Thread, NULL, &writeThread(), NULL);
-    ret_read = pthread_create(&read_Thread, NULL, &readThread(), NULL);
+    ret_write = pthread_create(&write_Thread, NULL, &RoverRobotics::CommManager::writeThread(), NULL);
+    ret_read = pthread_create(&read_Thread, NULL, &RoverRobotics::CommManager::readThread(), NULL);
 }
 RoverRobotics::CommManager::~CommManager() {}
 void RoverRobotics::CommManager::connect(std::string port) {
