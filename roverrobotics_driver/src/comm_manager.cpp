@@ -9,7 +9,7 @@ void CommManager::*writeThread(std::string msg) {
    std::cout << clock_t.clock() << std::endl;
 }
 }
-CommManager::CommManager(const std::string &device, BaudRate baudRate) {
+CommManager::CommManager(const std::string &device, float baudRate) {
     pthread_t write_Thread;
     int ret_write;
     pthread_t read_Thread;

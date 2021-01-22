@@ -1,4 +1,4 @@
-#include "protocol_base.h"
+#include "protocol_base.hpp"
 
 namespace RoverRobotics {
 class ProProtocolObject;

@@ -1,5 +1,5 @@
 #include <boost/bind.hpp>
-#include "comm_manager.h"
+#include "comm_manager.hpp"
 namespace RoverRobotics {
     class BaseProtocolObject;
 }
