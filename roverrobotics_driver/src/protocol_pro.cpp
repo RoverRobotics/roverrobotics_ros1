@@ -9,10 +9,10 @@ ProProtocolObject(){
 ~ProProtocolObject(){
     
 }
-void update_drivetrim(double value) {
-    RoverRobotics::ProProtocolObject::trimvalue = value;
+void RoverRobotics::ProProtocolObject::update_drivetrim(double value) {
+    trimvalue = value;
 }
-void translate_send_estop() {
+void RoverRobotics::ProProtocolObject::translate_send_estop() {
     // const int MOTOR_NEUTRAL = 125;
     // unsigned char write_buffer[SERIAL_OUT_PACKAGE_LENGTH];
     // write_buffer[0] = SERIAL_START_BYTE;
@@ -24,7 +24,7 @@ void translate_send_estop() {
     // // Calculate Checksum
     // write_buffer[6] = (char)255 - (write_buffer[1] + write_buffer[2] + write_buffer[3] + write_buffer[4] + write_buffer[5]) % 255;
 }
-void translate_send_state_request() {
+void RoverRobotics::ProProtocolObject::translate_send_state_request() {
     // //TODO: DOUBLE CHECK
     // unsigned char write_buffer[SERIAL_OUT_PACKAGE_LENGTH];
     // write_buffer[0] = SERIAL_START_BYTE;
@@ -37,18 +37,18 @@ void translate_send_state_request() {
     // write_buffer[6] = (char)255 - (write_buffer[1] + write_buffer[2] + write_buffer[3] + write_buffer[4] + write_buffer[5]) % 255;
 }
 
-void translate_send_speed(double linearx, double angularz) {
+void RoverRobotics::ProProtocolObject::translate_send_speed(double linearx, double angularz) {
     
 }
 
-void translate_send_robot_info_request() {
+void RoverRobotics::ProProtocolObject::translate_send_robot_info_request() {
     //TODO:
 }
 
-void unpack_robot_response() {
+void RoverRobotics::ProProtocolObject:::unpack_robot_response() {
     //TODO: get robot response from comm manager
     //decode
 }
 
-statusData register_state_response_cb() {
+statusData RoverRobotics::ProProtocolObject::register_state_response_cb() {
 }

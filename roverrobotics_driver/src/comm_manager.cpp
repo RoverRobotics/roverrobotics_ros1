@@ -1,12 +1,13 @@
 #include "comm_manager.hpp"
 
 void *readThread(void *arg) {
-    clock_t
-    std::cout << clock_t.clock() << std::endl;
+    clock_t t;
+    std::cout << t.clock() << std::endl;
 }
 
 void *writeThread(std::string msg) {
-   std::cout << clock_t.clock() << std::endl;
+    clock_t t;
+   std::cout << t.clock() << std::endl;
 }
 }
 CommManager(const std::string &device, float baudRate) {
