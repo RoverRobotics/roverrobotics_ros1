@@ -3,10 +3,10 @@
 namespace RoverRobotics {
 class ProProtocolObject;
 }
-class RoverRobotics::ProProtocolObject public virtual RoverRobotics::BaseProtocolObject {
+class RoverRobotics::ProProtocolObject: public virtual RoverRobotics::BaseProtocolObject {
    public:
-    ProProtocolObject();
-    ~ProProtocolObject();
+    ProtocolObject();
+    ~ProtocolObject();
     void update_drivetrim(double);
     void translate_send_estop();
     void translate_send_state_request();
