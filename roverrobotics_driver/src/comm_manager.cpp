@@ -1,4 +1,4 @@
-#include "comm_manager.h"
+#include "comm_manager.hpp"
 
 void CommManager::*readThread(void *arg) {
     clock_t
