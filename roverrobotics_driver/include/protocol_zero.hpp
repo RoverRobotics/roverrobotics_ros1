@@ -3,7 +3,7 @@
 namespace RoverRobotics {
 class ZeroProtocolObject;
 }
-class RoverRobotics::ZeroProtocolObject: public virtual RoverRobotics::ZeroProtocolObject {
+class RoverRobotics::ZeroProtocolObject: public RoverRobotics::ZeroProtocolObject {
    public:
     ZeroProtocolObject(){}
     ~ZeroProtocolObject(){}

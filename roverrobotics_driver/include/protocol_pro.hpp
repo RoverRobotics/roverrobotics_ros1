@@ -3,7 +3,7 @@
 namespace RoverRobotics {
 class ProProtocolObject;
 }
-class RoverRobotics::ProProtocolObject: public virtual RoverRobotics::BaseProtocolObject {
+class RoverRobotics::ProProtocolObject: public RoverRobotics::BaseProtocolObject {
    public:
     ProtocolObject(){}
     ~ProtocolObject(){}

@@ -23,4 +23,4 @@ class RoverRobotics::BaseProtocolObject {
     CommManager comm_manager;
     // mutex comm_manager_mutex;
     void (*state_response_cb_function)();
-}
+};
