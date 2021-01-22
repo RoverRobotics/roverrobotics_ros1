@@ -1,5 +1,4 @@
 #include "protocol_base.h"
-#include "comm_manager.h"
 
 namespace RoverRobotics {
 class ProProtocolObject;
@@ -7,6 +6,7 @@ class ProProtocolObject;
 class RoverRobotics::ProProtocolObject public virtual RoverRobotics::BaseProtocolObject {
    public:
     ProProtocolObject();
+    ~ProProtocolObject();
     void update_drivetrim(double);
     void translate_send_estop();
     void translate_send_state_request();
@@ -19,7 +19,7 @@ class RoverRobotics::ProProtocolObject public virtual RoverRobotics::BaseProtoco
 
    private:
     double trimvalue;
-    comm_manager_t comm_manager;
-    mutex comm_manager_mutex;
+    CommManager comm_manager;
+    // mutex comm_manager_mutex;
     void (*state_response_cb_function)();
 };
