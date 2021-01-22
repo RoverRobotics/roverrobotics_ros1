@@ -27,7 +27,7 @@ class RoverRobotics::CommManager {
     static void *writeThread_helper(void *context);
     void *readThread(void *arg);
     void *writeThread(std::string msg);
-    void connect(std::string);
+    void connect(const std::string &device);
     void disconnect();
 
    private:
