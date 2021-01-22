@@ -7,7 +7,7 @@ void *readThread(void *arg) {
 
 void *writeThread(std::string msg) {
     clock_t t;
-   std::cout << t.clock() << std::endl;
+    std::cout << t.clock() << std::endl;
 }
 }
 CommManager(const std::string &device, float baudRate) {
