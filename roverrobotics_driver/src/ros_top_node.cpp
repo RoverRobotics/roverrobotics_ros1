@@ -1,8 +1,8 @@
 #include <stdio.h>
 
-#include "protocol_base.h"
-#include "protocol_pro.h"
-#include "protocol_zero.h"
+#include "protocol_base.hpp"
+#include "protocol_pro.hpp"
+#include "protocol_zero.hpp"
 #include "robot_info.hpp"
 #include "ros/ros.h"
 #include "status_data.hpp"
