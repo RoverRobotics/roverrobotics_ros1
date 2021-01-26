@@ -42,6 +42,8 @@ class RoverRobotics::ROSWrapper {
   std::string trim_topic_;
   bool estop_state;
   float trimvalue;
+  std::string device_port_;
+  std::string comm_type_;
   // Timer
   ros::Timer robot_status_timer_;
 
@@ -60,13 +62,19 @@ class RoverRobotics::ROSWrapper {
 RoverRobotics::ROSWrapper::ROSWrapper(ros::NodeHandle *nh) {
   estop_state = false;
   // robot type check; if fail will stop this whole node.
+  if (!ros::param::get("~device_port", device_port_)) {
+    device_port_ = "/rover_zero";
+  }
+  if (!ros::param::get("~device_port", comm_type_)) {
+    comm_type_ = "can";
+  }
   if (!ros::param::get("~robot_type", robot_type_)) {
     ROS_FATAL("No Robot Type set. Shutting down ROS");
     ros::shutdown();
   } else if (robot_type == "Pro") {
-    robot_ = new ProProtocolObject;
+    robot_ = new ProProtocolObject(device_port_, comm_type);
   } else if (robot_type == "Zero") {
-    robot_ = new ZeroProtocolObject;
+    robot_ = new ZeroProtocolObject(device_port_, comm_type);
   } else {
     ROS_FATAL("Unknown Robot Type. Shutting down ROS");
     ros::shutdown();
@@ -198,7 +206,7 @@ void RoverRobotics::ROSWrapper::callbackTrim(
 int main(int argc, char **argv) {
   ros::init(argc, argv, "Rover Robotics ROS Driver");
   ros::NodeHandle nh;
-  ros::AsyncSpinner spinner(4);  // Prevent Callback bottleneck
+  ros::AsyncSpinner spinner(0);  // Prevent Callback bottleneck
   spinner.start();
   RoverRobotics::ROSWrapper robot(&nh);
   ROS_INFO("Robot driver is started");

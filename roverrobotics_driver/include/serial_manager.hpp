@@ -5,7 +5,7 @@ class SerialManager;
 }
 class RoverRobotics::SerialManager : public RoverRobotics::CommManager {
  public:
-  SerialManager(std::string device, int baud);
+  SerialManager(const char*);
   ~SerialManager();
   void writetodevice(const char*);
   char* readfromdevice();
