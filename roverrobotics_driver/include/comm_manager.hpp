@@ -21,10 +21,12 @@ class CommManager;
 class RoverRobotics::CommManager {
  public:
   CommManager();
-  ~CommManager();
-  virtual void writetodevice(const char *);
+  virtual ~CommManager();
+  virtual void writetodevice(const char*);
   virtual char* readfromdevice();
+
  private:
-//   char read_buf[256];  // size ? 
-//   int serial_port;
+  std::unique_ptr<CommManager> comm_manager;
+  //   char read_buf[256];  // size ?
+  //   int serial_port;
 };

@@ -7,7 +7,7 @@ class BaseProtocolObject;
 class RoverRobotics::BaseProtocolObject {
    public:
     BaseProtocolObject();
-    ~BaseProtocolObject();
+    virtual ~BaseProtocolObject();
     virtual void update_drivetrim();
     virtual void translate_send_estop();
     virtual void translate_send_speed();
@@ -20,7 +20,7 @@ class RoverRobotics::BaseProtocolObject {
 
    private:
     double trimvalue;
-    CommManager comm_manager;
+    std::unique_ptr<CommManager> comm_manager;
     // mutex comm_manager_mutex;
     void (*state_response_cb_function)();
 };
