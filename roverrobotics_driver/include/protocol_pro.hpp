@@ -5,7 +5,7 @@ class ProProtocolObject;
 }
 class RoverRobotics::ProProtocolObject: public RoverRobotics::BaseProtocolObject {
    public:
-    ProProtocolObject();
+    ProProtocolObject(std::string device, std::string new_comm_type);
     ~ProProtocolObject();
     void update_drivetrim(double);
     void translate_send_estop();
@@ -20,6 +20,7 @@ class RoverRobotics::ProProtocolObject: public RoverRobotics::BaseProtocolObject
    private:
     double trimvalue;
     CommManager comm_manager;
+    std::string comm_type;
     // mutex comm_manager_mutex;
     void (*state_response_cb_function)();
 };
