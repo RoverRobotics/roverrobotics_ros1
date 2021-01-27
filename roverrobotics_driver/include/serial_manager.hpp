@@ -6,7 +6,7 @@ class SerialManager;
 class RoverRobotics::SerialManager : public RoverRobotics::CommManager {
  public:
   SerialManager(const char*);
-  ~SerialManager() override;
+  ~SerialManager();
   void writetodevice(const char*);
   char* readfromdevice();
  private:

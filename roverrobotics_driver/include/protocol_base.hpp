@@ -20,7 +20,7 @@ class RoverRobotics::BaseProtocolObject {
 
    private:
     double trimvalue;
-    std::unique_ptr<CommManager> comm_manager;
+    // std::unique_ptr<CommManager> comm_manager;
     // mutex comm_manager_mutex;
     void (*state_response_cb_function)();
 };

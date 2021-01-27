@@ -5,7 +5,7 @@ class CanManager;
 }
 class RoverRobotics::CanManager : public RoverRobotics::CommManager {
  public:
-  CanManager(std::string device);
+  CanManager(const char* device);
   ~CanManager() override;
   void writetodevice(const char*);
   char* readfromdevice();
