@@ -1,4 +1,4 @@
-
+#pragma once
 /*
 This is the serial communication layer to the robot .
 */
@@ -16,16 +16,12 @@ This is the serial communication layer to the robot .
 #include <string>
 
 namespace RoverRobotics {
-class CommManager;
+class CommBase;
 }
-class RoverRobotics::CommManager {
- private:
-  // std::unique_ptr<CommManager> comm_manager;
-  //   char read_buf[256];  // size ?
-  //   int serial_port;
+class RoverRobotics::CommBase {
  public:
-  CommManager();
-  ~CommManager();
-  virtual void writetodevice(const char*);
-  virtual char* readfromdevice();
+  CommBase();
+  virtual ~CommBase() = 0;
+  virtual void writetodevice(unsigned char*) = 0;
+  virtual char* readfromdevice() = 0;
 };

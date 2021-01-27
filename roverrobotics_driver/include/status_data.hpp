@@ -1,4 +1,4 @@
-
+#pragma once
 struct statusData {
     unsigned long long int time;
     int motor1_id;

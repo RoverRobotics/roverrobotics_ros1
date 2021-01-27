@@ -1,8 +1,8 @@
 
-#include "serial_manager.hpp"
+#include "comm_serial.hpp"
 
 namespace RoverRobotics {
-SerialManager::SerialManager(const char* device) {
+CommSerial::CommSerial(const char* device) {
   // open serial port at specified port
   serial_port = open(device, 02);
 
@@ -47,13 +47,13 @@ SerialManager::SerialManager(const char* device) {
   }
 }
 
-SerialManager::~SerialManager() { close(serial_port); }
+CommSerial::~CommSerial() { close(serial_port); }
 
-void SerialManager::writetodevice(const char * msg) {
+void CommSerial::writetodevice(unsigned char * msg) {
   write(serial_port, msg, sizeof(msg));
 }
 
-char* SerialManager::readfromdevice(){
+char* CommSerial::readfromdevice(){
       int num_bytes = read(serial_port, &read_buf, sizeof(read_buf));
       return read_buf;
 }

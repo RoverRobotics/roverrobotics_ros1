@@ -42,7 +42,7 @@ public:
   void robotDataSlowCB(const ros::WallTimerEvent& e);
   void timeoutCB(const ros::WallTimerEvent& e);
 
-  void serialManager();
+  void CommSerial();
 
   bool publish_fast_rate_values_;
   bool publish_med_rate_values_;

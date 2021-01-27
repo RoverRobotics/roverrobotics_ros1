@@ -687,7 +687,7 @@ void OpenRover::publishMotorSpeeds()
   return;
 }
 
-void OpenRover::serialManager()
+void OpenRover::CommSerial()
 {  // sends serial commands stored in the 3 buffers in order of speed with fast getting highest priority
   unsigned char param1;
   unsigned char param2;
@@ -1174,7 +1174,7 @@ int main(int argc, char* argv[])
     {
       ros::spinOnce();
       // Process Serial Buffers
-      openrover.serialManager();
+      openrover.CommSerial();
       loop_rate.sleep();  // sleeping greatly reduces CPU
     }
     catch (std::string s)

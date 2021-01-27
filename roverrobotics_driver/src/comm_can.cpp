@@ -1,12 +1,12 @@
 
-#include "can_manager.hpp"
+#include "comm_can.hpp"
 
 namespace RoverRobotics {
 CanManager::CanManager(const char* device) {}
 
 CanManager::~CanManager() { close(serial_port); }
 
-void CanManager::writetodevice(const char* msg) {
+void CanManager::writetodevice(unsigned char* msg) {
   write(serial_port, msg, sizeof(msg));
 }
 

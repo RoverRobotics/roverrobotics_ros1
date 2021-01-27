@@ -1,29 +1,26 @@
 #include "protocol_pro.hpp"
 
-#include "can_manager.hpp"
-#include "comm_manager.hpp"
-#include "robot_info.hpp"
-#include "serial_manager.hpp"
-#include "status_data.hpp"
+
 namespace RoverRobotics {
-RoverRobotics::ProProtocolObject::ProProtocolObject(const char* device,
+ProProtocolObject::ProProtocolObject(const char* device,
                                      std::string new_comm_type) {
-  //std::unique_ptr<CommManager> comm_manager;
   comm_type = new_comm_type;
-  if (comm_type == "serial") {
-    // comm_manager = new SerialManager(device); //bugged
-    comm_manager = std::make_unique<SerialManager>(device);
-  } else if (comm_type == "can") {
-    comm_manager = std::make_unique<CanManager>(device);
-  }
-  comm_manager = new SerialManager(device);
+  // if (comm_type == "serial") {
+  //   // comm_base = new CommSerial(device); //bugged
+  //   comm_base = std::make_unique<CommSerial>(device);
+  // } else if (comm_type == "can") {
+  //   comm_base = std::make_unique<CanManager>(device);
+  // }
+  // comm_base = new CommSerial(device); //THIS SHOULD"VE work
+  // comm_base.reset(new CommSerial(device));
+  // comm_base = std::make_unique<CommSerial>(device);
+  comm_base = std::unique_ptr<CommSerial>(new CommSerial(device));
 }
 ProProtocolObject::~ProProtocolObject() {}
 void ProProtocolObject::update_drivetrim(double value) { trimvalue = value; }
 void ProProtocolObject::translate_send_estop() {
   if (comm_type == "serial") {
     const int MOTOR_NEUTRAL = 125;
-    unsigned char write_buffer[7];
     write_buffer[0] = 253;
     write_buffer[1] = (unsigned char)MOTOR_NEUTRAL;  // left motor
     write_buffer[2] = (unsigned char)MOTOR_NEUTRAL;  // right motor
@@ -36,17 +33,15 @@ void ProProtocolObject::translate_send_estop() {
         (char)255 - (write_buffer[1] + write_buffer[2] + write_buffer[3] +
                      write_buffer[4] + write_buffer[5]) %
                         255;
-    comm_manager.writetodevice(write_buffer);
+    comm_base->writetodevice(write_buffer); //BUG
   } else if (comm_type == "can") {
     return; //no CAN for rover pro yet
   } else {
     return;
   }
 }
-void ProProtocolObject::translate_send_state_request() {
+statusData ProProtocolObject::translate_send_robot_status_request() {
   //TODO: DOUBLE CHECK
-  unsigned char write_buffer[7];
-  write_buffer[0] = 253;
   // write_buffer[1] = (unsigned char)MOTOR_NEUTRAL;  // left motor
   // write_buffer[2] = (unsigned char)MOTOR_NEUTRAL;  // right motor
   // write_buffer[3] = (unsigned char)MOTOR_NEUTRAL;  // flipper
@@ -55,13 +50,16 @@ void ProProtocolObject::translate_send_state_request() {
   // Calculate Checksum
   write_buffer[6] = (char)255 - (write_buffer[1] + write_buffer[2] +
   write_buffer[3] + write_buffer[4] + write_buffer[5]) % 255;
-  comm_manager.writetodevice(write_buffer);
+  comm_base->writetodevice(write_buffer);
+  //Open a new thread for reading ?
+  comm_base->readfromdevice();
 }
 
 void ProProtocolObject::translate_send_speed(double linearx, double angularz) {}
 
-void ProProtocolObject::translate_send_robot_info_request() {
+robotInfo ProProtocolObject::translate_send_robot_info_request() {
   // TODO:
+
 }
 
 void ProProtocolObject::unpack_robot_response() {
@@ -69,6 +67,8 @@ void ProProtocolObject::unpack_robot_response() {
   // decode
 }
 
-// statusData RoverRobotics::ProProtocolObject::register_state_response_cb() {
-// }
+bool ProProtocolObject::isConnected(){
+  
+}
+
 }  // namespace RoverRobotics

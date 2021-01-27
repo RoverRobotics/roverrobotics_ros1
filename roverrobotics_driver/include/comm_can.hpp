@@ -1,13 +1,13 @@
-#include "protocol_base.hpp"
-
+#pragma once
+#include "comm_base.hpp"
 namespace RoverRobotics {
 class CanManager;
 }
-class RoverRobotics::CanManager : public RoverRobotics::CommManager {
+class RoverRobotics::CanManager: public RoverRobotics::CommBase {
  public:
   CanManager(const char* device);
-  ~CanManager() override;
-  void writetodevice(const char*);
+  ~CanManager();
+  void writetodevice(unsigned char*);
   char* readfromdevice();
 
  private:
