@@ -20,8 +20,8 @@ class CommBase;
 }
 class RoverRobotics::CommBase {
  public:
-  CommBase();
-  virtual ~CommBase() = 0;
+  CommBase() = default;
+  virtual ~CommBase() = default;
   virtual void writetodevice(unsigned char*) = 0;
   virtual char* readfromdevice() = 0;
 };

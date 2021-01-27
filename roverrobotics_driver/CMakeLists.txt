@@ -46,10 +46,8 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_library(support_lib src/protocol_base.cpp
-                         src/protocol_pro.cpp
+add_library(support_lib src/protocol_pro.cpp
                          src/protocol_zero.cpp
-                         src/comm_base.cpp
                          src/comm_serial.cpp
                          src/comm_can.cpp
                          src/utils.cpp)

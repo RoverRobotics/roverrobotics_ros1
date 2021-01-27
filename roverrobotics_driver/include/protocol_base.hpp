@@ -8,8 +8,8 @@ class BaseProtocolObject;
 }
 class RoverRobotics::BaseProtocolObject {
  public:
-  BaseProtocolObject();
-  virtual ~BaseProtocolObject() = 0;
+  BaseProtocolObject() = default;
+  virtual ~BaseProtocolObject() = default;
   virtual void update_drivetrim(double) = 0;
   virtual void translate_send_estop() = 0;
   virtual void translate_send_speed(double linearx, double angularz) = 0;

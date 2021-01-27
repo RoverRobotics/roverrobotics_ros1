@@ -1,5 +1,7 @@
 #include <stdio.h>
 
+#include <memory>
+
 #include "diagnostic_msgs/DiagnosticStatus.h"
 #include "geometry_msgs/Twist.h"
 #include "protocol_base.hpp"
@@ -76,11 +78,12 @@ RoverRobotics::ROSWrapper::ROSWrapper(ros::NodeHandle *nh) {
     ros::shutdown();
   } else if (robot_type_ == "Pro") {
     // robot_ = new ProProtocolObject(device_port_.c_str(), comm_type_);
-    robot_ = std::unique_ptr<ProProtocolObject>(
-        new ProProtocolObject(device_port_.c_str(), comm_type_));
+
+    robot_ =
+        std::make_unique<ProProtocolObject>(device_port.c_str(), comm_type_);
   } else if (robot_type_ == "Zero") {
-    robot_ = std::unique_ptr<ZeroProtocolObject>(
-        new ZeroProtocolObject(device_port_.c_str(), comm_type_));
+    robot_ =
+        std::make_unique<ZeroProtocolObject>(device_port.c_str(), comm_type_);
   } else {
     ROS_FATAL("Unknown Robot Type. Shutting down ROS");
     ros::shutdown();
@@ -133,7 +136,6 @@ RoverRobotics::ROSWrapper::ROSWrapper(ros::NodeHandle *nh) {
       nh->createTimer(ros::Duration(1.0 / robot_status_frequency),
                       &ROSWrapper::publishRobotStatus, this);
   ROS_INFO("Subscribers and Publishers are running...");
-
 }
 
 void RoverRobotics::ROSWrapper::publishRobotStatus(
@@ -198,10 +200,10 @@ void RoverRobotics::ROSWrapper::callbackSpeedCommand(
 
 void RoverRobotics::ROSWrapper::callbackInfo(
     const std_msgs::Bool::ConstPtr &msg) {
-      if(msg->data){
-        publishRobotInfo();
-      }
-    }
+  if (msg->data) {
+    publishRobotInfo();
+  }
+}
 
 void RoverRobotics::ROSWrapper::callbackEstopTrigger(
     const std_msgs::Bool::ConstPtr &msg) {
@@ -219,9 +221,7 @@ void RoverRobotics::ROSWrapper::callbackTrim(
   robot_->update_drivetrim(msg->data);
 }
 
-RoverRobotics::ROSWrapper::~ROSWrapper(){
-
-}
+RoverRobotics::ROSWrapper::~ROSWrapper() {}
 int main(int argc, char **argv) {
   ros::init(argc, argv, "Rover Robotics ROS Driver");
   ros::NodeHandle nh;
