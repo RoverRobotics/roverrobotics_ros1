@@ -11,6 +11,6 @@ class RoverRobotics::CommSerial : public RoverRobotics::CommBase {
   void writetodevice(unsigned char*);
   char* readfromdevice();
  private:
-  char read_buf[256];  // size ?
+  char read_buf[5];  // size ?
   int serial_port;
 };

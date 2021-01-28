@@ -70,7 +70,7 @@ RoverRobotics::ROSWrapper::ROSWrapper(ros::NodeHandle *nh) {
   if (!ros::param::get("~device_port", device_port_)) {
     device_port_ = "/rover_zero";
   }
-  if (!ros::param::get("~device_port", comm_type_)) {
+  if (!ros::param::get("~comm_type", comm_type_)) {
     comm_type_ = "can";
   }
   if (!ros::param::get("~robot_type", robot_type_)) {
@@ -80,10 +80,10 @@ RoverRobotics::ROSWrapper::ROSWrapper(ros::NodeHandle *nh) {
     // robot_ = new ProProtocolObject(device_port_.c_str(), comm_type_);
 
     robot_ =
-        std::make_unique<ProProtocolObject>(device_port.c_str(), comm_type_);
+        std::make_unique<ProProtocolObject>(device_port_.c_str(), comm_type_);
   } else if (robot_type_ == "Zero") {
     robot_ =
-        std::make_unique<ZeroProtocolObject>(device_port.c_str(), comm_type_);
+        std::make_unique<ZeroProtocolObject>(device_port_.c_str(), comm_type_);
   } else {
     ROS_FATAL("Unknown Robot Type. Shutting down ROS");
     ros::shutdown();
@@ -193,9 +193,17 @@ void RoverRobotics::ROSWrapper::publishRobotInfo() {
 void RoverRobotics::ROSWrapper::callbackSpeedCommand(
     const geometry_msgs::Twist &msg) {
   if (!estop_state) {
-    robot_->translate_send_speed(msg.linear.x, msg.angular.z);
-    ROS_INFO("sent %f %f to the robot", msg.linear.x, msg.angular.z);
+    double speeddata[2];
+    speeddata[0] = msg.linear.x;
+    speeddata[1] = msg.angular.z;
+    speeddata[2] = msg.angular.y;
+    robot_->translate_send_speed(speeddata);
+    ROS_INFO("sent %f %f %f to the robot", msg.linear.x, msg.angular.z, msg.angular.y);
+  }else
+  {
+    robot_->translate_send_estop();
   }
+  
 }
 
 void RoverRobotics::ROSWrapper::callbackInfo(

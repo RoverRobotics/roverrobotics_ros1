@@ -19,14 +19,17 @@ class RoverRobotics::ProProtocolObject
   void translate_send_estop() override;
   statusData translate_send_robot_status_request() override;
   robotInfo translate_send_robot_info_request() override;
-  void translate_send_speed(double, double) override;
+  void translate_send_speed(double*) override;
   void handle_unsupported_ros_message() override;
   void unpack_robot_response() override;
   bool isConnected() override;
   // void register_state_response_cb(boost::function<int(void)> _f);
-  void register_comm_base() override;
+  void register_comm_base(const char* device) override;
+  bool sendCommand(int param1, int param2);
 
  private:
+  const int MOTOR_NEUTRAL = 125;
+  int motors_speeds_[3];
   double trimvalue;
   std::unique_ptr<CommBase> comm_base;
   std::string comm_type;
