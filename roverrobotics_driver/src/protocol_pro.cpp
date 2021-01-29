@@ -21,6 +21,10 @@ void ProProtocolObject::translate_send_estop() {
 
 statusData ProProtocolObject::translate_send_robot_status_request() {
   sendCommand(10, 4);
+  output.motor1_rpm = 808;
+  // atof(read_buffer[0]); //convert char* to float from buffer
+  unpack_robot_response();
+  return output;
 }
 
 robotInfo ProProtocolObject::translate_send_robot_info_request() {
@@ -54,12 +58,13 @@ void ProProtocolObject::handle_unsupported_ros_message() {
 void ProProtocolObject::unpack_robot_response() {
   int data = 0;
   //* Placeholder; While not getting enough data
-  while (data < -1) {                     // TODO
-    printf(comm_base->readfromdevice());  // Get data
-  }
+  // while (data < -1) {                     // TODO
+    std::cout << (uint8_t*)comm_base->readfromdevice() << std::endl;  // Get data
+  // }
 }
 
 bool ProProtocolObject::isConnected() {
+  return true;
   // TODO: TBD
 }
 

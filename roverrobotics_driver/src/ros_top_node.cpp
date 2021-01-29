@@ -2,7 +2,6 @@
 
 #include <memory>
 
-#include "diagnostic_msgs/DiagnosticStatus.h"
 #include "geometry_msgs/Twist.h"
 #include "protocol_base.hpp"
 #include "protocol_pro.hpp"
@@ -67,21 +66,23 @@ class RoverRobotics::ROSWrapper {
 RoverRobotics::ROSWrapper::ROSWrapper(ros::NodeHandle *nh) {
   estop_state = false;
   // robot type check; if fail will stop this whole node.
-  if (!ros::param::get("~device_port", device_port_)) {
+  if (!ros::param::get("device_port", device_port_)) {
+    ROS_INFO("No Robot Interface Location Set, using known default");
     device_port_ = "/rover_zero";
   }
-  if (!ros::param::get("~comm_type", comm_type_)) {
+  if (!ros::param::get("comm_type", comm_type_)) {
+    ROS_INFO("No communication method set; Using default CAN");
     comm_type_ = "can";
   }
-  if (!ros::param::get("~robot_type", robot_type_)) {
-    ROS_FATAL("No Robot Type set. Shutting down ROS");
+  if (!ros::param::get("robot_type", robot_type_)) {
+    ROS_FATAL("No Robot Type set. Shutting down Driver Node");
     ros::shutdown();
-  } else if (robot_type_ == "Pro") {
+  } else if (robot_type_ == "pro") {
     // robot_ = new ProProtocolObject(device_port_.c_str(), comm_type_);
 
     robot_ =
         std::make_unique<ProProtocolObject>(device_port_.c_str(), comm_type_);
-  } else if (robot_type_ == "Zero") {
+  } else if (robot_type_ == "zero") {
     robot_ =
         std::make_unique<ZeroProtocolObject>(device_port_.c_str(), comm_type_);
   } else {
@@ -90,29 +91,29 @@ RoverRobotics::ROSWrapper::ROSWrapper(ros::NodeHandle *nh) {
   }
 
   // Check if launch files have parameters set; Otherwise use hardcoded values
-  if (!ros::param::get("~trim_topic", trim_topic_)) {
+  if (!ros::param::get("trim_topic", trim_topic_)) {
     trim_topic_ = "/trim";
   }
-  if (!ros::param::get("~speed_topic", speed_topic_)) {
+  if (!ros::param::get("speed_topic", speed_topic_)) {
     speed_topic_ = "/cmd_vel";
   }
-  if (!ros::param::get("~estop_trigger_topic", estop_trigger_topic_)) {
+  if (!ros::param::get("estop_trigger_topic", estop_trigger_topic_)) {
     estop_trigger_topic_ = "/estop_trigger";
   }
-  if (!ros::param::get("~estop_reset_topic", estop_reset_topic_)) {
+  if (!ros::param::get("estop_reset_topic", estop_reset_topic_)) {
     estop_reset_topic_ = "/estop_reset";
   }
-  if (!ros::param::get("~status_topic", robot_status_topic_)) {
-    robot_status_topic_ = "~/status";
+  if (!ros::param::get("status_topic", robot_status_topic_)) {
+    robot_status_topic_ = "/robot_status";
   }
-  if (!ros::param::get("~status_frequency", robot_status_frequency)) {
+  if (!ros::param::get("status_frequency", robot_status_frequency)) {
     robot_status_frequency = 1.00;
   }
-  if (!ros::param::get("~info_request_topic", robot_info_request_topic_)) {
+  if (!ros::param::get("info_request_topic", robot_info_request_topic_)) {
     robot_info_request_topic_ = "/robot_request_info";
   }
-  if (!ros::param::get("~info_topic", robot_info_topic_)) {
-    robot_info_topic_ = "~/robot_unique_info";
+  if (!ros::param::get("info_topic", robot_info_topic_)) {
+    robot_info_topic_ = "/robot_unique_info";
   }
   trim_command_subscriber_ =
       nh->subscribe(trim_topic_, 1, &ROSWrapper::callbackSpeedCommand, this);
@@ -131,7 +132,7 @@ RoverRobotics::ROSWrapper::ROSWrapper(ros::NodeHandle *nh) {
   // &ROSWrapper::callbackInfo, this);  //listen to user togglable inputs i.e
   // estop
   robot_status_publisher_ =
-      nh->advertise<diagnostic_msgs::DiagnosticStatus>(robot_status_topic_, 10);
+      nh->advertise<std_msgs::Int32MultiArray>(robot_status_topic_, 10);
   robot_status_timer_ =
       nh->createTimer(ros::Duration(1.0 / robot_status_frequency),
                       &ROSWrapper::publishRobotStatus, this);
@@ -169,7 +170,7 @@ void RoverRobotics::ROSWrapper::publishRobotStatus(
   robot_status.data.push_back(data.power);
   robot_status.data.push_back(data.charge_status);
   robot_status_publisher_.publish(robot_status);
-  ROS_INFO("publishing some robot info");
+  ROS_INFO("publishing some robot state");
 }
 
 void RoverRobotics::ROSWrapper::publishRobotInfo() {

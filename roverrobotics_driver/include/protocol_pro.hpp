@@ -28,6 +28,7 @@ class RoverRobotics::ProProtocolObject
   bool sendCommand(int param1, int param2);
 
  private:
+  statusData output;
   const int MOTOR_NEUTRAL = 125;
   int motors_speeds_[3];
   double trimvalue;
@@ -36,4 +37,5 @@ class RoverRobotics::ProProtocolObject
   // mutex comm_base_mutex;
   void (*state_response_cb_function)();
   unsigned char write_buffer[7];
+  char* read_buffer[7];
 };

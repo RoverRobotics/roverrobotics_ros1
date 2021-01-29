@@ -50,11 +50,19 @@ CommSerial::CommSerial(const char* device) {
 CommSerial::~CommSerial() { close(serial_port); }
 
 void CommSerial::writetodevice(unsigned char * msg) {
-  write(serial_port, msg, sizeof(msg));
+  msg[0] = 0x48; msg[1] = 0x49; msg[2] = 0x50;
+
+  write(serial_port, msg, 3);
+  for(int i=0; i<3; i++){
+    //std::cout << std::dec << 3 << std::endl;
+    std::cout << std::dec << msg[i] << " ";
+  }
+  std::cout << std::endl;
 }
 
 char* CommSerial::readfromdevice(){
       int num_bytes = read(serial_port, &read_buf, sizeof(read_buf));
+      std::cout << read_buf[0] << std::endl;
       return read_buf;
 }
 }  // namespace RoverRobotics

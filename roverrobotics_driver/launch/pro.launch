@@ -1,27 +1,26 @@
 <launch>
     <arg name="driver_node_name" default="roverrobotics_driver" />
-    <arg name="config_locks"  default="$(find rr_openrover_driver)/config/twist_mux_locks.yaml"/>
-    <arg name="config_topics" default="$(find rr_openrover_driver)/config/twist_mux_topics.yaml"/>
-
+    <arg name="config_locks" default="$(find rr_openrover_driver)/config/twist_mux_locks.yaml" />
+    <arg name="config_topics" default="$(find rr_openrover_driver)/config/twist_mux_topics.yaml" />
+    <param name="device_port" value="/dev/rover" />
+    <param name="comm_type" value="serial" />
+    <param name="robot_type" value="pro"/>
+    <param name="status_frequency" value="30"/>
+    
     <!-- RoverRobotics Ros 1 Driver -->
-    <node pkg="roverrobotics" type="ros_top_node" name="$(arg driver_node_name)" respawn="false" output="screen">
-        <param name="device_port" value="/dev/rover" />
-        <param name="comm_type" value="serial" />
-        <param name="robot_type" value="pro"/>
-    </node>
+    <node pkg="roverrobotics_driver" type="roverrobotics_driver_node" name="$(arg driver_node_name)" respawn="false" output="screen"></node>
 
     <!-- PS4 Ubuntu Driver -->
-    <include file="$(find ds4_driver)/launch/ds4_driver.launch" >
+    <include file="$(find ds4_driver)/launch/ds4_driver.launch">
         <arg name="addr" value="" />
         <arg name="use_standard_msgs" value="false" />
     </include>
 
     <!-- PS4 Mapper -->
-    <node pkg="rr_control_input_manager" type="ps4_mapper.py" name="ps4_mapper" output="screen" >
+    <!-- <node pkg="rr_control_input_manager" type="ps4_mapper.py" name="ps4_mapper" output="screen">
         <rosparam command="load" file="$(find rr_openrover_driver)/config/ps4_controller_config.yaml" />
         <param name="stamped" value="True" />
-    </node>
-
+    </node> -->
 
     <!--  Twist Mux  -->
     <node pkg="twist_mux" type="twist_mux" name="twist_mux" output="screen">
@@ -32,8 +31,8 @@
     </node>
 
     <!-- Control input manager -->
-    <node pkg="rr_control_input_manager" type="control_input_manager.py" name="rr_control_input_manager_node" output="log" >
-        <rosparam file="$(find rr_control_input_manager)/config/input_topics.yaml" command="load"/>
+    <node pkg="rr_control_input_manager" type="control_input_manager.py" name="rr_control_input_manager_node" output="log">
+        <rosparam file="$(find rr_control_input_manager)/config/input_topics.yaml" command="load" />
     </node>
 
 </launch>
