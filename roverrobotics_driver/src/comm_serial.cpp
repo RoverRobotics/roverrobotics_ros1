@@ -57,20 +57,22 @@ void CommSerial::writetodevice(unsigned char *msg) {
   // msg[1] = 0x49;
   // msg[2] = 0x50;
 
-  write(serial_port, msg, 3);
-  for (int i = 0; i < 3; i++) {
-    //   // std::cout << std::dec << 3 << std::endl;
-    std::cout << std::dec << msg[i] << " ";
-  }
-  std::cout << std::endl;
+  write(serial_port, msg, sizeof(msg));
 }
 
 void CommSerial::readfromdevice(std::function<void(char *)> parsefunction) {
   while (true) {
     readmutex.lock();
     int num_bytes = read(serial_port, &read_buf, sizeof(read_buf));
-    std::cout << read_buf[0] << std::endl;
+    // std::cout << read_buf[0] << std::endl;
+    std::cerr << "From Robot";
+    for (int i = 0; i < sizeof(read_buf); i++) {
+      std::cerr << std::hex << int(read_buf[i]) << " " <<std::endl;
+      std::cerr << std::dec << int(read_buf[i]) << " " <<std::endl;
+    }
+    std::cout << std::endl;
     parsefunction(read_buf);
+
     readmutex.unlock();
   }
   // return read_buf;

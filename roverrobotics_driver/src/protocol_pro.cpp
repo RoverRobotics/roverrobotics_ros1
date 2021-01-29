@@ -6,6 +6,7 @@ ProProtocolObject::ProProtocolObject(const char* device,
                                      std::string new_comm_type) {
   comm_type = new_comm_type;
   register_comm_base(device);
+  translate_send_estop();
 }
 
 ProProtocolObject::~ProProtocolObject() {
@@ -19,7 +20,7 @@ void ProProtocolObject::translate_send_estop() {
   motors_speeds_[0] = MOTOR_NEUTRAL;
   motors_speeds_[1] = MOTOR_NEUTRAL;
   motors_speeds_[2] = MOTOR_NEUTRAL;
-  writemutex.lock();
+  writemutex.unlock();
 }
 
 statusData ProProtocolObject::translate_send_robot_status_request() {
@@ -104,6 +105,12 @@ bool ProProtocolObject::sendCommand(int param1, int param2) {
                      write_buffer[4] + write_buffer[5]) %
                         255;
     comm_base->writetodevice(write_buffer);
+    std::cerr << "To Robot";
+    for (int i = 0; i < sizeof(write_buffer); i++) {
+      std::cerr <<  std::hex <<int(write_buffer[i]) << " "<<std::endl;;
+      std::cerr <<  std::dec <<int(write_buffer[i]) << " "<<std::endl;;
+    }
+    std::cout << std::endl;
     writemutex.unlock();
   } else if (comm_type == "can") {
     return false;  //* no CAN for rover pro yet
