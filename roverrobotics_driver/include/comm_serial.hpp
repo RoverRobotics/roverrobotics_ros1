@@ -12,6 +12,7 @@ class RoverRobotics::CommSerial : public RoverRobotics::CommBase {
   void writetodevice(unsigned char*);
   void readfromdevice(std::function<void(char *)>);
  private:
+  std::mutex writemutex;
   std::mutex readmutex;
   char read_buf[5];  // size ?
   int serial_port;

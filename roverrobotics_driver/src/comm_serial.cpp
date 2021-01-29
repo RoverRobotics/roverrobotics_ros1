@@ -53,11 +53,9 @@ CommSerial::CommSerial(const char *device,
 CommSerial::~CommSerial() { close(serial_port); }
 
 void CommSerial::writetodevice(unsigned char *msg) {
-  // msg[0] = 0x48;
-  // msg[1] = 0x49;
-  // msg[2] = 0x50;
-
+  writemutex.lock(); //Over Protective 
   write(serial_port, msg, sizeof(msg));
+  writemutex.unlock(); 
 }
 
 void CommSerial::readfromdevice(std::function<void(char *)> parsefunction) {
