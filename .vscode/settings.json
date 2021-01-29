@@ -74,7 +74,9 @@
         "optional": "cpp",
         "random": "cpp",
         "set": "cpp",
-        "string_view": "cpp"
+        "string_view": "cpp",
+        "condition_variable": "cpp",
+        "mutex": "cpp"
     },
     "python.autoComplete.extraPaths": [
         "/home/rover/catkin_ws/devel/lib/python2.7/dist-packages",

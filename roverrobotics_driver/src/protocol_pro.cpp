@@ -1,6 +1,7 @@
 #include "protocol_pro.hpp"
 
 namespace RoverRobotics {
+
 ProProtocolObject::ProProtocolObject(const char* device,
                                      std::string new_comm_type) {
   comm_type = new_comm_type;
@@ -14,21 +15,23 @@ ProProtocolObject::~ProProtocolObject() {
 void ProProtocolObject::update_drivetrim(double value) { trimvalue = value; }
 
 void ProProtocolObject::translate_send_estop() {
+  writemutex.lock();
   motors_speeds_[0] = MOTOR_NEUTRAL;
   motors_speeds_[1] = MOTOR_NEUTRAL;
   motors_speeds_[2] = MOTOR_NEUTRAL;
+  writemutex.lock();
 }
 
 statusData ProProtocolObject::translate_send_robot_status_request() {
   sendCommand(10, 4);
   output.motor1_rpm = 808;
   // atof(read_buffer[0]); //convert char* to float from buffer
-  unpack_robot_response();
+  // unpack_robot_response();
   return output;
 }
 
 robotInfo ProProtocolObject::translate_send_robot_info_request() {
-  // TODO:
+  // !:This robot have no special Info to request
 }
 
 void ProProtocolObject::translate_send_speed(double* controlarray) {
@@ -45,9 +48,11 @@ void ProProtocolObject::translate_send_speed(double* controlarray) {
   }
 
   double diff_vel_commanded = turn_rate;
+  writemutex.lock();
   motors_speeds_[0] = linear_rate - 0.5 * diff_vel_commanded;
   motors_speeds_[1] = linear_rate + 0.5 * diff_vel_commanded;
   motors_speeds_[2] = controlarray[2];
+  writemutex.unlock();
   sendCommand(10, 4);
 }
 
@@ -55,11 +60,14 @@ void ProProtocolObject::handle_unsupported_ros_message() {
   // TODO: TBD
 }
 
-void ProProtocolObject::unpack_robot_response() {
+void ProProtocolObject::unpack_robot_response(char* a) {
   int data = 0;
+
+  std::cout << a;
   //* Placeholder; While not getting enough data
   // while (data < -1) {                     // TODO
-    std::cout << (uint8_t*)comm_base->readfromdevice() << std::endl;  // Get data
+  // std::cout << (uint8_t*)comm_base->readfromdevice() << std::endl;  // Get
+  // data
   // }
 }
 
@@ -70,15 +78,20 @@ bool ProProtocolObject::isConnected() {
 
 void ProProtocolObject::register_comm_base(const char* device) {
   if (comm_type == "serial") {
-    comm_base = std::make_unique<CommSerial>(device);
+    comm_base = std::make_unique<CommSerial>(
+        device, [this](char* c) { unpack_robot_response(c); });
+    // comm_base = std::make_unique<CommSerial>(device,unpack_robot_response);
   } else if (comm_type == "can") {
-    comm_base = std::make_unique<CanManager>(device);
+    comm_base = std::make_unique<CommCan>(
+        device, [this](char* c) { unpack_robot_response(c); });
+    // comm_base = std::make_unique<CommCan>(device,unpack_robot_response);
   }
 }
 
 bool ProProtocolObject::sendCommand(int param1, int param2) {
   // Param 1: 10 to get data, 240 for low speed mode
   if (comm_type == "serial") {
+    writemutex.lock();
     write_buffer[0] = 253;
     write_buffer[1] = (unsigned char)motors_speeds_[0];  // left motor
     write_buffer[2] = (unsigned char)motors_speeds_[1];  // right motor
@@ -91,6 +104,7 @@ bool ProProtocolObject::sendCommand(int param1, int param2) {
                      write_buffer[4] + write_buffer[5]) %
                         255;
     comm_base->writetodevice(write_buffer);
+    writemutex.unlock();
   } else if (comm_type == "can") {
     return false;  //* no CAN for rover pro yet
   } else {         //! How did you get here?

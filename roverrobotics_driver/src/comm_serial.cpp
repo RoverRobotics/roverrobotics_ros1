@@ -2,13 +2,14 @@
 #include "comm_serial.hpp"
 
 namespace RoverRobotics {
-CommSerial::CommSerial(const char* device) {
+CommSerial::CommSerial(const char *device,
+                       std::function<void(char *)> parsefunction) {
   // open serial port at specified port
   serial_port = open(device, 02);
 
   struct termios tty;
   if (tcgetattr(serial_port, &tty) != 0) {
-    printf("Error %i from tcgetattr: %s\n", errno);
+    printf("Error %i from tcgetattr: \n", errno);
     return;
   }
   tty.c_cflag &= ~PARENB;  // Clear parity bit, disabling parity (most common)
@@ -45,24 +46,33 @@ CommSerial::CommSerial(const char* device) {
   if (tcsetattr(serial_port, TCSANOW, &tty) != 0) {
     printf("Error %i from tcsetattr: \n", errno);
   }
+  readthread = std::thread(
+      [this, parsefunction]() { this->readfromdevice(parsefunction); });
 }
 
 CommSerial::~CommSerial() { close(serial_port); }
 
-void CommSerial::writetodevice(unsigned char * msg) {
-  msg[0] = 0x48; msg[1] = 0x49; msg[2] = 0x50;
+void CommSerial::writetodevice(unsigned char *msg) {
+  // msg[0] = 0x48;
+  // msg[1] = 0x49;
+  // msg[2] = 0x50;
 
   write(serial_port, msg, 3);
-  for(int i=0; i<3; i++){
-    //std::cout << std::dec << 3 << std::endl;
+  for (int i = 0; i < 3; i++) {
+    //   // std::cout << std::dec << 3 << std::endl;
     std::cout << std::dec << msg[i] << " ";
   }
   std::cout << std::endl;
 }
 
-char* CommSerial::readfromdevice(){
-      int num_bytes = read(serial_port, &read_buf, sizeof(read_buf));
-      std::cout << read_buf[0] << std::endl;
-      return read_buf;
+void CommSerial::readfromdevice(std::function<void(char *)> parsefunction) {
+  while (true) {
+    readmutex.lock();
+    int num_bytes = read(serial_port, &read_buf, sizeof(read_buf));
+    std::cout << read_buf[0] << std::endl;
+    parsefunction(read_buf);
+    readmutex.unlock();
+  }
+  // return read_buf;
 }
 }  // namespace RoverRobotics

@@ -1,6 +1,8 @@
 #pragma once
 #include <stdio.h>
 
+#include <mutex>
+
 #include "comm_base.hpp"
 #include "comm_can.hpp"
 #include "comm_serial.hpp"
@@ -21,21 +23,28 @@ class RoverRobotics::ProProtocolObject
   robotInfo translate_send_robot_info_request() override;
   void translate_send_speed(double*) override;
   void handle_unsupported_ros_message() override;
-  void unpack_robot_response() override;
+  void unpack_robot_response(char *) override;
   bool isConnected() override;
   // void register_state_response_cb(boost::function<int(void)> _f);
   void register_comm_base(const char* device) override;
   bool sendCommand(int param1, int param2);
 
  private:
-  statusData output;
+  
   const int MOTOR_NEUTRAL = 125;
-  int motors_speeds_[3];
-  double trimvalue;
   std::unique_ptr<CommBase> comm_base;
   std::string comm_type;
-  // mutex comm_base_mutex;
-  void (*state_response_cb_function)();
+
+  std::mutex writemutex;
+  statusData output;
+  int motors_speeds_[3];
+  double trimvalue;
   unsigned char write_buffer[7];
   char* read_buffer[7];
-};
+
+
+  // mutex comm_base_mutex;
+  void (*state_response_cb_function)();
+
+  };
+  

@@ -1,14 +1,14 @@
 #pragma once
 #include "comm_base.hpp"
 namespace RoverRobotics {
-class CanManager;
+class CommCan;
 }
-class RoverRobotics::CanManager: public RoverRobotics::CommBase {
+class RoverRobotics::CommCan: public RoverRobotics::CommBase {
  public:
-  CanManager(const char* device);
-  ~CanManager();
+  CommCan(const char* device,std::function<void(char *)>);
+  ~CommCan();
   void writetodevice(unsigned char*);
-  char* readfromdevice();
+  void readfromdevice(std::function<void(char *)>);
 
  private:
   char read_buf[256];  // size ?

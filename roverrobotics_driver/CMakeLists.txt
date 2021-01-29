@@ -51,6 +51,7 @@ add_library(support_lib src/protocol_pro.cpp
                          src/protocol_base.cpp
                          src/comm_serial.cpp
                          src/comm_can.cpp
+                         src/comm_base.cpp
                          src/utils.cpp)
 
 add_executable(roverrobotics_driver_node src/ros_top_node.cpp)

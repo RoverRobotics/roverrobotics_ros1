@@ -14,6 +14,7 @@ This is the serial communication layer to the robot .
 #include <ctime>
 #include <iostream>
 #include <string>
+#include <functional>
 
 namespace RoverRobotics {
 class CommBase;
@@ -21,7 +22,7 @@ class CommBase;
 class RoverRobotics::CommBase {
  public:
   CommBase() = default;
-  virtual ~CommBase() = default;
+  virtual ~CommBase();
   virtual void writetodevice(unsigned char*) = 0;
-  virtual char* readfromdevice() = 0;
+  virtual void readfromdevice(std::function<void(char *)>) = 0;
 };
