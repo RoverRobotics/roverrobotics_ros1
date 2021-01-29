@@ -23,7 +23,7 @@ class RoverRobotics::ProProtocolObject
   robotInfo translate_send_robot_info_request() override;
   void translate_send_speed(double*) override;
   void handle_unsupported_ros_message() override;
-  void unpack_robot_response(char *) override;
+  void unpack_robot_response(unsigned char *) override;
   bool isConnected() override;
   // void register_state_response_cb(boost::function<int(void)> _f);
   void register_comm_base(const char* device) override;

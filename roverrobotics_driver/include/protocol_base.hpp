@@ -16,7 +16,7 @@ class RoverRobotics::BaseProtocolObject {
   virtual statusData translate_send_robot_status_request() = 0;
   virtual robotInfo translate_send_robot_info_request() = 0;
   virtual void handle_unsupported_ros_message() = 0;
-  virtual void unpack_robot_response(char *) = 0;
+  virtual void unpack_robot_response(unsigned char *) = 0;
   virtual bool isConnected() = 0;
   // virtual void register_state_response_cb(boost::function<int(void)> _f);
   virtual void register_comm_base(const char* device) = 0;

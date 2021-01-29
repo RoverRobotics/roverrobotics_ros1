@@ -5,10 +5,10 @@ class CommCan;
 }
 class RoverRobotics::CommCan: public RoverRobotics::CommBase {
  public:
-  CommCan(const char* device,std::function<void(char *)>);
+  CommCan(const char* device,std::function<void(unsigned char *)>);
   ~CommCan();
   void writetodevice(unsigned char*);
-  void readfromdevice(std::function<void(char *)>);
+  void readfromdevice(std::function<void(unsigned char *)>);
 
  private:
   char read_buf[256];  // size ?

@@ -3,7 +3,7 @@
 
 namespace RoverRobotics {
 CommSerial::CommSerial(const char *device,
-                       std::function<void(char *)> parsefunction) {
+                       std::function<void(unsigned char *)> parsefunction) {
   // open serial port at specified port
   serial_port = open(device, 02);
 
@@ -58,12 +58,12 @@ void CommSerial::writetodevice(unsigned char *msg) {
   writemutex.unlock(); 
 }
 
-void CommSerial::readfromdevice(std::function<void(char *)> parsefunction) {
+void CommSerial::readfromdevice(std::function<void(unsigned char *)> parsefunction) {
   while (true) {
     readmutex.lock();
     int num_bytes = read(serial_port, &read_buf, sizeof(read_buf));
     // std::cout << read_buf[0] << std::endl;
-    std::cerr << "From Robot";
+    std::cerr << "From Robot: ";
     for (int i = 0; i < sizeof(read_buf); i++) {
       // std::cerr << std::hex << int(read_buf[i]) << " ";
       std::cerr << std::hex << int(read_buf[i]) <<" ";

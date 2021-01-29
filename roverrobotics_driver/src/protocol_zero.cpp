@@ -19,7 +19,7 @@ void ZeroProtocolObject::translate_send_speed(double*) {}
 
 void ZeroProtocolObject::handle_unsupported_ros_message() {}
 
-void ZeroProtocolObject::unpack_robot_response(char * a) {}
+void ZeroProtocolObject::unpack_robot_response(unsigned char * a) {}
 
 bool ZeroProtocolObject::isConnected() {}
 

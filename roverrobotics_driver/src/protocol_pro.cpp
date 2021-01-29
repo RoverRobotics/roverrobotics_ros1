@@ -61,15 +61,8 @@ void ProProtocolObject::handle_unsupported_ros_message() {
   // TODO: TBD
 }
 
-void ProProtocolObject::unpack_robot_response(char* a) {
-  int data = 0;
-
-  std::cout << a;
-  //* Placeholder; While not getting enough data
-  // while (data < -1) {                     // TODO
-  // std::cout << (uint8_t*)comm_base->readfromdevice() << std::endl;  // Get
-  // data
-  // }
+void ProProtocolObject::unpack_robot_response(unsigned char* a) {
+  std::cerr << "protocol received: "<< std::hex << (int)a[0] << std::endl;
 }
 
 bool ProProtocolObject::isConnected() {
@@ -80,11 +73,11 @@ bool ProProtocolObject::isConnected() {
 void ProProtocolObject::register_comm_base(const char* device) {
   if (comm_type == "serial") {
     comm_base = std::make_unique<CommSerial>(
-        device, [this](char* c) { unpack_robot_response(c); });
+        device, [this](unsigned char* c) { unpack_robot_response(c); });
     // comm_base = std::make_unique<CommSerial>(device,unpack_robot_response);
   } else if (comm_type == "can") {
     comm_base = std::make_unique<CommCan>(
-        device, [this](char* c) { unpack_robot_response(c); });
+        device, [this](unsigned char* c) { unpack_robot_response(c); });
     // comm_base = std::make_unique<CommCan>(device,unpack_robot_response);
   }
 }
@@ -105,7 +98,7 @@ bool ProProtocolObject::sendCommand(int param1, int param2) {
                      write_buffer[4] + write_buffer[5]) %
                         255;
     comm_base->writetodevice(write_buffer);
-    std::cerr << "To Robot";
+    std::cerr << "To Robot: ";
     for (int i = 0; i < sizeof(write_buffer); i++) {
       std::cerr <<  std::hex <<int(write_buffer[i]) << " ";
       // std::cerr <<  std::dec <<int(write_buffer[i]) << " ";

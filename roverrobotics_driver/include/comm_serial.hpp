@@ -7,14 +7,14 @@ class CommSerial;
 }
 class RoverRobotics::CommSerial : public RoverRobotics::CommBase {
  public:
-  CommSerial(const char* device,std::function<void(char *)>);
+  CommSerial(const char* device,std::function<void(unsigned char *)>);
   ~CommSerial();
   void writetodevice(unsigned char*);
-  void readfromdevice(std::function<void(char *)>);
+  void readfromdevice(std::function<void(unsigned char *)>);
  private:
   std::mutex writemutex;
   std::mutex readmutex;
-  char read_buf[5];  // size ?
+  unsigned char read_buf[5];  // size ?
   int serial_port;
   std::thread readthread;
 };

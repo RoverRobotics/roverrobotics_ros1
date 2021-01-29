@@ -24,5 +24,5 @@ class RoverRobotics::CommBase {
   CommBase() = default;
   virtual ~CommBase();
   virtual void writetodevice(unsigned char*) = 0;
-  virtual void readfromdevice(std::function<void(char *)>) = 0;
+  virtual void readfromdevice(std::function<void(unsigned char *)>) = 0;
 };
