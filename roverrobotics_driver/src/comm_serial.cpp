@@ -67,8 +67,8 @@ void CommSerial::readfromdevice(std::function<void(char *)> parsefunction) {
     // std::cout << read_buf[0] << std::endl;
     std::cerr << "From Robot";
     for (int i = 0; i < sizeof(read_buf); i++) {
-      std::cerr << std::hex << int(read_buf[i]) << " " <<std::endl;
-      std::cerr << std::dec << int(read_buf[i]) << " " <<std::endl;
+      // std::cerr << std::hex << int(read_buf[i]) << " ";
+      std::cerr << std::hex << int(read_buf[i]) <<" ";
     }
     std::cout << std::endl;
     parsefunction(read_buf);

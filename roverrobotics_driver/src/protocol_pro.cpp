@@ -107,8 +107,8 @@ bool ProProtocolObject::sendCommand(int param1, int param2) {
     comm_base->writetodevice(write_buffer);
     std::cerr << "To Robot";
     for (int i = 0; i < sizeof(write_buffer); i++) {
-      std::cerr <<  std::hex <<int(write_buffer[i]) << " "<<std::endl;;
-      std::cerr <<  std::dec <<int(write_buffer[i]) << " "<<std::endl;;
+      std::cerr <<  std::hex <<int(write_buffer[i]) << " ";
+      // std::cerr <<  std::dec <<int(write_buffer[i]) << " ";
     }
     std::cout << std::endl;
     writemutex.unlock();
