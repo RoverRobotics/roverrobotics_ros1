@@ -9,6 +9,7 @@
 #include "protocol_base.hpp"
 #include "robot_info.hpp"
 #include "status_data.hpp"
+#include <cmath>
 namespace RoverRobotics {
 class ProProtocolObject;
 }

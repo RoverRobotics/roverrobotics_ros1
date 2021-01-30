@@ -50,9 +50,11 @@ void ProProtocolObject::translate_send_speed(double* controlarray) {
 
   double diff_vel_commanded = turn_rate;
   writemutex.lock();
-  motors_speeds_[0] = linear_rate - 0.5 * diff_vel_commanded;
-  motors_speeds_[1] = linear_rate + 0.5 * diff_vel_commanded;
-  motors_speeds_[2] = controlarray[2];
+  motors_speeds_[0] =
+      (int)round((linear_rate - 0.5 * diff_vel_commanded) * 50 + MOTOR_NEUTRAL);
+  motors_speeds_[1] =
+      (int)round((linear_rate + 0.5 * diff_vel_commanded) * 50 + MOTOR_NEUTRAL);
+  motors_speeds_[2] = (int)round(flipper_rate + 125) % 250;
   writemutex.unlock();
   sendCommand(0, 4);
 }
