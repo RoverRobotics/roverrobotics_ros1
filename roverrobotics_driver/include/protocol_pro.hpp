@@ -36,7 +36,8 @@ class RoverRobotics::ProProtocolObject
   std::string comm_type;
 
   std::mutex writemutex;
-  statusData output;
+  statusData robotstatus_;
+  robotInfo robotinfo_;
   int motors_speeds_[3];
   double trimvalue;
   unsigned char write_buffer[7];

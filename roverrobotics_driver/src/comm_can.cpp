@@ -14,4 +14,8 @@ void CommCan::readfromdevice(std::function<void(unsigned char *)> A) {
   int num_bytes = read(serial_port, &read_buf, sizeof(read_buf));
   // return read_buf;
 }
+
+void CommCan::clearbuffer(){}
+
+bool CommCan::isConnect(){}
 }  // namespace RoverRobotics

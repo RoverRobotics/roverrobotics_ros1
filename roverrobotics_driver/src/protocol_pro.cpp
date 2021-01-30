@@ -25,10 +25,10 @@ void ProProtocolObject::translate_send_estop() {
 
 statusData ProProtocolObject::translate_send_robot_status_request() {
   sendCommand(10, 4);
-  output.motor1_rpm = 808;
+  robotstatus_.motor1_rpm = 808;
   // atof(read_buffer[0]); //convert char* to float from buffer
   // unpack_robot_response();
-  return output;
+  return robotstatus_;
 }
 
 robotInfo ProProtocolObject::translate_send_robot_info_request() {
@@ -54,7 +54,7 @@ void ProProtocolObject::translate_send_speed(double* controlarray) {
   motors_speeds_[1] = linear_rate + 0.5 * diff_vel_commanded;
   motors_speeds_[2] = controlarray[2];
   writemutex.unlock();
-  sendCommand(10, 4);
+  sendCommand(0, 4);
 }
 
 void ProProtocolObject::handle_unsupported_ros_message() {
@@ -62,7 +62,80 @@ void ProProtocolObject::handle_unsupported_ros_message() {
 }
 
 void ProProtocolObject::unpack_robot_response(unsigned char* a) {
-  std::cerr << "protocol received: "<< std::hex << (int)a[0] << std::endl;
+  if (int(a[0]) != 0xfd) {  // invalid clear and move on
+    comm_base->clearbuffer();
+  } else if (a[0] == 0xfd) {  // if valid starting
+    int b = ((a[3]) | (a[2]));
+    switch (a[1]) {
+      case 0x00:  // bat total current
+      case 0x02:  // ?
+      case 0x04:  // ?
+      case 0x06:  // motor 3 sensor 1
+      case 0x08:  // motor 3 sensor 2
+      case 0x10:  // motor 1 current
+        robotstatus_.motor1_current = b;
+        break;
+      case 0x12:  // motor 2 current
+        robotstatus_.motor2_current = b;
+        break;
+      case 0x14:  // motor 1 motor encoder count
+
+      case 0x16:  // motor 2 motor encoder count
+      case 0x18:  // motor fault
+      case 0x20:  // motor 1 motor temp
+        robotstatus_.motor1_temp = b;
+        break;
+      case 0x22:  // motor 2 motor temp
+        robotstatus_.motor2_temp = b;
+        break;
+      case 0x24:  // voltage battery a
+      case 0x26:  // voltage battery b
+      case 0x28:  // motor 1 encoder inverval
+      case 0x30:  // motor 2 encoder interval
+      case 0x32:  // motor 3 encoder interval
+      case 0x34:  // battery A %
+      case 0x36:  // battery B %
+      case 0x38:  // battery state of charge
+        robotstatus_.charge_status = b;
+        break;
+      case 0x40:  // build NO
+        robotinfo_.guid = b;
+        break;
+      case 0x42:  // battery A current
+      case 0x44:  // battery B current
+      case 0x46:  // motor 3 angle
+      case 0x48:  // system fan speed
+      case 0x50:  // speed mode
+      case 0x52:  // battery status A from BMS
+      case 0x54:  // battery status B from BMS
+      case 0x56:  // battery A flag from BMS
+      case 0x58:  // battery B flag from BMS
+      case 0x60:  // battery temp A from BMS
+      case 0x62:  // battery temp B from BMS
+      case 0x64:  // battery A voltage from BMS
+        robotstatus_.battery_voltage = b;
+        break;
+      case 0x66:  // battery B voltage from BMS
+      case 0x68:  // battery A current from BMS
+      case 0x70:  // battery B current from BMS
+
+        break;
+    }
+    // float motor1_rpm;
+    // float motor2_rpm;
+    // float motor3_rpm;
+    // float motor1_current;
+    // float motor2_current;
+    // float motor3_current;
+    // float battery_voltage;
+    // float power;
+    // std::cerr << "protocol received: " << (int)a[0] << std::endl;  // start
+    // std::cerr << "protocol received: " << (int)a[1] << std::endl;  // marker
+    // std::cerr << "protocol received: " << (int)a[2] << std::endl;  // data 1
+    // std::cerr << "protocol received: " << (int)a[3] << std::endl;  // data 2
+    // std::cerr << "protocol received: " << (int)a[4] << std::endl;  //
+    // checksum
+  }
 }
 
 bool ProProtocolObject::isConnected() {
@@ -86,7 +159,7 @@ bool ProProtocolObject::sendCommand(int param1, int param2) {
   // Param 1: 10 to get data, 240 for low speed mode
   if (comm_type == "serial") {
     writemutex.lock();
-    write_buffer[0] = 253;
+    write_buffer[0] = (unsigned char)253;
     write_buffer[1] = (unsigned char)motors_speeds_[0];  // left motor
     write_buffer[2] = (unsigned char)motors_speeds_[1];  // right motor
     write_buffer[3] = (unsigned char)motors_speeds_[2];  // flipper
@@ -100,7 +173,7 @@ bool ProProtocolObject::sendCommand(int param1, int param2) {
     comm_base->writetodevice(write_buffer);
     std::cerr << "To Robot: ";
     for (int i = 0; i < sizeof(write_buffer); i++) {
-      std::cerr <<  std::hex <<int(write_buffer[i]) << " ";
+      std::cerr << int(write_buffer[i]) << " ";
       // std::cerr <<  std::dec <<int(write_buffer[i]) << " ";
     }
     std::cout << std::endl;

@@ -53,26 +53,27 @@ CommSerial::CommSerial(const char *device,
 CommSerial::~CommSerial() { close(serial_port); }
 
 void CommSerial::writetodevice(unsigned char *msg) {
-  writemutex.lock(); //Over Protective 
+  writemutex.lock();  // Over Protective
   write(serial_port, msg, sizeof(msg));
-  writemutex.unlock(); 
+  writemutex.unlock();
 }
 
-void CommSerial::readfromdevice(std::function<void(unsigned char *)> parsefunction) {
+void CommSerial::readfromdevice(
+    std::function<void(unsigned char *)> parsefunction) {
   while (true) {
     readmutex.lock();
     int num_bytes = read(serial_port, &read_buf, sizeof(read_buf));
-    // std::cout << read_buf[0] << std::endl;
-    std::cerr << "From Robot: ";
-    for (int i = 0; i < sizeof(read_buf); i++) {
-      // std::cerr << std::hex << int(read_buf[i]) << " ";
-      std::cerr << std::hex << int(read_buf[i]) <<" ";
-    }
-    std::cout << std::endl;
     parsefunction(read_buf);
-
     readmutex.unlock();
   }
   // return read_buf;
 }
+
+void CommSerial::clearbuffer() {
+  read_buf[5] = {0};
+}
+bool CommSerial::isConnect(){
+  return (serial_port > 0);
+}
+
 }  // namespace RoverRobotics

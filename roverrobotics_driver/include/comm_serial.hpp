@@ -11,6 +11,8 @@ class RoverRobotics::CommSerial : public RoverRobotics::CommBase {
   ~CommSerial();
   void writetodevice(unsigned char*);
   void readfromdevice(std::function<void(unsigned char *)>);
+  void clearbuffer();
+  bool isConnect();
  private:
   std::mutex writemutex;
   std::mutex readmutex;
