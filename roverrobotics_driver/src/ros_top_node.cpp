@@ -171,7 +171,7 @@ void RoverRobotics::ROSWrapper::publishRobotStatus(
   robot_status.data.push_back(data.power);
   robot_status.data.push_back(data.charge_status);
   robot_status_publisher_.publish(robot_status);
-  ROS_INFO("publishing some robot state");
+  // ROS_INFO("publishing some robot state");
 }
 
 void RoverRobotics::ROSWrapper::publishRobotInfo() {
@@ -189,7 +189,7 @@ void RoverRobotics::ROSWrapper::publishRobotInfo() {
   robot_info.data.push_back(data.firmware);
 
   robot_info_publisher.publish(robot_info);
-  ROS_INFO("publishing some robot info");
+  // ROS_INFO("publishing some robot info");
 }
 // call everytime speed_topic_ get data
 void RoverRobotics::ROSWrapper::callbackSpeedCommand(
