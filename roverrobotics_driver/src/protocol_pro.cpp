@@ -1,4 +1,5 @@
 #include "protocol_pro.hpp"
+
 #include <chrono>
 
 namespace RoverRobotics {
@@ -10,7 +11,7 @@ ProProtocolObject::ProProtocolObject(const char* device,
   translate_send_estop();
   // start thread for sending command to the robot
   // writethread = std::thread th(&Task::execute, taskPtr, "Sample Task");
-  writethread = std::thread([this]() { this->sendCommand();});
+  writethread = std::thread([this]() { this->sendCommand(); });
 }
 
 ProProtocolObject::~ProProtocolObject() {
@@ -44,8 +45,9 @@ robotInfo ProProtocolObject::translate_send_robot_info_request() {
 }
 
 void ProProtocolObject::translate_send_speed(double* controlarray) {
-  double turn_rate = controlarray[1];
+  writemutex.lock();
   double linear_rate = controlarray[0];
+  double turn_rate = controlarray[1];
   double flipper_rate = controlarray[2];
   // apply trim value
   if (turn_rate == 0) {
@@ -55,9 +57,8 @@ void ProProtocolObject::translate_send_speed(double* controlarray) {
       turn_rate = -trimvalue;
     }
   }
-  std::cerr << std::hex << "updating move command" << std::endl;
   double diff_vel_commanded = turn_rate;
-  writemutex.lock();
+
   motors_speeds_[0] =
       (int)round((linear_rate - 0.5 * diff_vel_commanded) * 50 + MOTOR_NEUTRAL);
   motors_speeds_[1] =
@@ -202,7 +203,7 @@ void ProProtocolObject::sendCommand() {
         // }
         // std::cout << std::endl;
         writemutex.unlock();
-        
+
       } else if (comm_type == "can") {
         return;  //* no CAN for rover pro yet
       } else {   //! How did you get here?
