@@ -137,7 +137,7 @@ RoverRobotics::ROSWrapper::ROSWrapper(ros::NodeHandle *nh) {
       nh->createTimer(ros::Duration(1.0 / robot_status_frequency),
                       &ROSWrapper::publishRobotStatus, this);
   ROS_INFO("Subscribers and Publishers are running...");
-  ROS_INFO("ROBOT ESTOP STATE %d", estop_state );
+  ROS_INFO("ROBOT ESTOP STATE %d", estop_state);
 }
 
 void RoverRobotics::ROSWrapper::publishRobotStatus(
@@ -194,20 +194,19 @@ void RoverRobotics::ROSWrapper::publishRobotInfo() {
 // call everytime speed_topic_ get data
 void RoverRobotics::ROSWrapper::callbackSpeedCommand(
     const geometry_msgs::Twist &msg) {
-      ROS_INFO("trying to update speed");
+  ROS_INFO("trying to update speed");
   if (!estop_state) {
     double speeddata[2];
     speeddata[0] = msg.linear.x;
     speeddata[1] = msg.angular.z;
     speeddata[2] = msg.angular.y;
-    ROS_INFO("sent %f %f %f to the robot", msg.linear.x, msg.angular.z, msg.angular.y);
+    ROS_INFO("sent %f %f %f to the robot", msg.linear.x, msg.angular.z,
+             msg.angular.y);
     robot_->translate_send_speed(speeddata);
-    
-  }else
-  {
+
+  } else {
     robot_->translate_send_estop();
   }
-  
 }
 
 void RoverRobotics::ROSWrapper::callbackInfo(
