@@ -141,15 +141,15 @@ void ProProtocolObject::unpack_robot_response(unsigned char* a) {
     // float motor3_current;
     // float battery_voltage;
     // float power;
-    std::cerr << "From Robot: " << (int)a[0];  // start
-    std::cerr << " " << (int)a[1];  // marker
-    std::cerr << " " << (int)a[2];  // data 1
-    std::cerr << " " << (int)a[3];  // data 2
-    std::cerr << " " << (int)a[4];  // checksum
-    if (checksum == a[4]){
-      std::cerr << " checksum verified";
-    }
-    std::cerr << std::endl;
+    // std::cerr << "From Robot: " << (int)a[0];  // start
+    // std::cerr << " " << (int)a[1];  // marker
+    // std::cerr << " " << (int)a[2];  // data 1
+    // std::cerr << " " << (int)a[3];  // data 2
+    // std::cerr << " " << (int)a[4];  // checksum
+    // if (checksum == a[4]){
+    //   std::cerr << " checksum verified";
+    // }
+    // std::cerr << std::endl;
   }
 }
 
