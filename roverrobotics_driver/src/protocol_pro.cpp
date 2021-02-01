@@ -60,7 +60,7 @@ void ProProtocolObject::translate_send_speed(double* controlarray) {
       (int)round((linear_rate + 0.5 * diff_vel_commanded) * 50 + MOTOR_NEUTRAL);
   motors_speeds_[2] = (int)round(flipper_rate + 125) % 250;
   writemutex.unlock();
-  sendCommand(10,0);
+  sendCommand(0,0);
 }
 
 void ProProtocolObject::handle_unsupported_ros_message() {
