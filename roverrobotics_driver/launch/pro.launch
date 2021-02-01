@@ -19,7 +19,6 @@
     <!-- PS4 Mapper -->
     <node pkg="rr_control_input_manager" type="ps4_mapper.py" name="ps4_mapper" output="screen">
         <rosparam command="load" file="$(find rr_openrover_driver)/config/ps4_controller_config.yaml" />
-        <param name="stamped" value="False" />
     </node>
 
     <!--  Twist Mux  -->
