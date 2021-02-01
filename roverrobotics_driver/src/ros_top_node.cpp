@@ -44,7 +44,7 @@ class RoverRobotics::ROSWrapper {
   std::string robot_info_topic_;
   std::string robot_type_;
   std::string trim_topic_;
-  bool estop_state;
+  bool estop_state = false;
   float trimvalue;
   std::string device_port_;
   std::string comm_type_;

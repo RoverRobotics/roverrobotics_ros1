@@ -180,11 +180,11 @@ bool ProProtocolObject::sendCommand(int param1, int param2) {
                      write_buffer[4] + write_buffer[5]) %
                         255;
     comm_base->writetodevice(write_buffer);
-    std::cerr << "To Robot: ";
-    for (int i = 0; i < sizeof(write_buffer); i++) {
-      std::cerr << int(write_buffer[i]) << " ";
-      // std::cerr <<  std::dec <<int(write_buffer[i]) << " ";
-    }
+    // std::cerr << "To Robot: ";
+    // for (int i = 0; i < sizeof(write_buffer); i++) {
+    //   std::cerr << int(write_buffer[i]) << " ";
+    //   // std::cerr <<  std::dec <<int(write_buffer[i]) << " ";
+    // }
     std::cout << std::endl;
     writemutex.unlock();
   } else if (comm_type == "can") {
