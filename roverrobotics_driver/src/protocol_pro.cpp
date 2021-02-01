@@ -11,9 +11,9 @@ ProProtocolObject::ProProtocolObject(const char* device,
   slow_data = {10, 12, 20, 22, 38, 40, 64};
   register_comm_base(device);
   translate_send_estop();
-  writethread = std::thread([this]() { this->sendCommand(50, fast_data); });
+  writethread = std::thread([this, fast_data]() { this->sendCommand(50, fast_data); });
 
-  writethread = std::thread([this]() { this->sendCommand(50, slow_data); });
+  writethread2 = std::thread([this, slow_data]() { this->sendCommand(50, slow_data); });
 }
 ProProtocolObject::~ProProtocolObject() {
   // Decontructor

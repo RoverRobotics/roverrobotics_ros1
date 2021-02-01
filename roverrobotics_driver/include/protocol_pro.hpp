@@ -45,6 +45,7 @@ class RoverRobotics::ProProtocolObject
   unsigned char write_buffer[7];
   char* read_buffer[7];
   std::thread writethread;
+  std::thread writethread2;
   std::vector<int> fast_data;
   std::vector<int> slow_data;
 
