@@ -78,8 +78,6 @@ RoverRobotics::ROSWrapper::ROSWrapper(ros::NodeHandle *nh) {
     ROS_FATAL("No Robot Type set. Shutting down Driver Node");
     ros::shutdown();
   } else if (robot_type_ == "pro") {
-    // robot_ = new ProProtocolObject(device_port_.c_str(), comm_type_);
-
     robot_ =
         std::make_unique<ProProtocolObject>(device_port_.c_str(), comm_type_);
   } else if (robot_type_ == "zero") {
