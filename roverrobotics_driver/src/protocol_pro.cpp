@@ -51,7 +51,7 @@ void ProProtocolObject::translate_send_speed(double* controlarray) {
       turn_rate = -trimvalue;
     }
   }
-
+ std::cerr << "updating move command" << std::endl;
   double diff_vel_commanded = turn_rate;
   writemutex.lock();
   motors_speeds_[0] =
@@ -60,7 +60,7 @@ void ProProtocolObject::translate_send_speed(double* controlarray) {
       (int)round((linear_rate + 0.5 * diff_vel_commanded) * 50 + MOTOR_NEUTRAL);
   motors_speeds_[2] = (int)round(flipper_rate + 125) % 250;
   writemutex.unlock();
-  sendCommand(0, 4);
+  sendCommand(10,0);
 }
 
 void ProProtocolObject::handle_unsupported_ros_message() {
@@ -74,7 +74,6 @@ void ProProtocolObject::unpack_robot_response(unsigned char* a) {
     comm_base->clearbuffer();
   } else if (a[0] == 0xfd) {  // if valid starting
     checksum = 255 - (a[0] + a[1] + a[2]) % 255;
-    std::cerr << checksum << "v:" << a[4] << std::endl;
     if (checksum == a[4]) {  // verify checksum
       int b = ((a[3]) | (a[2]));
       switch (a[1]) {
@@ -142,12 +141,15 @@ void ProProtocolObject::unpack_robot_response(unsigned char* a) {
     // float motor3_current;
     // float battery_voltage;
     // float power;
-    std::cerr << "received: " << (int)a[0];  // start
+    std::cerr << "From Robot: " << (int)a[0];  // start
     std::cerr << " " << (int)a[1];  // marker
     std::cerr << " " << (int)a[2];  // data 1
     std::cerr << " " << (int)a[3];  // data 2
     std::cerr << " " << (int)a[4];  // checksum
-    std::cerr << "cal cs" << checksum << std::endl;
+    if (checksum == a[4]){
+      std::cerr << " checksum verified";
+    }
+    std::cerr << std::endl;
   }
 }
 
