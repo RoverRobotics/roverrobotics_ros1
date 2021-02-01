@@ -174,8 +174,10 @@ void ProProtocolObject::register_comm_base(const char* device) {
 
 void ProProtocolObject::sendCommand() {
   while (true) {
+    std::cerr << "To Robot: " << std::endl;
     // Param 1: 10 to get data, 240 for low speed mode
     for (int param2 = 0; param2 <= 70; param2 += 2) {
+      sleep(50);  // 20Hz
       if (comm_type == "serial") {
         writemutex.lock();
         write_buffer[0] = (unsigned char)253;
@@ -197,7 +199,7 @@ void ProProtocolObject::sendCommand() {
         // }
         // std::cout << std::endl;
         writemutex.unlock();
-        sleep(50);  // 20Hz
+        
       } else if (comm_type == "can") {
         return;  //* no CAN for rover pro yet
       } else {   //! How did you get here?
