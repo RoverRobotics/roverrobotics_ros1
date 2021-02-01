@@ -9,8 +9,8 @@ ProProtocolObject::ProProtocolObject(const char* device,
   comm_type = new_comm_type;
   register_comm_base(device);
   translate_send_estop();
-  writethread = std::thread([this]() { this->sendCommand(50,fast_data); });
-  writethread = std::thread([this]() { this->sendCommand(500,slow_data); });
+  writethread = std::thread([this]() { this->sendCommand(50, fast_data); });
+  writethread = std::thread([this]() { this->sendCommand(500, slow_data); });
 }
 
 ProProtocolObject::~ProProtocolObject() {
@@ -176,11 +176,12 @@ void ProProtocolObject::register_comm_base(const char* device) {
   }
 }
 
-void ProProtocolObject::sendCommand(int sleeptime,const int *datalist) {
+void ProProtocolObject::sendCommand(int sleeptime, std::vector<int>& datalist) {
   while (true) {
     // Param 1: 10 to get data, 240 for low speed mode
-    for (int param2 = 0; param2 <= sizeof(datalist); param2 += 2) {
-      std::this_thread::sleep_for(std::chrono::milliseconds(sleeptime));  // 20Hz
+    for (int x : datalist) {
+      std::this_thread::sleep_for(
+          std::chrono::milliseconds(sleeptime));  // 20Hz
       if (comm_type == "serial") {
         writemutex.lock();
         write_buffer[0] = (unsigned char)253;
@@ -188,7 +189,7 @@ void ProProtocolObject::sendCommand(int sleeptime,const int *datalist) {
         write_buffer[2] = (unsigned char)motors_speeds_[1];  // right motor
         write_buffer[3] = (unsigned char)motors_speeds_[2];  // flipper
         write_buffer[4] = (unsigned char)10;
-        write_buffer[5] = (unsigned char)param2;  // Param 2:
+        write_buffer[5] = (unsigned char)x;  // Param 2:
         // Calculate Checksum
         write_buffer[6] =
             (char)255 - (write_buffer[1] + write_buffer[2] + write_buffer[3] +
