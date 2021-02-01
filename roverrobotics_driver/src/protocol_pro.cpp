@@ -7,6 +7,8 @@ ProProtocolObject::ProProtocolObject(const char* device,
   comm_type = new_comm_type;
   register_comm_base(device);
   translate_send_estop();
+  // start thread for sending command to the robot
+  std::thread(this->sendCommand());
 }
 
 ProProtocolObject::~ProProtocolObject() {
@@ -24,13 +26,13 @@ void ProProtocolObject::translate_send_estop() {
 }
 
 statusData ProProtocolObject::translate_send_robot_status_request() {
-  // for (int x = 0; x <= 70; x += 2) {
-  //   sendCommand(10, x);
-  //   sleep(100);
-  // }
-  sendCommand(10,40);
-  // atof(read_buffer[0]); //convert char* to float from buffer
-  // unpack_robot_response();
+  // // for (int x = 0; x <= 70; x += 2) {
+  // //   sendCommand(10, x);
+  // //   sleep(100);
+  // // }
+  // sendCommand(10, 40);
+  // // atof(read_buffer[0]); //convert char* to float from buffer
+  // // unpack_robot_response();
   return robotstatus_;
 }
 
@@ -51,7 +53,7 @@ void ProProtocolObject::translate_send_speed(double* controlarray) {
       turn_rate = -trimvalue;
     }
   }
- std::cerr<< std::hex << "updating move command" << std::endl;
+  std::cerr << std::hex << "updating move command" << std::endl;
   double diff_vel_commanded = turn_rate;
   writemutex.lock();
   motors_speeds_[0] =
@@ -60,7 +62,7 @@ void ProProtocolObject::translate_send_speed(double* controlarray) {
       (int)round((linear_rate + 0.5 * diff_vel_commanded) * 50 + MOTOR_NEUTRAL);
   motors_speeds_[2] = (int)round(flipper_rate + 125) % 250;
   writemutex.unlock();
-  sendCommand(0,0);
+  // sendCommand(0, 0);
 }
 
 void ProProtocolObject::handle_unsupported_ros_message() {
@@ -170,33 +172,38 @@ void ProProtocolObject::register_comm_base(const char* device) {
   }
 }
 
-bool ProProtocolObject::sendCommand(int param1, int param2) {
-  // Param 1: 10 to get data, 240 for low speed mode
-  if (comm_type == "serial") {
-    writemutex.lock();
-    write_buffer[0] = (unsigned char)253;
-    write_buffer[1] = (unsigned char)motors_speeds_[0];  // left motor
-    write_buffer[2] = (unsigned char)motors_speeds_[1];  // right motor
-    write_buffer[3] = (unsigned char)motors_speeds_[2];  // flipper
-    write_buffer[4] = (unsigned char)param1;
-    write_buffer[5] = (unsigned char)param2;  // Param 2:
-    // Calculate Checksum
-    write_buffer[6] =
-        (char)255 - (write_buffer[1] + write_buffer[2] + write_buffer[3] +
-                     write_buffer[4] + write_buffer[5]) %
-                        255;
-    comm_base->writetodevice(write_buffer);
-    // std::cerr << "To Robot: ";
-    // for (int i = 0; i < sizeof(write_buffer); i++) {
-    //   std::cerr << int(write_buffer[i]) << " ";
-    //   // std::cerr <<  std::dec <<int(write_buffer[i]) << " ";
-    // }
-    // std::cout << std::endl;
-    writemutex.unlock();
-  } else if (comm_type == "can") {
-    return false;  //* no CAN for rover pro yet
-  } else {         //! How did you get here?
-    return false;  // TODO: Return error ?
+bool ProProtocolObject::sendCommand() {
+  while (true) {
+    // Param 1: 10 to get data, 240 for low speed mode
+    for (int param2 = 0; param2 <= 70; param2 += 2) {
+      if (comm_type == "serial") {
+        writemutex.lock();
+        write_buffer[0] = (unsigned char)253;
+        write_buffer[1] = (unsigned char)motors_speeds_[0];  // left motor
+        write_buffer[2] = (unsigned char)motors_speeds_[1];  // right motor
+        write_buffer[3] = (unsigned char)motors_speeds_[2];  // flipper
+        write_buffer[4] = (unsigned char)10;
+        write_buffer[5] = (unsigned char)param2;  // Param 2:
+        // Calculate Checksum
+        write_buffer[6] =
+            (char)255 - (write_buffer[1] + write_buffer[2] + write_buffer[3] +
+                         write_buffer[4] + write_buffer[5]) %
+                            255;
+        comm_base->writetodevice(write_buffer);
+        // std::cerr << "To Robot: ";
+        // for (int i = 0; i < sizeof(write_buffer); i++) {
+        //   std::cerr << int(write_buffer[i]) << " ";
+        //   // std::cerr <<  std::dec <<int(write_buffer[i]) << " ";
+        // }
+        // std::cout << std::endl;
+        writemutex.unlock();
+        sleep(50); //20Hz
+      } else if (comm_type == "can") {
+        return false;  //* no CAN for rover pro yet
+      } else {         //! How did you get here?
+        return false;  // TODO: Return error ?
+      }
+    }
   }
 }
 
