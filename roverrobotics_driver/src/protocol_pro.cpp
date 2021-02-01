@@ -24,9 +24,11 @@ void ProProtocolObject::translate_send_estop() {
 }
 
 statusData ProProtocolObject::translate_send_robot_status_request() {
-  for (int x = 0; x <= 70; x += 2) {
-    sendCommand(10, x);
-  }
+  // for (int x = 0; x <= 70; x += 2) {
+  //   sendCommand(10, x);
+  //   sleep(100);
+  // }
+  sendCommand(10,40);
   // atof(read_buffer[0]); //convert char* to float from buffer
   // unpack_robot_response();
   return robotstatus_;
