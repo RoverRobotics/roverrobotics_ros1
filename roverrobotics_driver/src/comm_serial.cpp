@@ -39,8 +39,8 @@ CommSerial::CommSerial(const char *device,
   tty.c_cc[VTIME] = 0;  // remove wait time
 
   // Set in/out baud rate to be 1152000
-  cfsetispeed(&tty, B1152000);
-  cfsetospeed(&tty, B1152000);
+  cfsetispeed(&tty, B57600);
+  cfsetospeed(&tty, B57600);
 
   // Save tty settings, also checking for error
   if (tcsetattr(serial_port, TCSANOW, &tty) != 0) {
