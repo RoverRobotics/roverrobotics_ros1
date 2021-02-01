@@ -176,6 +176,7 @@ void ProProtocolObject::register_comm_base(const char* device) {
 
 void ProProtocolObject::sendCommand() {
   while (true) {
+    std::cerr << comm_type << std::endl;
     std::cerr << "To Robot: " << std::endl;
     // Param 1: 10 to get data, 240 for low speed mode
     for (int param2 = 0; param2 <= 70; param2 += 2) {
