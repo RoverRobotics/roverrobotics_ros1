@@ -116,7 +116,7 @@ RoverRobotics::ROSWrapper::ROSWrapper(ros::NodeHandle *nh) {
     robot_info_topic_ = "/robot_unique_info";
   }
   trim_command_subscriber_ =
-      nh->subscribe(trim_topic_, 1, &ROSWrapper::callbackSpeedCommand, this);
+      nh->subscribe(trim_topic_, 1, &ROSWrapper::callbackTrim, this);
   speed_command_subscriber_ =
       nh->subscribe(speed_topic_, 10, &ROSWrapper::callbackSpeedCommand, this);
   estop_trigger_subscriber_ = nh->subscribe(
