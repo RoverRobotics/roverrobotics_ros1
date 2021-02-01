@@ -137,6 +137,7 @@ RoverRobotics::ROSWrapper::ROSWrapper(ros::NodeHandle *nh) {
       nh->createTimer(ros::Duration(1.0 / robot_status_frequency),
                       &ROSWrapper::publishRobotStatus, this);
   ROS_INFO("Subscribers and Publishers are running...");
+  ROS_INFO("ROBOT ESTOP STATE %d", estop_state );
 }
 
 void RoverRobotics::ROSWrapper::publishRobotStatus(
