@@ -9,9 +9,8 @@ ProProtocolObject::ProProtocolObject(const char* device,
   comm_type = new_comm_type;
   register_comm_base(device);
   translate_send_estop();
-  // start thread for sending command to the robot
-  // writethread = std::thread th(&Task::execute, taskPtr, "Sample Task");
-  writethread = std::thread([this]() { this->sendCommand(); });
+  writethread = std::thread([this]() { this->sendCommand(50,fast_data); });
+  writethread = std::thread([this]() { this->sendCommand(500,slow_data); });
 }
 
 ProProtocolObject::~ProProtocolObject() {
@@ -85,8 +84,10 @@ void ProProtocolObject::unpack_robot_response(unsigned char* a) {
         case 0x00:  // bat total current
         case 0x02:  // ? motor1_rpm;
           robotstatus_.motor1_rpm = (short int)b;
+          break;
         case 0x04:  // ? motor2_rpm;
           robotstatus_.motor1_rpm = (short int)b;
+          break;
         case 0x06:  // motor 3 sensor 1
         case 0x08:  // motor 3 sensor 2
         case 0x10:  // motor 1 current
@@ -175,13 +176,11 @@ void ProProtocolObject::register_comm_base(const char* device) {
   }
 }
 
-void ProProtocolObject::sendCommand() {
+void ProProtocolObject::sendCommand(int sleeptime,const int *datalist) {
   while (true) {
-    std::cerr << comm_type << std::endl;
-    std::cerr << "To Robot: " << std::endl;
     // Param 1: 10 to get data, 240 for low speed mode
-    for (int param2 = 0; param2 <= 70; param2 += 2) {
-      std::this_thread::sleep_for(std::chrono::milliseconds(50));  // 20Hz
+    for (int param2 = 0; param2 <= sizeof(datalist); param2 += 2) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(sleeptime));  // 20Hz
       if (comm_type == "serial") {
         writemutex.lock();
         write_buffer[0] = (unsigned char)253;
