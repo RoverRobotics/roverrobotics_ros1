@@ -9,8 +9,7 @@ ProProtocolObject::ProProtocolObject(const char* device,
   translate_send_estop();
   // start thread for sending command to the robot
   // writethread = std::thread th(&Task::execute, taskPtr, "Sample Task");
-  // writethread = std::thread([this]() { this->sendCommand();});
-  writethread = std::thread(&ProProtocolObject::sendCommand, this);
+  writethread = std::thread([this]() { this->sendCommand();});
 }
 
 ProProtocolObject::~ProProtocolObject() {
