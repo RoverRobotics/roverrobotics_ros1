@@ -51,7 +51,7 @@ void ProProtocolObject::translate_send_speed(double* controlarray) {
       turn_rate = -trimvalue;
     }
   }
- std::cerr << "updating move command" << std::endl;
+ std::cerr<< std::hex << "updating move command" << std::endl;
   double diff_vel_commanded = turn_rate;
   writemutex.lock();
   motors_speeds_[0] =
