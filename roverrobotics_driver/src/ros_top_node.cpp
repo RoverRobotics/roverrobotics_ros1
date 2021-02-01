@@ -95,7 +95,7 @@ RoverRobotics::ROSWrapper::ROSWrapper(ros::NodeHandle *nh) {
     trim_topic_ = "/trim";
   }
   if (!ros::param::get("speed_topic", speed_topic_)) {
-    speed_topic_ = "/cmd_vel/joystick";
+    speed_topic_ = "/cmd_vel/managed";
   }
   if (!ros::param::get("estop_trigger_topic", estop_trigger_topic_)) {
     estop_trigger_topic_ = "/estop_trigger";
