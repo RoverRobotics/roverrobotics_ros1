@@ -8,7 +8,8 @@ ProProtocolObject::ProProtocolObject(const char* device,
   register_comm_base(device);
   translate_send_estop();
   // start thread for sending command to the robot
-  std::thread(this->sendCommand());
+  std::thread(
+      [this]() { this->sendCommand(); });
 }
 
 ProProtocolObject::~ProProtocolObject() {
@@ -172,7 +173,7 @@ void ProProtocolObject::register_comm_base(const char* device) {
   }
 }
 
-bool ProProtocolObject::sendCommand() {
+void ProProtocolObject::sendCommand() {
   while (true) {
     // Param 1: 10 to get data, 240 for low speed mode
     for (int param2 = 0; param2 <= 70; param2 += 2) {
@@ -197,11 +198,11 @@ bool ProProtocolObject::sendCommand() {
         // }
         // std::cout << std::endl;
         writemutex.unlock();
-        sleep(50); //20Hz
+        sleep(50);  // 20Hz
       } else if (comm_type == "can") {
-        return false;  //* no CAN for rover pro yet
-      } else {         //! How did you get here?
-        return false;  // TODO: Return error ?
+        return;  //* no CAN for rover pro yet
+      } else {   //! How did you get here?
+        return;  // TODO: Return error ?
       }
     }
   }

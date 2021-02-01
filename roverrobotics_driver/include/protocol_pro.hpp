@@ -28,7 +28,7 @@ class RoverRobotics::ProProtocolObject
   bool isConnected() override;
   // void register_state_response_cb(boost::function<int(void)> _f);
   void register_comm_base(const char* device) override;
-  bool sendCommand();
+  void sendCommand();
 
  private:
   
