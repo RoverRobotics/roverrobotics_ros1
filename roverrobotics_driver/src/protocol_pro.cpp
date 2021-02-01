@@ -7,12 +7,14 @@ namespace RoverRobotics {
 ProProtocolObject::ProProtocolObject(const char* device,
                                      std::string new_comm_type) {
   comm_type = new_comm_type;
+  fast_data = {2, 4, 28, 30};
+  slow_data = {10, 12, 20, 22, 38, 40, 64};
   register_comm_base(device);
   translate_send_estop();
   writethread = std::thread([this]() { this->sendCommand(50, fast_data); });
-  writethread = std::thread([this]() { this->sendCommand(500, slow_data); });
-}
 
+  writethread = std::thread([this]() { this->sendCommand(50, slow_data); });
+}
 ProProtocolObject::~ProProtocolObject() {
   // Decontructor
 }
@@ -176,7 +178,7 @@ void ProProtocolObject::register_comm_base(const char* device) {
   }
 }
 
-void ProProtocolObject::sendCommand(int sleeptime, std::vector<int>& datalist) {
+void ProProtocolObject::sendCommand(int sleeptime, std::vector<int> datalist) {
   while (true) {
     // Param 1: 10 to get data, 240 for low speed mode
     for (int x : datalist) {

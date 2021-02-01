@@ -30,7 +30,7 @@ class RoverRobotics::ProProtocolObject
   bool isConnected() override;
   // void register_state_response_cb(boost::function<int(void)> _f);
   void register_comm_base(const char* device) override;
-  void sendCommand(int sleeptime, std::vector<int> &datalist);
+  void sendCommand(int sleeptime, std::vector<int> datalist);
 
  private:
   const int MOTOR_NEUTRAL = 125;
@@ -45,8 +45,8 @@ class RoverRobotics::ProProtocolObject
   unsigned char write_buffer[7];
   char* read_buffer[7];
   std::thread writethread;
-  std::vector<int> fast_data{2, 4, 28, 30};
-  std::vector<int> slow_data{10, 12, 20, 22, 38, 40, 64};
+  std::vector<int> fast_data;
+  std::vector<int> slow_data;
 
   // mutex comm_base_mutex;
   void (*state_response_cb_function)();
