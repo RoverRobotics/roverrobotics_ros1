@@ -72,13 +72,15 @@ void ProProtocolObject::unpack_robot_response(unsigned char* a) {
     comm_base->clearbuffer();
   } else if (a[0] == 0xfd) {  // if valid starting
     checksum = 255 - (a[0] + a[1] + a[2]) % 255;
-    std::cerr << checksum << "v:" << a[4];
+    std::cerr << checksum << "v:" << a[4] << std::endl;
     if (checksum == a[4]) {  // verify checksum
       int b = ((a[3]) | (a[2]));
       switch (a[1]) {
         case 0x00:  // bat total current
         case 0x02:  // ? motor1_rpm;
+          robotstatus_.motor1_rpm = (short int)b;
         case 0x04:  // ? motor2_rpm;
+          robotstatus_.motor1_rpm = (short int)b;
         case 0x06:  // motor 3 sensor 1
         case 0x08:  // motor 3 sensor 2
         case 0x10:  // motor 1 current
@@ -138,12 +140,12 @@ void ProProtocolObject::unpack_robot_response(unsigned char* a) {
     // float motor3_current;
     // float battery_voltage;
     // float power;
-    // std::cerr << "protocol received: " << (int)a[0] << std::endl;  // start
-    // std::cerr << "protocol received: " << (int)a[1] << std::endl;  // marker
-    // std::cerr << "protocol received: " << (int)a[2] << std::endl;  // data 1
-    // std::cerr << "protocol received: " << (int)a[3] << std::endl;  // data 2
-    // std::cerr << "protocol received: " << (int)a[4] << std::endl;  //
-    // checksum checksum
+    std::cerr << "received: " << (int)a[0];  // start
+    std::cerr << " " << (int)a[1];  // marker
+    std::cerr << " " << (int)a[2];  // data 1
+    std::cerr << " " << (int)a[3];  // data 2
+    std::cerr << " " << (int)a[4];  // checksum
+    std::cerr << "cal cs" << checksum << std::endl;
   }
 }
 
@@ -180,11 +182,11 @@ bool ProProtocolObject::sendCommand(int param1, int param2) {
                      write_buffer[4] + write_buffer[5]) %
                         255;
     comm_base->writetodevice(write_buffer);
-    // std::cerr << "To Robot: ";
-    // for (int i = 0; i < sizeof(write_buffer); i++) {
-    //   std::cerr << int(write_buffer[i]) << " ";
-    //   // std::cerr <<  std::dec <<int(write_buffer[i]) << " ";
-    // }
+    std::cerr << "To Robot: ";
+    for (int i = 0; i < sizeof(write_buffer); i++) {
+      std::cerr << int(write_buffer[i]) << " ";
+      // std::cerr <<  std::dec <<int(write_buffer[i]) << " ";
+    }
     std::cout << std::endl;
     writemutex.unlock();
   } else if (comm_type == "can") {
