@@ -46,8 +46,7 @@ class RoverRobotics::ProProtocolObject
   char* read_buffer[7];
   std::thread writethread;
   std::thread writethread2;
-  std::vector<int> fast_data;
-  std::vector<int> slow_data;
+
 
   // mutex comm_base_mutex;
   void (*state_response_cb_function)();

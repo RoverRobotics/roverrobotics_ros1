@@ -7,8 +7,9 @@ namespace RoverRobotics {
 ProProtocolObject::ProProtocolObject(const char* device,
                                      std::string new_comm_type) {
   comm_type = new_comm_type;
-  fast_data = {2, 4, 28, 30};
-  slow_data = {10, 12, 20, 22, 38, 40, 64};
+  std::vector<int> fast_data = fast_data = {2, 4, 28, 30};
+  std::vector<int> slow_data = slow_data = {10, 12, 20, 22, 38, 40, 64};
+
   register_comm_base(device);
   translate_send_estop();
   writethread = std::thread([this]() { this->sendCommand(50, fast_data); });
