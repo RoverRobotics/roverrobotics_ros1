@@ -17,10 +17,10 @@
     </include>
 
     <!-- PS4 Mapper -->
-    <!-- <node pkg="rr_control_input_manager" type="ps4_mapper.py" name="ps4_mapper" output="screen">
+    <node pkg="rr_control_input_manager" type="ps4_mapper.py" name="ps4_mapper" output="screen">
         <rosparam command="load" file="$(find rr_openrover_driver)/config/ps4_controller_config.yaml" />
         <param name="stamped" value="True" />
-    </node> -->
+    </node>
 
     <!--  Twist Mux  -->
     <node pkg="twist_mux" type="twist_mux" name="twist_mux" output="screen">
