@@ -43,6 +43,7 @@ class RoverRobotics::ProProtocolObject
   double trimvalue;
   unsigned char write_buffer[7];
   char* read_buffer[7];
+  std::thread writethread;
 
 
   // mutex comm_base_mutex;
