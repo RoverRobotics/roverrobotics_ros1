@@ -1,4 +1,5 @@
 #include "protocol_pro.hpp"
+#include <chrono>
 
 namespace RoverRobotics {
 
@@ -179,7 +180,7 @@ void ProProtocolObject::sendCommand() {
     std::cerr << "To Robot: " << std::endl;
     // Param 1: 10 to get data, 240 for low speed mode
     for (int param2 = 0; param2 <= 70; param2 += 2) {
-      sleep(50);  // 20Hz
+      std::this_thread::sleep_for(std::chrono::milliseconds(50));  // 20Hz
       if (comm_type == "serial") {
         writemutex.lock();
         write_buffer[0] = (unsigned char)253;
