@@ -179,15 +179,15 @@ void RoverRobotics::ROSWrapper::publishRobotInfo() {
     ros::shutdown();
     return;
   }
-  robotInfo data = robot_->translate_send_robot_info_request();
+  statusData data = robot_->translate_send_robot_info_request();
   std_msgs::Int32MultiArray robot_info;
   robot_info.data.clear();
-  robot_info.data.push_back(data.time);
-  robot_info.data.push_back(data.guid);
-  robot_info.data.push_back(data.firmware);
-
+  robot_info.data.push_back(data.robot_guid);
+  robot_info.data.push_back(data.robot_firmware);
+  robot_info.data.push_back(data.robot_speed_limit);
+  robot_info.data.push_back(data.robot_fan_speed);
+  robot_info.data.push_back(data.robot_fault_flag);
   robot_info_publisher.publish(robot_info);
-  // ROS_INFO("publishing some robot info");
 }
 // call everytime speed_topic_ get data
 void RoverRobotics::ROSWrapper::callbackSpeedCommand(

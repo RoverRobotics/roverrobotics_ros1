@@ -13,7 +13,7 @@ void ZeroProtocolObject::translate_send_estop() {}
 
 statusData ZeroProtocolObject::translate_send_robot_status_request() {}
 
-robotInfo ZeroProtocolObject::translate_send_robot_info_request() {}
+statusData ZeroProtocolObject::translate_send_robot_info_request() {}
 
 void ZeroProtocolObject::translate_send_speed(double*) {}
 

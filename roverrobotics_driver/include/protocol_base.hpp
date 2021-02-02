@@ -14,7 +14,7 @@ class RoverRobotics::BaseProtocolObject {
   virtual void translate_send_estop() = 0;
   virtual void translate_send_speed(double *) = 0;
   virtual statusData translate_send_robot_status_request() = 0;
-  virtual robotInfo translate_send_robot_info_request() = 0;
+  virtual statusData translate_send_robot_info_request() = 0;
   virtual void handle_unsupported_ros_message() = 0;
   virtual void unpack_robot_response(unsigned char *) = 0;
   virtual bool isConnected() = 0;

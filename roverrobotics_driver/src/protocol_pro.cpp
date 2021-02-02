@@ -30,20 +30,12 @@ void ProProtocolObject::translate_send_estop() {
   writemutex.unlock();
 }
 
-statusData ProProtocolObject::translate_send_robot_status_request() {
-  // // for (int x = 0; x <= 70; x += 2) {
-  // //   sendCommand(10, x);
-  // //   sleep(100);
-  // // }
-  // sendCommand(10, 40);
-  // // atof(read_buffer[0]); //convert char* to float from buffer
-  // // unpack_robot_response();
+change statusData ProProtocolObject::translate_send_robot_status_request() {
   return robotstatus_;
 }
 
-robotInfo ProProtocolObject::translate_send_robot_info_request() {
-  // !:This robot have no special Info to request protocol. All were processed
-  // from status request
+statusData ProProtocolObject::translate_send_robot_info_request() {
+  return robotstatus_;
 }
 
 void ProProtocolObject::translate_send_speed(double* controlarray) {
@@ -70,10 +62,6 @@ void ProProtocolObject::translate_send_speed(double* controlarray) {
   // sendCommand(0, 0);
 }
 
-void ProProtocolObject::handle_unsupported_ros_message() {
-  // TODO: TBD
-}
-
 void ProProtocolObject::unpack_robot_response(unsigned char* a) {
   unsigned char checksum, readchecksum;
 
@@ -89,7 +77,7 @@ void ProProtocolObject::unpack_robot_response(unsigned char* a) {
           robotstatus_.motor1_rpm = (short int)b;
           break;
         case 0x04:  // ? motor2_rpm;
-          robotstatus_.motor1_rpm = (short int)b;
+          robotstatus_.motor2_rpm = (short int)b;
           break;
         case 0x06:  // motor 3 sensor 1
         case 0x08:  // motor 3 sensor 2
@@ -111,7 +99,7 @@ void ProProtocolObject::unpack_robot_response(unsigned char* a) {
           break;
         case 0x24:  // voltage battery a
         case 0x26:  // voltage battery b
-        case 0x28:  // motor 1 encoder inverval
+        case 0x28:  // motor 1 encoder interval
         case 0x30:  // motor 2 encoder interval
         case 0x32:  // motor 3 encoder interval
         case 0x34:  // battery A %
