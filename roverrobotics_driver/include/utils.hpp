@@ -12,7 +12,7 @@ struct PidGains {
   double Kp;
   double Ki;
   double Kd;
-
+  PidGains();
   PidGains(float p, float i, float d) : Kp(p), Ki(i), Kd(d) {}
 };
 class OdomControl {

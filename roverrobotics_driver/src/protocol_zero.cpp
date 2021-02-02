@@ -9,7 +9,7 @@ ZeroProtocolObject::~ZeroProtocolObject() {}
 
 void ZeroProtocolObject::update_drivetrim(double) {}
 
-void ZeroProtocolObject::translate_send_estop() {}
+void ZeroProtocolObject::translate_send_estop(bool) {}
 
 statusData ZeroProtocolObject::translate_send_robot_status_request() {}
 

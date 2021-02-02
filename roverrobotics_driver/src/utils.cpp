@@ -1,6 +1,7 @@
 #include "utils.hpp"
 
 namespace RoverRobotics {
+PidGains::PidGains() {}
 void OdomControl::start(bool use_control, PidGains pid_gains, int max,
                         int min) {
   K_P_ = pid_gains.Kp;
@@ -31,8 +32,7 @@ OdomControl::OdomControl()
       differential_error_(0),
       velocity_commanded_(0),
       velocity_measured_(0),
-      velocity_filtered_(0) {
-}
+      velocity_filtered_(0) {}
 
 OdomControl::OdomControl(bool use_control, PidGains pid_gains, int max, int min,
                          std::ofstream* fs)
@@ -59,7 +59,6 @@ OdomControl::OdomControl(bool use_control, PidGains pid_gains, int max, int min,
       velocity_commanded_(0),
       velocity_measured_(0),
       velocity_filtered_(0) {
-
   if (fs_ != nullptr && fs_->is_open()) {
     *fs_ << "time,Kp,Ki,Kd,error,integral_error,differential_error,error_"
             "filtered,meas_vel,filt_vel,cmd_vel,dt,motor_cmd\n";
@@ -90,8 +89,7 @@ OdomControl::OdomControl(bool use_control, PidGains pid_gains, int max, int min)
       differential_error_(0),
       velocity_commanded_(0),
       velocity_measured_(0),
-      velocity_filtered_(0) {
-}
+      velocity_filtered_(0) {}
 
 unsigned char OdomControl::run(bool e_stop_on, bool control_on,
                                double commanded_vel, double measured_vel,
@@ -262,7 +260,6 @@ double OdomControl::filter(double velocity, double dt,
   velocity_filtered_history_.pop_back();
 
   return velocity_filtered_;
-} // class OdomControl
-
+}  // class OdomControl
 
 }  // namespace RoverRobotics

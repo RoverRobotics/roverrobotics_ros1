@@ -1,10 +1,10 @@
 #pragma once
 #include <stdio.h>
 
-#include <vector>
 #include <chrono>
 #include <cmath>
 #include <mutex>
+#include <vector>
 
 #include "comm_base.hpp"
 #include "comm_can.hpp"
@@ -17,10 +17,11 @@ class ProProtocolObject;
 class RoverRobotics::ProProtocolObject
     : public RoverRobotics::BaseProtocolObject {
  public:
-  ProProtocolObject(const char* device, std::string new_comm_type, bool closed_loop, PidGains pid);
+  ProProtocolObject(const char* device, std::string new_comm_type,
+                    bool closed_loop, PidGains pid);
   ~ProProtocolObject() override;
   void update_drivetrim(double) override;
-  void translate_send_estop() override;
+  void translate_send_estop(bool) override;
   statusData translate_send_robot_status_request() override;
   statusData translate_send_robot_info_request() override;
   void translate_send_speed(double*) override;
@@ -43,8 +44,14 @@ class RoverRobotics::ProProtocolObject
   char* read_buffer[7];
   std::thread writethread;
   std::thread writethread2;
-
-
+  bool estop_;
+  //Motor PID variables
+  OdomControl motor1_control;
+  OdomControl motor2_control;
+  bool closed_loop_;
+  PidGains pid_;
+  std::chrono::steady_clock::time_point motor1_prev_t;
+  std::chrono::steady_clock::time_point motor2_prev_t;
   // mutex comm_base_mutex;
   void (*state_response_cb_function)();
 };

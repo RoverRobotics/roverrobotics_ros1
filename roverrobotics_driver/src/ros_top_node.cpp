@@ -52,7 +52,7 @@ class RoverRobotics::ROSWrapper {
   std::string comm_type_;
   // Timer
   ros::Timer robot_status_timer_;
-  PidGains pidGains_ = { 0,0,0 };
+  PidGains pidGains_ = {0, 0, 0};
 
  public:
   ROSWrapper(ros::NodeHandle *nh);
@@ -250,19 +250,11 @@ void RoverRobotics::ROSWrapper::publishRobotInfo() {
 // call everytime speed_topic_ get data
 void RoverRobotics::ROSWrapper::callbackSpeedCommand(
     const geometry_msgs::Twist &msg) {
-  ROS_INFO("trying to update speed");
-  if (!estop_state) {
-    double speeddata[2];
-    speeddata[0] = msg.linear.x;
-    speeddata[1] = msg.angular.z;
-    speeddata[2] = msg.angular.y;
-    ROS_INFO("sent %f %f %f to the robot", msg.linear.x, msg.angular.z,
-             msg.angular.y);
-    robot_->translate_send_speed(speeddata);
-
-  } else {
-    robot_->translate_send_estop();
-  }
+  double speeddata[2];
+  speeddata[0] = msg.linear.x;
+  speeddata[1] = msg.angular.z;
+  speeddata[2] = msg.angular.y;
+  robot_->translate_send_speed(speeddata);
 }
 
 void RoverRobotics::ROSWrapper::callbackInfo(
@@ -275,12 +267,13 @@ void RoverRobotics::ROSWrapper::callbackInfo(
 void RoverRobotics::ROSWrapper::callbackEstopTrigger(
     const std_msgs::Bool::ConstPtr &msg) {
   estop_state = true;
-  robot_->translate_send_estop();
+  robot_->translate_send_estop(estop_state);
 }
 
 void RoverRobotics::ROSWrapper::callbackEstopReset(
     const std_msgs::Bool::ConstPtr &msg) {
   estop_state = false;
+  robot_->translate_send_estop(estop_state);
 }
 
 void RoverRobotics::ROSWrapper::callbackTrim(

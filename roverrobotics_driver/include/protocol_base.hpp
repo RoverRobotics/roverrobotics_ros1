@@ -10,7 +10,7 @@ class RoverRobotics::BaseProtocolObject {
   BaseProtocolObject() = default;
   virtual ~BaseProtocolObject();
   virtual void update_drivetrim(double) = 0;
-  virtual void translate_send_estop() = 0;
+  virtual void translate_send_estop(bool) = 0;
   virtual void translate_send_speed(double *) = 0;
   virtual statusData translate_send_robot_status_request() = 0;
   virtual statusData translate_send_robot_info_request() = 0;

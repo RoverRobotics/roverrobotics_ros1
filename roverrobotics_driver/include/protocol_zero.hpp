@@ -12,7 +12,7 @@ class RoverRobotics::ZeroProtocolObject
   ZeroProtocolObject(const char* device, std::string new_comm_type,bool closed_loop, PidGains pid);
   ~ZeroProtocolObject() override;
   void update_drivetrim(double) override;
-  void translate_send_estop() override;
+  void translate_send_estop(bool) override;
   statusData translate_send_robot_status_request() override;
   statusData translate_send_robot_info_request() override;
   void translate_send_speed(double*) override;

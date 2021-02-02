@@ -2,16 +2,23 @@
 
 #include <chrono>
 
+float MOTOR_RPM_TO_MPS_RATIO = 13749 / 1.26;
+float MOTOR_RPM_TO_MPS_CFB = -0.07;
 namespace RoverRobotics {
 
 ProProtocolObject::ProProtocolObject(const char* device,
-                                     std::string new_comm_type,bool closed_loop, PidGains pid) {
+                                     std::string new_comm_type,
+                                     bool closed_loop, PidGains pid) {
   comm_type = new_comm_type;
+  closed_loop_ = closed_loop;
+  pid_ = pid;
   std::vector<int> fast_data = {2, 4, 28, 30};
   std::vector<int> slow_data = {10, 12, 20, 22, 38, 40, 64};
-
+  motor1_control = OdomControl(closed_loop_, pid_, 250, 0);
+  motor2_control = OdomControl(closed_loop_, pid_, 250, 0);
   register_comm_base(device);
-  translate_send_estop();
+  motor1_control.start(closed_loop, pid, 250, 0);
+  motor2_control.start(closed_loop, pid, 250, 0);
   writethread =
       std::thread([this, fast_data]() { this->sendCommand(50, fast_data); });
 
@@ -24,11 +31,9 @@ ProProtocolObject::~ProProtocolObject() {
 
 void ProProtocolObject::update_drivetrim(double value) { trimvalue = value; }
 
-void ProProtocolObject::translate_send_estop() {
+void ProProtocolObject::translate_send_estop(bool estop) {
   writemutex.lock();
-  motors_speeds_[0] = MOTOR_NEUTRAL;
-  motors_speeds_[1] = MOTOR_NEUTRAL;
-  motors_speeds_[2] = MOTOR_NEUTRAL;
+  estop_ = estop;
   writemutex.unlock();
 }
 
@@ -42,24 +47,51 @@ statusData ProProtocolObject::translate_send_robot_info_request() {
 
 void ProProtocolObject::translate_send_speed(double* controlarray) {
   writemutex.lock();
-  double linear_rate = controlarray[0];
-  double turn_rate = controlarray[1];
-  double flipper_rate = controlarray[2];
-  // apply trim value
-  if (turn_rate == 0) {
-    if (linear_rate > 0) {
-      turn_rate = trimvalue;
-    } else if (linear_rate < 0) {
-      turn_rate = -trimvalue;
+  if (!estop_) {
+    double linear_rate = controlarray[0];
+    double turn_rate = controlarray[1];
+    double flipper_rate = controlarray[2];
+    // apply trim value
+    if (turn_rate == 0) {
+      if (linear_rate > 0) {
+        turn_rate = trimvalue;
+      } else if (linear_rate < 0) {
+        turn_rate = -trimvalue;
+      }
     }
-  }
-  double diff_vel_commanded = turn_rate;
+    double diff_vel_commanded = turn_rate;
 
-  motors_speeds_[0] =
-      (int)round((linear_rate - 0.5 * diff_vel_commanded) * 50 + MOTOR_NEUTRAL);
-  motors_speeds_[1] =
-      (int)round((linear_rate + 0.5 * diff_vel_commanded) * 50 + MOTOR_NEUTRAL);
-  motors_speeds_[2] = (int)round(flipper_rate + 125) % 250;
+    int motor1_speed = (int)round(
+        (linear_rate - 0.5 * diff_vel_commanded) * 50 + MOTOR_NEUTRAL);
+    int motor2_speed = (int)round(
+        (linear_rate + 0.5 * diff_vel_commanded) * 50 + MOTOR_NEUTRAL);
+
+    std::chrono::steady_clock::time_point current_time =
+        std::chrono::steady_clock::now();
+    motors_speeds_[0] = motor1_control.run(
+        true, closed_loop_, motor1_speed,
+        robotstatus_.motor1_rpm / MOTOR_RPM_TO_MPS_RATIO + MOTOR_RPM_TO_MPS_CFB,
+        std::chrono::duration_cast<std::chrono::microseconds>(current_time -
+                                                              motor1_prev_t)
+                .count() /
+            1000000.0,
+        robotstatus_.robot_firmware);
+    motors_speeds_[1] = motor2_control.run(
+        true, closed_loop_, motor2_speed,
+        robotstatus_.motor2_rpm / MOTOR_RPM_TO_MPS_RATIO + MOTOR_RPM_TO_MPS_CFB,
+        std::chrono::duration_cast<std::chrono::microseconds>(current_time -
+                                                              motor2_prev_t)
+                .count() /
+            1000000.0,
+        robotstatus_.robot_firmware);
+    motors_speeds_[2] = (int)round(flipper_rate + 125) % 250;
+  }else
+  {
+    motors_speeds_[0] = 125;
+    motors_speeds_[1] = 125;
+    motors_speeds_[2] = 125;
+  }
+  
   writemutex.unlock();
   // sendCommand(0, 0);
 }
@@ -76,9 +108,11 @@ void ProProtocolObject::unpack_robot_response(unsigned char* a) {
       switch (a[1]) {
         case 0x00:  // bat total current
         case 0x02:  // motor1_rpm;
+          motor1_prev_t = std::chrono::steady_clock::now();
           robotstatus_.motor1_rpm = b;
           break;
         case 0x04:  // motor2_rpm;
+          motor2_prev_t = std::chrono::steady_clock::now();
           robotstatus_.motor2_rpm = b;
           break;
         case 0x06:  // motor 3 sensor 1
@@ -157,7 +191,7 @@ void ProProtocolObject::unpack_robot_response(unsigned char* a) {
           break;
       }
     }
-    //THESE VALUES ARE NOT AVAILABLE ON ROVER PRO
+    // THESE VALUES ARE NOT AVAILABLE ON ROVER PRO
     robotstatus_.motor1_id = 0;
     robotstatus_.motor1_mos_temp = 0;
     robotstatus_.motor2_id = 0;
