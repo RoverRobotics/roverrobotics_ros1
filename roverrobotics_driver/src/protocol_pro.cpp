@@ -93,7 +93,7 @@ void ProProtocolObject::translate_send_speed(double* controlarray) {
     motors_speeds_[1] = MOTOR_NEUTRAL;
     motors_speeds_[2] = MOTOR_NEUTRAL;
   }
-  
+  std::cerr << motors_speeds_[0] << " "  << motors_speeds_[1] << " " << motors_speeds_[0] << std::endl;
   writemutex.unlock();
   // sendCommand(0, 0);
 }
