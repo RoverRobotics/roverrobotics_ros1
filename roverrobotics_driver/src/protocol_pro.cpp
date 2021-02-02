@@ -5,16 +5,18 @@
 namespace RoverRobotics {
 
 ProProtocolObject::ProProtocolObject(const char* device,
-                                     std::string new_comm_type) {
+                                     std::string new_comm_type,bool closed_loop, PidGains pid) {
   comm_type = new_comm_type;
   std::vector<int> fast_data = {2, 4, 28, 30};
   std::vector<int> slow_data = {10, 12, 20, 22, 38, 40, 64};
 
   register_comm_base(device);
   translate_send_estop();
-  writethread = std::thread([this , fast_data]() { this->sendCommand(50, fast_data); });
+  writethread =
+      std::thread([this, fast_data]() { this->sendCommand(50, fast_data); });
 
-  writethread2 = std::thread([this, slow_data]() { this->sendCommand(50, slow_data); });
+  writethread2 =
+      std::thread([this, slow_data]() { this->sendCommand(50, slow_data); });
 }
 ProProtocolObject::~ProProtocolObject() {
   // Decontructor
@@ -70,17 +72,21 @@ void ProProtocolObject::unpack_robot_response(unsigned char* a) {
   } else if (a[0] == 0xfd) {  // if valid starting
     checksum = 255 - (a[0] + a[1] + a[2]) % 255;
     if (checksum == a[4]) {  // verify checksum
-      int b = ((a[3]) | (a[2]));
+      unsigned char b = ((a[3]) | (a[2]));
       switch (a[1]) {
         case 0x00:  // bat total current
-        case 0x02:  // ? motor1_rpm;
-          robotstatus_.motor1_rpm = (short int)b;
+        case 0x02:  // motor1_rpm;
+          robotstatus_.motor1_rpm = b;
           break;
-        case 0x04:  // ? motor2_rpm;
-          robotstatus_.motor2_rpm = (short int)b;
+        case 0x04:  // motor2_rpm;
+          robotstatus_.motor2_rpm = b;
           break;
         case 0x06:  // motor 3 sensor 1
+          robotstatus_.motor3_sensor1 = b;
+          break;
         case 0x08:  // motor 3 sensor 2
+          robotstatus_.motor3_sensor2 = b;
+          break;
         case 0x10:  // motor 1 current
           robotstatus_.motor1_current = b;
           break;
@@ -91,6 +97,8 @@ void ProProtocolObject::unpack_robot_response(unsigned char* a) {
 
         case 0x16:  // motor 2 motor encoder count
         case 0x18:  // motor fault
+          robotstatus_.robot_fault_flag = b;
+          break;
         case 0x20:  // motor 1 motor temp
           robotstatus_.motor1_temp = b;
           break;
@@ -98,6 +106,7 @@ void ProProtocolObject::unpack_robot_response(unsigned char* a) {
           robotstatus_.motor2_temp = b;
           break;
         case 0x24:  // voltage battery a
+
         case 0x26:  // voltage battery b
         case 0x28:  // motor 1 encoder interval
         case 0x30:  // motor 2 encoder interval
@@ -105,39 +114,66 @@ void ProProtocolObject::unpack_robot_response(unsigned char* a) {
         case 0x34:  // battery A %
         case 0x36:  // battery B %
         case 0x38:  // battery state of charge
-          robotstatus_.charge_status = b;
+          robotstatus_.battery1_SOC = b;
+          robotstatus_.battery2_SOC = b;
           break;
         case 0x40:  // build NO
-          robotinfo_.guid = b;
+          robotstatus_.robot_firmware = b;
           break;
         case 0x42:  // battery A current
         case 0x44:  // battery B current
         case 0x46:  // motor 3 angle
+          robotstatus_.motor3_angle = b;
+          break;
         case 0x48:  // system fan speed
+          robotstatus_.robot_fan_speed = b;
+          break;
         case 0x50:  // speed mode
         case 0x52:  // battery status A from BMS
         case 0x54:  // battery status B from BMS
         case 0x56:  // battery A flag from BMS
+          robotstatus_.battery1_fault_flag;
+          break;
         case 0x58:  // battery B flag from BMS
+          robotstatus_.battery2_fault_flag;
+          break;
         case 0x60:  // battery temp A from BMS
+          robotstatus_.battery1_temp = b;
+          break;
         case 0x62:  // battery temp B from BMS
+          robotstatus_.battery2_temp = b;
+          break;
         case 0x64:  // battery A voltage from BMS
-          robotstatus_.battery_voltage = b;
+          robotstatus_.battery1_voltage = b;
           break;
         case 0x66:  // battery B voltage from BMS
+          robotstatus_.battery2_voltage = b;
+          break;
         case 0x68:  // battery A current from BMS
+          robotstatus_.battery1_current = b;
+          break;
         case 0x70:  // battery B current from BMS
-
+          robotstatus_.battery2_current = b;
           break;
       }
     }
-
-    // float motor3_rpm;
-    // float motor1_current;
-    // float motor2_current;
-    // float motor3_current;
-    // float battery_voltage;
-    // float power;
+    //THESE VALUES ARE NOT AVAILABLE ON ROVER PRO
+    robotstatus_.motor1_id = 0;
+    robotstatus_.motor1_mos_temp = 0;
+    robotstatus_.motor2_id = 0;
+    robotstatus_.motor2_mos_temp = 0;
+    robotstatus_.motor3_id = 0;
+    robotstatus_.motor3_rpm = 0;
+    robotstatus_.motor3_current = 0;
+    robotstatus_.motor3_temp = 0;
+    robotstatus_.motor3_mos_temp = 0;
+    robotstatus_.motor4_id = 0;
+    robotstatus_.motor4_rpm = 0;
+    robotstatus_.motor4_current = 0;
+    robotstatus_.motor4_temp = 0;
+    robotstatus_.motor4_mos_temp = 0;
+    robotstatus_.robot_guid = 0;
+    robotstatus_.robot_speed_limit = 0;
     // std::cerr << "From Robot: " << (int)a[0];  // start
     // std::cerr << " " << (int)a[1];  // marker
     // std::cerr << " " << (int)a[2];  // data 1

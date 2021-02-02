@@ -1,7 +1,6 @@
 #pragma once
 #include <boost/bind.hpp>
-
-#include "robot_info.hpp"
+#include "utils.hpp"
 #include "status_data.hpp"
 namespace RoverRobotics {
 class BaseProtocolObject;
@@ -15,7 +14,6 @@ class RoverRobotics::BaseProtocolObject {
   virtual void translate_send_speed(double *) = 0;
   virtual statusData translate_send_robot_status_request() = 0;
   virtual statusData translate_send_robot_info_request() = 0;
-  virtual void handle_unsupported_ros_message() = 0;
   virtual void unpack_robot_response(unsigned char *) = 0;
   virtual bool isConnected() = 0;
   // virtual void register_state_response_cb(boost::function<int(void)> _f);

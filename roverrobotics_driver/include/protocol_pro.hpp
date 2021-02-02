@@ -10,22 +10,20 @@
 #include "comm_can.hpp"
 #include "comm_serial.hpp"
 #include "protocol_base.hpp"
-#include "robot_info.hpp"
-#include "status_data.hpp"
+
 namespace RoverRobotics {
 class ProProtocolObject;
 }
 class RoverRobotics::ProProtocolObject
     : public RoverRobotics::BaseProtocolObject {
  public:
-  ProProtocolObject(const char* device, std::string new_comm_type);
+  ProProtocolObject(const char* device, std::string new_comm_type, bool closed_loop, PidGains pid);
   ~ProProtocolObject() override;
   void update_drivetrim(double) override;
   void translate_send_estop() override;
   statusData translate_send_robot_status_request() override;
   statusData translate_send_robot_info_request() override;
   void translate_send_speed(double*) override;
-  void handle_unsupported_ros_message() override;
   void unpack_robot_response(unsigned char*) override;
   bool isConnected() override;
   // void register_state_response_cb(boost::function<int(void)> _f);
@@ -39,7 +37,6 @@ class RoverRobotics::ProProtocolObject
 
   std::mutex writemutex;
   statusData robotstatus_;
-  robotInfo robotinfo_;
   int motors_speeds_[3];
   double trimvalue;
   unsigned char write_buffer[7];

@@ -3,7 +3,7 @@
 
 namespace RoverRobotics {
 ZeroProtocolObject::ZeroProtocolObject(const char* device,
-                                       std::string new_comm_type) {}
+                                       std::string new_comm_type,bool closed_loop, PidGains pid) {}
 
 ZeroProtocolObject::~ZeroProtocolObject() {}
 
@@ -16,8 +16,6 @@ statusData ZeroProtocolObject::translate_send_robot_status_request() {}
 statusData ZeroProtocolObject::translate_send_robot_info_request() {}
 
 void ZeroProtocolObject::translate_send_speed(double*) {}
-
-void ZeroProtocolObject::handle_unsupported_ros_message() {}
 
 void ZeroProtocolObject::unpack_robot_response(unsigned char * a) {}
 
