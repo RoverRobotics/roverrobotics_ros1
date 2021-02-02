@@ -30,7 +30,7 @@ void ProProtocolObject::translate_send_estop() {
   writemutex.unlock();
 }
 
-change statusData ProProtocolObject::translate_send_robot_status_request() {
+statusData ProProtocolObject::translate_send_robot_status_request() {
   return robotstatus_;
 }
 
