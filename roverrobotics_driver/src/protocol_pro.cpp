@@ -19,6 +19,8 @@ ProProtocolObject::ProProtocolObject(const char* device,
   register_comm_base(device);
   motor1_control.start(closed_loop, pid, 250, 0);
   motor2_control.start(closed_loop, pid, 250, 0);
+  motor1_prev_t = std::chrono::steady_clock::now();
+  motor2_prev_t = std::chrono::steady_clock::now();
   writethread =
       std::thread([this, fast_data]() { this->sendCommand(50, fast_data); });
 
@@ -69,7 +71,7 @@ void ProProtocolObject::translate_send_speed(double* controlarray) {
     std::chrono::steady_clock::time_point current_time =
         std::chrono::steady_clock::now();
     motors_speeds_[0] = motor1_control.run(
-        true, closed_loop_, motor1_speed,
+        estop_, closed_loop_, motor1_speed,
         robotstatus_.motor1_rpm / MOTOR_RPM_TO_MPS_RATIO + MOTOR_RPM_TO_MPS_CFB,
         std::chrono::duration_cast<std::chrono::microseconds>(current_time -
                                                               motor1_prev_t)
@@ -77,7 +79,7 @@ void ProProtocolObject::translate_send_speed(double* controlarray) {
             1000000.0,
         robotstatus_.robot_firmware);
     motors_speeds_[1] = motor2_control.run(
-        true, closed_loop_, motor2_speed,
+        estop_, closed_loop_, motor2_speed,
         robotstatus_.motor2_rpm / MOTOR_RPM_TO_MPS_RATIO + MOTOR_RPM_TO_MPS_CFB,
         std::chrono::duration_cast<std::chrono::microseconds>(current_time -
                                                               motor2_prev_t)
@@ -85,11 +87,11 @@ void ProProtocolObject::translate_send_speed(double* controlarray) {
             1000000.0,
         robotstatus_.robot_firmware);
     motors_speeds_[2] = (int)round(flipper_rate + 125) % 250;
-  }else
+  }else if (estop_)
   {
-    motors_speeds_[0] = 125;
-    motors_speeds_[1] = 125;
-    motors_speeds_[2] = 125;
+    motors_speeds_[0] = MOTOR_NEUTRAL;
+    motors_speeds_[1] = MOTOR_NEUTRAL;
+    motors_speeds_[2] = MOTOR_NEUTRAL;
   }
   
   writemutex.unlock();
