@@ -135,7 +135,7 @@ unsigned char OdomControl::run(bool e_stop_on, bool control_on,
 }
 
 int OdomControl::feedThroughControl() {
-  return (int)round(velocity_commanded_ * 50 + 125);
+  return (int)round(velocity_commanded_ + 125) % 250;
 }
 
 void OdomControl::reset() {
