@@ -17,10 +17,11 @@ ProProtocolObject::ProProtocolObject(const char* device,
   motor1_control = OdomControl(closed_loop_, pid_, 250, 0);
   motor2_control = OdomControl(closed_loop_, pid_, 250, 0);
   register_comm_base(device);
-  motor1_control.start(closed_loop, pid, 250, 0);
-  motor2_control.start(closed_loop, pid, 250, 0);
   motor1_prev_t = std::chrono::steady_clock::now();
   motor2_prev_t = std::chrono::steady_clock::now();
+  motors_speeds_[0] = 125;
+  motors_speeds_[1] = 125;
+  motors_speeds_[2] = 125;
   writethread =
       std::thread([this, fast_data]() { this->sendCommand(50, fast_data); });
 
