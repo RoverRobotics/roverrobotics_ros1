@@ -11,6 +11,9 @@ ProProtocolObject::ProProtocolObject(const char* device,
                                      bool closed_loop, PidGains pid) {
   comm_type = new_comm_type;
   closed_loop_ = closed_loop;
+  motors_speeds_[0] = 125;
+  motors_speeds_[1] = 125;
+  motors_speeds_[2] = 125;
   std::cerr << "Close Loop Control Status: " << closed_loop_ << std::endl;
   pid_ = pid;
   std::vector<int> fast_data = {2, 4, 28, 30};
