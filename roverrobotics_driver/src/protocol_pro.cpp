@@ -13,9 +13,6 @@ ProProtocolObject::ProProtocolObject(const char* device,
   closed_loop_ = closed_loop;
   std::cerr << "Close Loop Control Status: " << closed_loop_ << std::endl;
   pid_ = pid;
-  motors_speeds_[0] = MOTOR_NEUTRAL;
-  motors_speeds_[1] = MOTOR_NEUTRAL;
-  motors_speeds_[2] = MOTOR_NEUTRAL;
   std::vector<int> fast_data = {2, 4, 28, 30};
   std::vector<int> slow_data = {10, 12, 20, 22, 38, 40, 64};
   motor1_control = OdomControl(closed_loop_, pid_, 250, 0);
@@ -54,59 +51,53 @@ statusData ProProtocolObject::translate_send_robot_info_request() {
 
 void ProProtocolObject::translate_send_speed(double* controlarray) {
   writemutex.lock();
-  if (!estop_) {
-    double linear_rate = controlarray[0];
-    double turn_rate = controlarray[1];
-    double flipper_rate = controlarray[2];
-    // apply trim value
-    std::cerr << "Control parameters: linear:" << controlarray[0]
-              << " turn:" << controlarray[1] << " flipper:" << controlarray[2]
-              << std::endl;
-    if (turn_rate == 0) {
-      if (linear_rate > 0) {
-        turn_rate = trimvalue;
-      } else if (linear_rate < 0) {
-        turn_rate = -trimvalue;
-      }
+  double linear_rate = controlarray[0];
+  double turn_rate = controlarray[1];
+  double flipper_rate = controlarray[2];
+  // apply trim value
+  std::cerr << "Control parameters: linear:" << controlarray[0]
+            << " turn:" << controlarray[1] << " flipper:" << controlarray[2]
+            << std::endl;
+  if (turn_rate == 0) {
+    if (linear_rate > 0) {
+      turn_rate = trimvalue;
+    } else if (linear_rate < 0) {
+      turn_rate = -trimvalue;
     }
-    double diff_vel_commanded = turn_rate;
-
-    int motor1_speed = (int)round(
-        (linear_rate - 0.5 * diff_vel_commanded) * 50 + MOTOR_NEUTRAL);
-    int motor2_speed = (int)round(
-        (linear_rate + 0.5 * diff_vel_commanded) * 50 + MOTOR_NEUTRAL);
-
-    motors_speeds_[2] = (int)round(flipper_rate + 125) % 250;
-    std::cerr << "commanded motor speed: "
-              << "left:" << motor1_speed << " right:" << motor2_speed
-              << std::endl;
-    std::chrono::steady_clock::time_point current_time =
-        std::chrono::steady_clock::now();
-    motors_speeds_[0] = motor1_control.run(
-        estop_, closed_loop_, motor1_speed,
-        robotstatus_.motor1_rpm / MOTOR_RPM_TO_MPS_RATIO + MOTOR_RPM_TO_MPS_CFB,
-        std::chrono::duration_cast<std::chrono::microseconds>(current_time -
-                                                              motor1_prev_t)
-                .count() /
-            1000000.0,
-        robotstatus_.robot_firmware);
-    motors_speeds_[1] = motor2_control.run(
-        estop_, closed_loop_, motor2_speed,
-        robotstatus_.motor2_rpm / MOTOR_RPM_TO_MPS_RATIO + MOTOR_RPM_TO_MPS_CFB,
-        std::chrono::duration_cast<std::chrono::microseconds>(current_time -
-                                                              motor2_prev_t)
-                .count() /
-            1000000.0,
-        robotstatus_.robot_firmware);
-    std::cerr << "filtered motor speed"
-              << " left:" << motors_speeds_[0] << " right:" << motors_speeds_[1]
-              << std::endl;
-
-  } else if (estop_) {
-    motors_speeds_[0] = MOTOR_NEUTRAL;
-    motors_speeds_[1] = MOTOR_NEUTRAL;
-    motors_speeds_[2] = MOTOR_NEUTRAL;
   }
+  double diff_vel_commanded = turn_rate;
+
+  int motor1_speed =
+      (int)round((linear_rate - 0.5 * diff_vel_commanded) * 50 + MOTOR_NEUTRAL);
+  int motor2_speed =
+      (int)round((linear_rate + 0.5 * diff_vel_commanded) * 50 + MOTOR_NEUTRAL);
+
+  motors_speeds_[2] = (int)round(flipper_rate + 125) % 250;
+  std::cerr << "commanded motor speed: "
+            << "left:" << motor1_speed << " right:" << motor2_speed
+            << std::endl;
+  std::chrono::steady_clock::time_point current_time =
+      std::chrono::steady_clock::now();
+  motors_speeds_[0] = motor1_control.run(
+      estop_, closed_loop_, motor1_speed,
+      robotstatus_.motor1_rpm / MOTOR_RPM_TO_MPS_RATIO + MOTOR_RPM_TO_MPS_CFB,
+      std::chrono::duration_cast<std::chrono::microseconds>(current_time -
+                                                            motor1_prev_t)
+              .count() /
+          1000000.0,
+      robotstatus_.robot_firmware);
+  motors_speeds_[1] = motor2_control.run(
+      estop_, closed_loop_, motor2_speed,
+      robotstatus_.motor2_rpm / MOTOR_RPM_TO_MPS_RATIO + MOTOR_RPM_TO_MPS_CFB,
+      std::chrono::duration_cast<std::chrono::microseconds>(current_time -
+                                                            motor2_prev_t)
+              .count() /
+          1000000.0,
+      robotstatus_.robot_firmware);
+  std::cerr << "filtered motor speed"
+            << " left:" << motors_speeds_[0] << " right:" << motors_speeds_[1]
+            << std::endl;
+
   writemutex.unlock();
   // sendCommand(0, 0);
 }
