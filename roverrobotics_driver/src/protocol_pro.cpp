@@ -12,16 +12,19 @@ ProProtocolObject::ProProtocolObject(const char* device,
   comm_type = new_comm_type;
   closed_loop_ = closed_loop;
   pid_ = pid;
+  motors_speeds_[0] = MOTOR_NEUTRAL;
+  motors_speeds_[1] = MOTOR_NEUTRAL;
+  motors_speeds_[2] = MOTOR_NEUTRAL;
   std::vector<int> fast_data = {2, 4, 28, 30};
   std::vector<int> slow_data = {10, 12, 20, 22, 38, 40, 64};
   motor1_control = OdomControl(closed_loop_, pid_, 250, 0);
   motor2_control = OdomControl(closed_loop_, pid_, 250, 0);
+  motor1_control.start(closed_loop_, pid_, 250, 0);
+  motor2_control.start(closed_loop_, pid_, 250, 0);
   register_comm_base(device);
   motor1_prev_t = std::chrono::steady_clock::now();
   motor2_prev_t = std::chrono::steady_clock::now();
-  motors_speeds_[0] = 125;
-  motors_speeds_[1] = 125;
-  motors_speeds_[2] = 125;
+
   writethread =
       std::thread([this, fast_data]() { this->sendCommand(50, fast_data); });
 
@@ -88,13 +91,13 @@ void ProProtocolObject::translate_send_speed(double* controlarray) {
             1000000.0,
         robotstatus_.robot_firmware);
     motors_speeds_[2] = (int)round(flipper_rate + 125) % 250;
-  }else if (estop_)
-  {
+  } else if (estop_) {
     motors_speeds_[0] = MOTOR_NEUTRAL;
     motors_speeds_[1] = MOTOR_NEUTRAL;
     motors_speeds_[2] = MOTOR_NEUTRAL;
   }
-  std::cerr << motors_speeds_[0] << " "  << motors_speeds_[1] << " " << motors_speeds_[0] << std::endl;
+  std::cerr << motors_speeds_[0] << " " << motors_speeds_[1] << " "
+            << motors_speeds_[0] << std::endl;
   writemutex.unlock();
   // sendCommand(0, 0);
 }
