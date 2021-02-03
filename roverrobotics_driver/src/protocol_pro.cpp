@@ -66,11 +66,10 @@ void ProProtocolObject::translate_send_speed(double* controlarray) {
     }
   }
   double diff_vel_commanded = turn_rate;
-
   int motor1_speed =
-      (int)round((linear_rate - 0.5 * diff_vel_commanded) * 50 + MOTOR_NEUTRAL);
+      (int)round((linear_rate - 0.5 * diff_vel_commanded) ;
   int motor2_speed =
-      (int)round((linear_rate + 0.5 * diff_vel_commanded) * 50 + MOTOR_NEUTRAL);
+      (int)round((linear_rate + 0.5 * diff_vel_commanded);
 
   motors_speeds_[2] = (int)round(flipper_rate + 125) % 250;
   std::cerr << "commanded motor speed: "
