@@ -58,6 +58,9 @@ void ProProtocolObject::translate_send_speed(double* controlarray) {
     double turn_rate = controlarray[1];
     double flipper_rate = controlarray[2];
     // apply trim value
+    std::cerr << "Control parameters: linear:" << controlarray[0]
+              << " turn:" << controlarray[1] << " flipper:" << controlarray[2]
+              << std::endl;
     if (turn_rate == 0) {
       if (linear_rate > 0) {
         turn_rate = trimvalue;
@@ -72,6 +75,10 @@ void ProProtocolObject::translate_send_speed(double* controlarray) {
     int motor2_speed = (int)round(
         (linear_rate + 0.5 * diff_vel_commanded) * 50 + MOTOR_NEUTRAL);
 
+    motors_speeds_[2] = (int)round(flipper_rate + 125) % 250;
+    std::cerr << "commanded motor speed: "
+              << "left:" << motor1_speed << " right:" << motor2_speed
+              << std::endl;
     std::chrono::steady_clock::time_point current_time =
         std::chrono::steady_clock::now();
     motors_speeds_[0] = motor1_control.run(
@@ -90,14 +97,15 @@ void ProProtocolObject::translate_send_speed(double* controlarray) {
                 .count() /
             1000000.0,
         robotstatus_.robot_firmware);
-    motors_speeds_[2] = (int)round(flipper_rate + 125) % 250;
+    std::cerr << "filtered motor speed"
+              << " left:" << motors_speeds_[0] << " right:" << motors_speeds_[1]
+              << std::endl;
+
   } else if (estop_) {
     motors_speeds_[0] = MOTOR_NEUTRAL;
     motors_speeds_[1] = MOTOR_NEUTRAL;
     motors_speeds_[2] = MOTOR_NEUTRAL;
   }
-  std::cerr << motors_speeds_[0] << " " << motors_speeds_[1] << " "
-            << motors_speeds_[0] << std::endl;
   writemutex.unlock();
   // sendCommand(0, 0);
 }
