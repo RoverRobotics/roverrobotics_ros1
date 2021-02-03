@@ -8,7 +8,9 @@
     <param name="status_frequency" value="30"/>
     
     <!-- RoverRobotics Ros 1 Driver -->
-    <node pkg="roverrobotics_driver" type="roverrobotics_driver_node" name="$(arg driver_node_name)" respawn="false" output="screen"></node>
+    <node pkg="roverrobotics_driver" type="roverrobotics_driver_node" name="$(arg driver_node_name)" respawn="false" output="screen">
+    <arg name="closed_loop_control" value="true"/>
+    </node>
 
     <!-- PS4 Ubuntu Driver -->
     <include file="$(find ds4_driver)/launch/ds4_driver.launch">
