@@ -11,6 +11,7 @@ ProProtocolObject::ProProtocolObject(const char* device,
                                      bool closed_loop, PidGains pid) {
   comm_type = new_comm_type;
   closed_loop_ = closed_loop;
+  std::cerr << "Close Loop Control Status: " << closed_loop_ << std::endl;
   pid_ = pid;
   motors_speeds_[0] = MOTOR_NEUTRAL;
   motors_speeds_[1] = MOTOR_NEUTRAL;

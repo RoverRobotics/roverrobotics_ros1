@@ -104,10 +104,10 @@ unsigned char OdomControl::run(bool e_stop_on, bool control_on,
   cc since we don't care about the PATCH field of semantic versioning
   */
   int firmwareBuildNumberTrunc = firmwareBuildNumber / 100;
-
+  std::cerr << "firmware" << firmwareBuildNumberTrunc ;
   velocity_filtered_ = filter(measured_vel, dt, firmwareBuildNumberTrunc);
 
-  // If rover is E-Stopped, respond with NEUTRAL comman
+  // If rover is E-Stopped, respond with NEUTRAL command
   if (e_stop_on) {
     reset();
     return 125;
