@@ -45,14 +45,14 @@ class RoverRobotics::ROSWrapper {
   std::string robot_info_topic_;
   std::string robot_type_;
   std::string trim_topic_;
-  bool estop_state = false;
-  bool closed_loop = false;
   float trimvalue;
   std::string device_port_;
   std::string comm_type_;
   // Timer
   ros::Timer robot_status_timer_;
   PidGains pidGains_ = {0, 0, 0};
+  bool estop_state;
+  bool closed_loop;
 
  public:
   ROSWrapper(ros::NodeHandle *nh);
@@ -78,20 +78,6 @@ RoverRobotics::ROSWrapper::ROSWrapper(ros::NodeHandle *nh) {
     ROS_FATAL("No communication method set, Shutting down Driver Node");
     ros::shutdown();
   }
-  if (!ros::param::get("robot_type", robot_type_)) {
-    ROS_FATAL(
-        "No 'robot_type' found as a parameter. Shutting down Driver Node");
-    ros::shutdown();
-  } else if (robot_type_ == "pro") {
-    robot_ = std::make_unique<ProProtocolObject>(
-        device_port_.c_str(), comm_type_, closed_loop, pidGains_);
-  } else if (robot_type_ == "zero") {
-    robot_ = std::make_unique<ZeroProtocolObject>(
-        device_port_.c_str(), comm_type_, closed_loop, pidGains_);
-  } else {
-    ROS_FATAL("Unknown Robot Type. Shutting down ROS");
-    ros::shutdown();
-  }
   if (!ros::param::get("closed_loop_control", closed_loop)) {
     ROS_INFO("no 'closed_loop_control' set; using the default value: 'false'");
     closed_loop = false;
@@ -108,6 +94,21 @@ RoverRobotics::ROSWrapper::ROSWrapper(ros::NodeHandle *nh) {
     ROS_INFO("no 'Kd' set; using the default value: '0'");
     pidGains_.Kd = 0;
   }
+  if (!ros::param::get("robot_type", robot_type_)) {
+    ROS_FATAL(
+        "No 'robot_type' found as a parameter. Shutting down Driver Node");
+    ros::shutdown();
+  } else if (robot_type_ == "pro") {
+    robot_ = std::make_unique<ProProtocolObject>(
+        device_port_.c_str(), comm_type_, closed_loop, pidGains_);
+  } else if (robot_type_ == "zero") {
+    robot_ = std::make_unique<ZeroProtocolObject>(
+        device_port_.c_str(), comm_type_, closed_loop, pidGains_);
+  } else {
+    ROS_FATAL("Unknown Robot Type. Shutting down ROS");
+    ros::shutdown();
+  }
+
   // Check if launch files have parameters set; Otherwise use hardcoded values
   if (!ros::param::get("trim_topic", trim_topic_)) {
     ROS_INFO("no 'trim_topic' set; using the default value: '/trim'");
@@ -148,6 +149,12 @@ RoverRobotics::ROSWrapper::ROSWrapper(ros::NodeHandle *nh) {
         "no 'info_topic' set; using the default value: '/robot_unique_info'");
     robot_info_topic_ = "/robot_unique_info";
   }
+  // if (!ros::param::get("estop_state", estop_state)) {
+  //   ROS_INFO(
+  //       "No 'estop_state' set; using the default value:
+  //       '/robot_unique_info'");
+  //   estop_state = false
+  // }
   trim_command_subscriber_ =
       nh->subscribe(trim_topic_, 1, &ROSWrapper::callbackTrim, this);
   speed_command_subscriber_ =

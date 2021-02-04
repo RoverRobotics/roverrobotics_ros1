@@ -6,7 +6,7 @@
     <param name="comm_type" value="serial" />
     <param name="robot_type" value="pro"/>
     <param name="status_frequency" value="30"/>
-    <param name="closed_loop_control" value="true"/>
+    <param name="closed_loop_control" value="false"/>
     <!-- RoverRobotics Ros 1 Driver -->
     <node pkg="roverrobotics_driver" type="roverrobotics_driver_node" name="$(arg driver_node_name)" respawn="false" output="screen">
 

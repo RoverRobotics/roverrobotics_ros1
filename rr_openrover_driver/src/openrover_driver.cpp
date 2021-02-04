@@ -835,6 +835,8 @@ void OpenRover::updateMeasuredVelocities()
 
     int left_enc = robot_data_[i_ENCODER_INTERVAL_MOTOR_LEFT];
     int right_enc = robot_data_[i_ENCODER_INTERVAL_MOTOR_RIGHT];
+    std::cerr << left_rpm << std::endl;
+    std::cerr << right_rpm << std::endl;
 
     if(left_rpm > 0){
       left_vel_measured_ = (float) left_rpm / MOTOR_RPM_TO_MPS_RATIO + MOTOR_RPM_TO_MPS_CFB;

@@ -22,7 +22,7 @@ class OdomControl {
   OdomControl(bool use_control, PidGains pid_gains, int max, int min,
               std::ofstream* fs);  // max min values for returned value
   OdomControl(bool use_control, PidGains pid_gains, int max,
-              int min);  // max min values for returned value
+              int min, int neutral);  // max min values for returned value
 
   unsigned char run(bool e_stop_on, bool control_on, double commanded_vel,
                     double measured_vel, double dt,
@@ -33,7 +33,7 @@ class OdomControl {
   int MOTOR_MAX_;       // 250
   int MOTOR_MIN_;       // 0
   int MOTOR_DEADBAND_;  // = 9;
-
+  int MOTOR_NEUTRAL_;
   double MAX_ACCEL_CUTOFF_;  // 20
   double MIN_VELOCITY_;      // 0.04
   double MAX_VELOCITY_;      // 2.5ish?
