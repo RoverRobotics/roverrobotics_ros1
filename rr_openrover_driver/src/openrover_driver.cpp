@@ -1,5 +1,6 @@
 #include "ros/ros.h"
 
+#include <typeinfo>
 #include <fcntl.h>
 #include <termios.h>
 #include <ctime>
@@ -828,6 +829,7 @@ void OpenRover::updateMeasuredVelocities()
   cc since we don't care about the PATCH field of semantic versioning
   */
   int robotFirmwareBuild = robot_data_[i_BUILDNO] / 100;
+  std::cerr << "robot firmware" << robot_data_[i_BUILDNO];
 
   if(robotFirmwareBuild == BUILD_NUMBER_WITH_GOOD_RPM_DATA){
     signed short int left_rpm = robot_data_[i_REG_MOTOR_FB_RPM_LEFT];

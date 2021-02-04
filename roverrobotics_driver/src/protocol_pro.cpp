@@ -15,7 +15,6 @@ ProProtocolObject::ProProtocolObject(const char *device,
   motors_speeds_[0] = 125;
   motors_speeds_[1] = 125;
   motors_speeds_[2] = 125;
-  std::cerr << "Close Loop Control Status: " << closed_loop_ << std::endl;
   pid_ = pid;
   std::vector<int> fast_data = {2, 4, 28, 30};
   std::vector<int> slow_data = {10, 12, 20, 22, 38, 40, 64};
@@ -142,92 +141,90 @@ void ProProtocolObject::unpack_robot_response(unsigned char *a) {
   } else if (a[0] == 253) {  // if valid starting
     checksum = (255 - int(a[1]) - int(a[2]) - int(a[3])) % 255;
     if (checksum == int(a[4])) {  // verify checksum
-
       // (data1 << 8) + data2;
-      signed short int b = ((data1 << 8) + data2);
-      switch (a[1]) {
-        case 0x00:  // bat total current
-        case 0x02:  // motor1_rpm;
+      int b = (data1 << 8) + data2;
+      switch (int(a[1])) {
+        case 0:  // bat total current
+        case 2:  // motor1_rpm;
           motor1_prev_t = std::chrono::steady_clock::now();
           robotstatus_.motor1_rpm = b;
           break;
-        case 0x04:  // motor2_rpm;
+        case 4:  // motor2_rpm;
           motor2_prev_t = std::chrono::steady_clock::now();
           // std::cerr << int(b) << std::endl;
           robotstatus_.motor2_rpm = b;
           break;
-        case 0x06:  // motor 3 sensor 1
+        case 6:  // motor 3 sensor 1
           robotstatus_.motor3_sensor1 = b;
           break;
-        case 0x08:  // motor 3 sensor 2
+        case 8:  // motor 3 sensor 2
           robotstatus_.motor3_sensor2 = b;
           break;
-        case 0x10:  // motor 1 current
+        case 10:  // motor 1 current
           robotstatus_.motor1_current = b;
           break;
-        case 0x12:  // motor 2 current
+        case 12:  // motor 2 current
           robotstatus_.motor2_current = b;
           break;
-        case 0x14:  // motor 1 motor encoder count
+        case 14:  // motor 1 motor encoder count
 
-        case 0x16:  // motor 2 motor encoder count
-        case 0x18:  // motor fault
+        case 16:  // motor 2 motor encoder count
+        case 18:  // motor fault
           robotstatus_.robot_fault_flag = b;
           break;
-        case 0x20:  // motor 1 motor temp
+        case 20:  // motor 1 motor temp
           robotstatus_.motor1_temp = b;
           break;
-        case 0x22:  // motor 2 motor temp
+        case 22:  // motor 2 motor temp
           robotstatus_.motor2_temp = b;
           break;
-        case 0x24:  // voltage battery a
+        case 24:  // voltage battery a
 
-        case 0x26:  // voltage battery b
-        case 0x28:  // motor 1 encoder interval
-        case 0x30:  // motor 2 encoder interval
-        case 0x32:  // motor 3 encoder interval
-        case 0x34:  // battery A %
-        case 0x36:  // battery B %
-        case 0x38:  // battery state of charge
+        case 26:  // voltage battery b
+        case 28:  // motor 1 encoder interval
+        case 30:  // motor 2 encoder interval
+        case 32:  // motor 3 encoder interval
+        case 34:  // battery A %
+        case 36:  // battery B %
+        case 38:  // battery state of charge
           robotstatus_.battery1_SOC = b;
-          robotstatus_.battery2_SOC = b;
           break;
-        case 0x40:  // build NO
+        case 40:  // build NO
           robotstatus_.robot_firmware = b;
           break;
-        case 0x42:  // battery A current
-        case 0x44:  // battery B current
-        case 0x46:  // motor 3 angle
+        case 42:  // battery A current
+        case 44:  // battery B current
+        case 46:  // motor 3 angle
           robotstatus_.motor3_angle = b;
           break;
-        case 0x48:  // system fan speed
+        case 48:  // system fan speed
           robotstatus_.robot_fan_speed = b;
           break;
-        case 0x50:  // speed mode
-        case 0x52:  // battery status A from BMS
-        case 0x54:  // battery status B from BMS
-        case 0x56:  // battery A flag from BMS
-          robotstatus_.battery1_fault_flag;
+        case 50:  // speed mode
+        case 52:  // battery status A from BMS
+        case 54:  // battery status B from BMS
+        case 56:  // battery A flag from BMS
+          robotstatus_.battery1_fault_flag = b;
           break;
-        case 0x58:  // battery B flag from BMS
-          robotstatus_.battery2_fault_flag;
+        case 58:  // battery B flag from BMS
+          robotstatus_.battery2_fault_flag = b;
           break;
-        case 0x60:  // battery temp A from BMS
+        case 60:  // battery temp A from BMS
           robotstatus_.battery1_temp = b;
           break;
-        case 0x62:  // battery temp B from BMS
+        case 62:  // battery temp B from BMS
           robotstatus_.battery2_temp = b;
           break;
-        case 0x64:  // battery A voltage from BMS
+        case 64:  // battery A voltage from BMS
           robotstatus_.battery1_voltage = b;
           break;
-        case 0x66:  // battery B voltage from BMS
+        case 66:  // battery B voltage from BMS
           robotstatus_.battery2_voltage = b;
           break;
-        case 0x68:  // battery A current from BMS
+        case 68:  // battery A current from BMS
           robotstatus_.battery1_current = b;
           break;
-        case 0x70:  // battery B current from BMS
+        case 70:  // battery B current from BMS
           robotstatus_.battery2_current = b;
           break;
       }
@@ -249,6 +246,7 @@ void ProProtocolObject::unpack_robot_response(unsigned char *a) {
     robotstatus_.motor4_mos_temp = 0;
     robotstatus_.robot_guid = 0;
     robotstatus_.robot_speed_limit = 0;
+    robotstatus_.battery2_SOC = robotstatus_.battery1_SOC;
     // std::cerr << "From Robot: " << (int)a[0];  // start
     // std::cerr << " " << (int)a[1];  // marker
     // std::cerr << " " << (int)a[2];  // data 1

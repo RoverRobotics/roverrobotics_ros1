@@ -124,7 +124,6 @@ unsigned char OdomControl::run(bool e_stop_on, bool control_on,
 
   // If controller should be ON, run it.
   if (control_on) {
-    std::cerr << "pid is on" << std::endl;
     velocity_error_ = commanded_vel - velocity_filtered_;
     if (!skip_measurement_) {
       motor_speed_ = feedThroughControl() +  int(round(PID(velocity_error_, dt)));
@@ -165,7 +164,6 @@ int OdomControl::PID(double error, double dt) {
   } else {
     stop_integrating_ = false;
   }
-  std::cerr << "pid" << int(round(pid_val)) << std::endl;
   return pid_val;
 }
 
@@ -179,13 +177,11 @@ double OdomControl::I(double error, double dt) {
   if (!stop_integrating_) {
     integral_error_ += error * dt;
   }
-  std::cerr<< K_I_ * integral_error_ << std::endl;
   return K_I_ * integral_error_;
 }
 
 double OdomControl::P(double error, double dt) {
   double p_val = error * K_P_;
-  std::cerr << p_val << std::endl;
   return p_val;
 }
 
