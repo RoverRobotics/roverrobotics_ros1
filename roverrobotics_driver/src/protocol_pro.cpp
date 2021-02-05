@@ -20,8 +20,6 @@ ProProtocolObject::ProProtocolObject(const char *device,
   std::vector<int> slow_data = {10, 12, 20, 22, 38, 40, 64};
   motor1_control = OdomControl(closed_loop_, pid_, 250, 0, MOTOR_NEUTRAL);
   motor2_control = OdomControl(closed_loop_, pid_, 250, 0, MOTOR_NEUTRAL);
-  motor1_control.start(closed_loop_, pid_, 250, 0);
-  motor2_control.start(closed_loop_, pid_, 250, 0);
   register_comm_base(device);
   motor1_prev_t = std::chrono::steady_clock::now();
   motor2_prev_t = std::chrono::steady_clock::now();
@@ -63,59 +61,67 @@ void ProProtocolObject::translate_send_speed(double *controlarray) {
   writemutex.unlock();
 
   writemutex.lock();
+  if (!estop_) {
+    double linear_rate = controlarray[0];
+    double turn_rate = controlarray[1];
+    double flipper_rate = controlarray[2];
+    std::cerr << linear_rate << " " << turn_rate << " " << flipper_rate;
+    // apply trim value
 
-  double linear_rate = controlarray[0];
-  double turn_rate = controlarray[1];
-  double flipper_rate = controlarray[2];
-  std::cerr << linear_rate << " " << turn_rate << " " << flipper_rate;
-  // apply trim value
-
-  if (turn_rate == 0) {
-    if (linear_rate > 0) {
-      turn_rate = trimvalue;
-    } else if (linear_rate < 0) {
-      turn_rate = -trimvalue;
+    if (turn_rate == 0) {
+      if (linear_rate > 0) {
+        turn_rate = trimvalue;
+      } else if (linear_rate < 0) {
+        turn_rate = -trimvalue;
+      }
     }
+    double diff_vel_commanded = turn_rate;
+    double motor1_vel = linear_rate - 0.5 * diff_vel_commanded;
+    double motor2_vel = linear_rate + 0.5 * diff_vel_commanded;
+    double motor1_measured_vel =
+        rpm1 / MOTOR_RPM_TO_MPS_RATIO + MOTOR_RPM_TO_MPS_CFB;
+    double motor2_measured_vel =
+        rpm2 / MOTOR_RPM_TO_MPS_RATIO + MOTOR_RPM_TO_MPS_CFB;
+
+    motors_speeds_[2] = (int)round(flipper_rate + 125) % 250;
+    std::cerr << "commanded motor speed from ROS (m/s): "
+              << "left:" << motor1_vel << " right:" << motor2_vel << std::endl;
+    std::cerr << "measured motor speed (m/s)"
+              << " left:" << motor1_measured_vel
+              << " right:" << motor2_measured_vel << std::endl;
+    std::chrono::steady_clock::time_point current_time =
+        std::chrono::steady_clock::now();
+    motors_speeds_[0] = motor1_control.run(
+        motor1_vel, motor1_measured_vel,
+        std::chrono::duration_cast<std::chrono::microseconds>(current_time -
+                                                              motor1_prev_temp)
+                .count() /
+            1000000.0,
+        firmware);
+    motors_speeds_[1] = motor2_control.run(
+        motor2_vel, motor2_measured_vel,
+        std::chrono::duration_cast<std::chrono::microseconds>(current_time -
+                                                              motor2_prev_temp)
+                .count() /
+            1000000.0,
+        firmware);
+
+    std::cerr << "open loop motor command"
+              << " left:" << (int)round(motor1_vel * 50 + MOTOR_NEUTRAL)
+              << " right:" << (int)round(motor2_vel * 50 + MOTOR_NEUTRAL)
+              << std::endl;
+    std::cerr << "closed loop motor command"
+              << " left:" << motors_speeds_[0] << " right:" << motors_speeds_[1]
+              << std::endl;
   }
-  double diff_vel_commanded = turn_rate;
-  double motor1_vel = linear_rate - 0.5 * diff_vel_commanded;
-  double motor2_vel = linear_rate + 0.5 * diff_vel_commanded;
-  double motor1_measured_vel =
-      rpm1 / MOTOR_RPM_TO_MPS_RATIO + MOTOR_RPM_TO_MPS_CFB;
-  double motor2_measured_vel =
-      rpm2 / MOTOR_RPM_TO_MPS_RATIO + MOTOR_RPM_TO_MPS_CFB;
-
-  motors_speeds_[2] = (int)round(flipper_rate + 125) % 250;
-  std::cerr << "commanded motor speed from ROS (m/s): "
-            << "left:" << motor1_vel << " right:" << motor2_vel << std::endl;
-  std::cerr << "measured motor speed (m/s)"
-            << " left:" << motor1_measured_vel
-            << " right:" << motor2_measured_vel << std::endl;
-  std::chrono::steady_clock::time_point current_time =
-      std::chrono::steady_clock::now();
-  motors_speeds_[0] =
-      motor1_control.run(estop_, closed_loop_, motor1_vel, motor1_measured_vel,
-                         std::chrono::duration_cast<std::chrono::microseconds>(
-                             current_time - motor1_prev_temp)
-                                 .count() /
-                             1000000.0,
-                         firmware);
-  motors_speeds_[1] =
-      motor2_control.run(estop_, closed_loop_, motor2_vel, motor2_measured_vel,
-                         std::chrono::duration_cast<std::chrono::microseconds>(
-                             current_time - motor2_prev_temp)
-                                 .count() /
-                             1000000.0,
-                         firmware);
-
-  std::cerr << "open loop motor command"
-            << " left:" << (int)round(motor1_vel * 50 + MOTOR_NEUTRAL)
-            << " right:" << (int)round(motor2_vel * 50 + MOTOR_NEUTRAL)
-            << std::endl;
-  std::cerr << "closed loop motor command"
-            << " left:" << motors_speeds_[0] << " right:" << motors_speeds_[1]
-            << std::endl;
-
+  else
+  {
+    motors_speeds_[0] = MOTOR_NEUTRAL;
+    motors_speeds_[1] = MOTOR_NEUTRAL;
+    motors_speeds_[2] = MOTOR_NEUTRAL;
+    
+  }
+  
   writemutex.unlock();
   // sendCommand(0, 0);
 }

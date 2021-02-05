@@ -1,10 +1,15 @@
 {
     "folders": [
         {
-            "path": "../../roverrobotics_driver/src"
+            "path": "."
         },
         {
-            "path": "."
+            "path": "../../roverrobotics_driver"
         }
-    ]
+    ],
+    "settings": {
+        "files.associations": {
+            "chrono": "cpp"
+        }
+    }
 }

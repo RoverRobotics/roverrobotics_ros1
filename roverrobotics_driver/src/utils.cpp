@@ -2,12 +2,6 @@
 
 namespace RoverRobotics {
 PidGains::PidGains() {}
-void OdomControl::start(bool use_control, PidGains pid_gains, int max,
-                        int min) {
-  K_P_ = pid_gains.Kp;
-  K_I_ = pid_gains.Ki;
-  K_D_ = pid_gains.Kd;
-}
 
 OdomControl::OdomControl()
     : MOTOR_MAX_(250),
@@ -66,7 +60,8 @@ OdomControl::OdomControl(bool use_control, PidGains pid_gains, int max, int min,
   }
 }
 
-OdomControl::OdomControl(bool use_control, PidGains pid_gains, int max, int min, int neutral)
+OdomControl::OdomControl(bool use_control, PidGains pid_gains, int max, int min,
+                         int neutral)
     : MOTOR_MAX_(max),
       MOTOR_MIN_(min),
       MOTOR_NEUTRAL_(neutral),
@@ -92,8 +87,7 @@ OdomControl::OdomControl(bool use_control, PidGains pid_gains, int max, int min,
       velocity_measured_(0),
       velocity_filtered_(0) {}
 
-unsigned char OdomControl::run(bool e_stop_on, bool control_on,
-                               double commanded_vel, double measured_vel,
+unsigned char OdomControl::run(double commanded_vel, double measured_vel,
                                double dt, int firmwareBuildNumber) {
   velocity_commanded_ = commanded_vel;
 
@@ -107,13 +101,6 @@ unsigned char OdomControl::run(bool e_stop_on, bool control_on,
   int firmwareBuildNumberTrunc = firmwareBuildNumber / 100;
   velocity_filtered_ = filter(measured_vel, dt, firmwareBuildNumberTrunc);
 
-  // If rover is E-Stopped, respond with NEUTRAL comman
-  if (e_stop_on) {
-    reset();
-    std::cerr << "software estop is on" << std::endl;
-    return MOTOR_NEUTRAL_;
-  }
-
   // If stopping, stop now when velocity has slowed.
   if ((commanded_vel == 0.0) && (fabs(velocity_filtered_) < 0.3)) {
     integral_error_ = 0;
@@ -123,10 +110,11 @@ unsigned char OdomControl::run(bool e_stop_on, bool control_on,
   }
 
   // If controller should be ON, run it.
-  if (control_on) {
+  if (use_control_) {
     velocity_error_ = commanded_vel - velocity_filtered_;
     if (!skip_measurement_) {
-      motor_speed_ = feedThroughControl() +  int(round(PID(velocity_error_, dt)));
+      motor_speed_ =
+          feedThroughControl() + int(round(PID(velocity_error_, dt)));
     }
   } else {
     motor_speed_ = feedThroughControl();
@@ -180,7 +168,7 @@ double OdomControl::I(double error, double dt) {
   return K_I_ * integral_error_;
 }
 
-double OdomControl::P(double error, double dt) {
+double OdomControl::P(double error) {
   double p_val = error * K_P_;
   return p_val;
 }

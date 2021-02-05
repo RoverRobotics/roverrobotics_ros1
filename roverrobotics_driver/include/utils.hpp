@@ -24,10 +24,9 @@ class OdomControl {
   OdomControl(bool use_control, PidGains pid_gains, int max,
               int min, int neutral);  // max min values for returned value
 
-  unsigned char run(bool e_stop_on, bool control_on, double commanded_vel,
+  unsigned char run(double commanded_vel,
                     double measured_vel, double dt,
                     int firmwareBuildNumber);  // in m/s
-  void start(bool use_control, PidGains pid_gains, int max, int min);
   void reset();
 
   int MOTOR_MAX_;       // 250
@@ -75,7 +74,7 @@ class OdomControl {
   bool hasZeroHistory(const std::vector<double>& vel_history);
   int boundMotorSpeed(int motor_speed, int max, int min);
   int deadbandOffset(int motor_speed, int deadband_offset);
-  double P(double error, double dt);
+  double P(double error);
   double I(double error, double dt);
   double D(double error, double dt);
   int PID(double error, double dt);
