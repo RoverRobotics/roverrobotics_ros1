@@ -54,7 +54,7 @@ add_library(support_lib src/protocol_pro.cpp
                          src/comm_base.cpp
                          src/utils.cpp)
 
-add_executable(roverrobotics_driver_node src/ros_top_node.cpp)
+add_executable(roverrobotics_driver_node src/ros_wrapper.cpp)
 ##add_dependencies(roverrobotics_driver_node roverrobotics_driver_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
 target_link_libraries(roverrobotics_driver_node ${catkin_LIBRARIES} support_lib)
 
