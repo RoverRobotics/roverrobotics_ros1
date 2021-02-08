@@ -80,4 +80,4 @@ class OdomControl {
   int PID(double error, double dt);
   int feedThroughControl();
 };
-}  // namespace openrover
+}  // namespace RoverRobotics

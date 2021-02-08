@@ -1,0 +1,18 @@
+<launch>
+  <!-- ROS Joystick driver -->
+  <node pkg="joy" type="joy_node" name="joy_node" output="screen">
+    <param name="autorepeat_rate" value="10" />
+    <remap from="joy" to="joystick"/>
+  </node>
+
+  <!-- Map joystick to more useful commands -->
+  <node pkg="roverrobotics_input_manager" type="ps4_mapper.py" name="ps4_mapper_node" output="screen">
+    <param name="driver" value="xboxdrv"/>
+    <param name="wired_or_wireless" value="wireless"/>
+  </node>
+
+  <!-- Managed control inputs -->
+  <node pkg="roverrobotics_input_manager" type="control_input_manager.py" name="control_input_manager_node" output="screen">
+    <rosparam file="$(find roverrobotics_input_manager)/config/input_topics.yaml" command="load"/>
+  </node>
+</launch>
