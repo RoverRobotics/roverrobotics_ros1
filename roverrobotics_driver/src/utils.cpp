@@ -141,7 +141,7 @@ void OdomControl::reset() {
 }
 
 int OdomControl::PID(double error, double dt) {
-  double p_val = P(error, dt);
+  double p_val = P(error);
   double i_val = I(error, dt);
   double d_val = D(error, dt);
   double pid_val = p_val + i_val + d_val;
