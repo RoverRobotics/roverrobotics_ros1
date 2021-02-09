@@ -8,9 +8,7 @@ class RoverRobotics::CommCan : public RoverRobotics::CommBase {
  public:
   CommCan(const char *device, std::function<void(std::vector<uint32_t>)>);
   ~CommCan();
-  // void writetodevice(struct can_frame *frame);
   void writetodevice(std::vector<uint32_t> msg);
-  // void readfromdevice(std::function<void(struct can_frame)>);
   void readfromdevice(std::function<void(std::vector<uint32_t>)>);
   bool isConnect();
 

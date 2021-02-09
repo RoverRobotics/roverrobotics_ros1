@@ -16,11 +16,8 @@ class RoverRobotics::ZeroProtocolObject
   statusData translate_send_robot_status_request() override;
   statusData translate_send_robot_info_request() override;
   void translate_send_speed(double*) override;
-  // void unpack_serial(unsigned char*) override;
   void unpack_comm_response(std::vector<uint32_t> ) override;
-  // void unpack_can(struct can_frame) override;
   bool isConnected() override;
-  // void register_state_response_cb(boost::function<int(void)> _f);
   void register_comm_base(const char* device) override;
 
  private:

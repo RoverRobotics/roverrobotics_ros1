@@ -28,14 +28,7 @@ void ZeroProtocolObject::translate_send_speed(double*) {}
 
 void ZeroProtocolObject::unpack_comm_response(std::vector<uint32_t> ) {}
 
-// void ZeroProtocolObject::unpack_serial(unsigned char* a) {}
-
-// void ZeroProtocolObject::unpack_can(struct can_frame a) {}
-
-
 bool ZeroProtocolObject::isConnected() {}
-
-// void register_state_response_cb(boost::function<int(void)> _f);
 
 void ZeroProtocolObject::register_comm_base(const char* device) {}
 

@@ -8,9 +8,7 @@ class RoverRobotics::CommSerial : public RoverRobotics::CommBase {
  public:
   CommSerial(const char *device, std::function<void(std::vector<uint32_t>)>, std::vector<uint32_t>);
   ~CommSerial();
-  // void writetodevice(unsigned char*);
   void writetodevice(std::vector<uint32_t> msg);
-  // void readfromdevice(std::function<void(unsigned char *)>);
   void readfromdevice(std::function<void(std::vector<uint32_t>)>);
 
   bool isConnect();
