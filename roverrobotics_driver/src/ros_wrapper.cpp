@@ -125,6 +125,7 @@ RoverRobotics::ROSWrapper::ROSWrapper(ros::NodeHandle *nh) {
     ROS_FATAL("Unknown Robot Type. Shutting down ROS");
     ros::shutdown();
   }
+  std::cerr << "successfully setup robot interface" << std::endl;
 
   // Check if launch files have parameters set; Otherwise use hardcoded values
   if (!ros::param::get("trim_topic", trim_topic_)) {

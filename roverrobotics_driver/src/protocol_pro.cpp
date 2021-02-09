@@ -118,38 +118,74 @@ void ProProtocolObject::translate_send_speed(double *controlarray) {
   writemutex.unlock();
   // sendCommand(0, 0);
 }
-void ProProtocolObject::unpack_comm_response(std::vector<uint32_t> a) {
+void ProProtocolObject::unpack_comm_response(std::vector<uint32_t> robotmsg) {
+  static std::vector<uint32_t> msgqueue;
   writemutex.lock();
-  unsigned char start_byte_read, data1, data2, dataNO;
-  int checksum, read_checksum;
-  start_byte_read = a[0];
-  dataNO = a[1];
-  data1 = a[2];
-  data2 = a[3];
+  std::cerr << "From Robot: ";
+  for (auto data  : robotmsg) {
+    std::cerr << data << " ";
+  }
+  std::cerr << std::endl;
+  const int startbit = 253;
 
-  // std::cerr << " " << (int)a[0];  // data 1
-  // std::cerr << " " << (int)a[1];  // marker
-  // std::cerr << " " << (int)a[2];  // data 1
-  // std::cerr << " " << (int)a[3];  // data 2
-  // std::cerr << " " << (int)a[4];  // checksum
-  // std::cerr << std::endl;
-  if (int(a[0]) != 253) {  // invalid clear and move on
-    // // std::cerr << "clearing buffer" << int(a[0]) << std::endl;
-    // std::cerr << "Invalid Stream From Robot: " << (int)a[0];  // start
-    // std::cerr << " " << (int)a[1];  // marker
-    // std::cerr << " " << (int)a[2];  // data 1
-    // std::cerr << " " << (int)a[3];  // data 2
-    // std::cerr << " " << (int)a[4];  // checksum
-    // if (checksum == a[4]){
-    //   std::cerr << " checksum verified";
-    // }
-    // std::cerr << std::endl;
-  } else if (a[0] == 253) {  // if valid starting
-    checksum = (255 - int(a[1]) - int(a[2]) - int(a[3])) % 255;
-    if (checksum == int(a[4])) {  // verify checksum
+  msgqueue.insert(msgqueue.end(), robotmsg.begin(),
+                  robotmsg.end());  // insert robotmsg to msg list
+  std::cerr << "In Queue: ";
+  for (auto a : msgqueue) {
+    std::cerr << a << " ";
+  }
+  std::cerr << std::endl;
+  std::cerr << "First Queue Value " << msgqueue[0] << std::endl;
+  // reduce until finding the first startbit
+  std::cerr << "finding start bit";
+  // remove first value until first start bit is found
+  // while (msgqueue[0] != startbit && msgqueue.size() > 5) {
+  //   std::cerr << ".";
+  //   // remove the first element until finding start bit
+  //   std::vector<uint32_t> temp;
+  //   for (int x = 1; x < msgqueue.size(); x++) {
+  //     temp.push_back(msgqueue[x]);
+  //   }
+  //   msgqueue.clear();
+  //   msgqueue.resize(0);
+  //   msgqueue = temp;
+  //   temp.clear();
+  // }
+  if (msgqueue[0] != startbit && msgqueue.size() > 5) {
+    int startbyte_index = 0;
+    while (msgqueue[startbyte_index] != startbit &&
+           startbyte_index < msgqueue.size())
+      startbyte_index++;
+    if (startbyte_index > msgqueue.size()) {
+      msgqueue.clear();
+      return;
+    } else {
+      std::vector<uint32_t> temp;
+      // msgqueue.at
+      for (int x = startbyte_index; x < msgqueue.size(); x++) {
+        temp.push_back(msgqueue[x]);
+      }
+
+      msgqueue.clear();
+      msgqueue.resize(0);
+      msgqueue = temp;
+      temp.clear();
+    }
+  }
+  if (msgqueue[0] == 253) {  // if valid start bit
+    std::cerr << "start bit found!";
+    unsigned char start_byte_read, data1, data2, dataNO;
+    int checksum, read_checksum;
+    start_byte_read = msgqueue[0];
+    dataNO = msgqueue[1];
+    data1 = msgqueue[2];
+    data2 = msgqueue[3];
+    checksum =
+        (255 - int(msgqueue[1]) - int(msgqueue[2]) - int(msgqueue[3])) % 255;
+    if (checksum == int(msgqueue[4])) {  // verify checksum
       // (data1 << 8) + data2;
       int b = (data1 << 8) + data2;
-      switch (int(a[1])) {
+      switch (int(msgqueue[1])) {
         case 0:  // bat total current
         case 2:  // motor1_rpm;
           motor1_prev_t = std::chrono::steady_clock::now();
@@ -234,29 +270,63 @@ void ProProtocolObject::unpack_comm_response(std::vector<uint32_t> a) {
           robotstatus_.battery2_current = b;
           break;
       }
+      // THESE VALUES ARE NOT AVAILABLE ON ROVER PRO
+      robotstatus_.motor1_id = 0;
+      robotstatus_.motor1_mos_temp = 0;
+      robotstatus_.motor2_id = 0;
+      robotstatus_.motor2_mos_temp = 0;
+      robotstatus_.motor3_id = 0;
+      robotstatus_.motor3_rpm = 0;
+      robotstatus_.motor3_current = 0;
+      robotstatus_.motor3_temp = 0;
+      robotstatus_.motor3_mos_temp = 0;
+      robotstatus_.motor4_id = 0;
+      robotstatus_.motor4_rpm = 0;
+      robotstatus_.motor4_current = 0;
+      robotstatus_.motor4_temp = 0;
+      robotstatus_.motor4_mos_temp = 0;
+      robotstatus_.robot_guid = 0;
+      robotstatus_.robot_speed_limit = 0;
+      robotstatus_.battery2_SOC = robotstatus_.battery1_SOC;
+      std::vector<uint32_t> temp;
+      for (int x = 5; x < msgqueue.size(); x++) {
+        temp.push_back(msgqueue[x]);
+      }
+      msgqueue.clear();
+      msgqueue.resize(0);
+      msgqueue = temp;
+      temp.clear();
+      // msgqueue = temp;
+    } else {
+      std::cerr << "failed checksum" << std::endl;
+      std::vector<uint32_t> temp;
+      for (int x = 1; x < msgqueue.size(); x++) {
+        temp.push_back(msgqueue[x]);
+      }
+      msgqueue.clear();
+      msgqueue.resize(0);
+      msgqueue = temp;
+      temp.clear();
+      // msgqueue = temp;
     }
-    // THESE VALUES ARE NOT AVAILABLE ON ROVER PRO
-    robotstatus_.motor1_id = 0;
-    robotstatus_.motor1_mos_temp = 0;
-    robotstatus_.motor2_id = 0;
-    robotstatus_.motor2_mos_temp = 0;
-    robotstatus_.motor3_id = 0;
-    robotstatus_.motor3_rpm = 0;
-    robotstatus_.motor3_current = 0;
-    robotstatus_.motor3_temp = 0;
-    robotstatus_.motor3_mos_temp = 0;
-    robotstatus_.motor4_id = 0;
-    robotstatus_.motor4_rpm = 0;
-    robotstatus_.motor4_current = 0;
-    robotstatus_.motor4_temp = 0;
-    robotstatus_.motor4_mos_temp = 0;
-    robotstatus_.robot_guid = 0;
-    robotstatus_.robot_speed_limit = 0;
-    robotstatus_.battery2_SOC = robotstatus_.battery1_SOC;
-    
+
+  } else {  // ran out of byte doesn't have valid start bit
+    std::cerr << "no start bit found!";
+    // ran out of data; waiting for more
+    // // std::cerr << "clearing buffer" << int(a[0]) << std::endl;
+    // std::cerr << "Invalid Stream From Robot: " << (int)a[0];  // start
+    // std::cerr << " " << (int)a[1];  // marker
+    // std::cerr << " " << (int)a[2];  // data 1
+    // std::cerr << " " << (int)a[3];  // data 2
+    // std::cerr << " " << (int)a[4];  // checksum
+    // if (checksum == a[4]){
+    //   std::cerr << " checksum verified";
+    // }
+    // std::cerr << std::endl;
   }
+  std::cerr << std::endl;
   writemutex.unlock();
-}
+}  // namespace RoverRobotics
 
 bool ProProtocolObject::isConnected() {
   comm_base->isConnect();
@@ -266,8 +336,13 @@ bool ProProtocolObject::isConnected() {
 void ProProtocolObject::register_comm_base(const char *device) {
   if (comm_type == "serial") {
     std::cerr << "making serial connection" << std::endl;
+    std::vector<uint32_t> setting_;
+    setting_.push_back(4097);
+    setting_.push_back(7);
+    setting_.push_back(5);
     comm_base = std::make_unique<CommSerial>(
-        device, [this](std::vector<uint32_t> c) { unpack_comm_response(c); });
+        device, [this](std::vector<uint32_t> c) { unpack_comm_response(c); },
+        setting_);
   } else if (comm_type == "can") {
     std::cerr << "not available" << std::endl;
     // comm_base = std::make_unique<CommCan>(
@@ -291,10 +366,15 @@ void ProProtocolObject::sendCommand(int sleeptime,
                                               (unsigned char)motors_speeds_[2],
                                               (unsigned char)10,
                                               (unsigned char)x};
+
+        write_buffer.push_back((char)255 -
+                               (motors_speeds_[0] + motors_speeds_[1] +
+                                motors_speeds_[2] + 10 + x) %
+                                   255);
         comm_base->writetodevice(write_buffer);
         writemutex.unlock();
       } else if (comm_type == "can") {
-        return;  //* no CAN for rover pro yet
+        return;  //* no CAN for rover pro
       } else {   //! How did you get here?
         return;  // TODO: Return error ?
       }
