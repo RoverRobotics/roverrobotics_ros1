@@ -10,7 +10,7 @@ class RoverRobotics::ProProtocolObject
  public:
   ProProtocolObject(const char* device, std::string new_comm_type,
                     bool closed_loop, PidGains pid);
-  ~ProProtocolObject() override;
+  // ~ProProtocolObject() override;
   void update_drivetrim(double) override;
   void translate_send_estop(bool) override;
   statusData translate_send_robot_status_request() override;

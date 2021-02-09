@@ -14,8 +14,6 @@ ZeroProtocolObject::ZeroProtocolObject(const char* device,
 //   motors_speed_[3] = 0;
 }
 
-ZeroProtocolObject::~ZeroProtocolObject() {}
-
 void ZeroProtocolObject::update_drivetrim(double) {}
 
 void ZeroProtocolObject::translate_send_estop(bool) {}

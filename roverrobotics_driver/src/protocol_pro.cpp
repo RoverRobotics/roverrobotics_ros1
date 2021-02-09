@@ -26,9 +26,6 @@ ProProtocolObject::ProProtocolObject(const char *device,
   writethread2 =
       std::thread([this, slow_data]() { this->sendCommand(50, slow_data); });
 }
-ProProtocolObject::~ProProtocolObject() {
-  // Decontructor
-}
 
 void ProProtocolObject::update_drivetrim(double value) { trimvalue = value; }
 

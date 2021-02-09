@@ -9,8 +9,6 @@ class BaseProtocolObject;
 }
 class RoverRobotics::BaseProtocolObject {
  public:
-  BaseProtocolObject() = default;
-  virtual ~BaseProtocolObject();
   /* Accept a double that changes how the robot trim incase the robot is not
    * driving straight */
   virtual void update_drivetrim(double) = 0;

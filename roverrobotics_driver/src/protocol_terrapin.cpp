@@ -34,9 +34,6 @@ TerrapinProtocolObject::TerrapinProtocolObject(const char *device,
   //       std::thread([this, slow_data]() { this->sendCommand(50, slow_data);
   //       });
 }
-TerrapinProtocolObject::~TerrapinProtocolObject() {
-  // Decontructor
-}
 
 void TerrapinProtocolObject::update_drivetrim(double value) {
   trimvalue = value;

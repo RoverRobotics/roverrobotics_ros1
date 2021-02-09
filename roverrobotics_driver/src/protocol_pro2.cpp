@@ -34,9 +34,6 @@ Pro2ProtocolObject::Pro2ProtocolObject(const char *device,
   //       std::thread([this, slow_data]() { this->sendCommand(50, slow_data);
   //       });
 }
-Pro2ProtocolObject::~Pro2ProtocolObject() {
-  // Decontructor
-}
 
 void Pro2ProtocolObject::update_drivetrim(double value) { trimvalue = value; }
 

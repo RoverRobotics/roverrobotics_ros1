@@ -36,9 +36,6 @@ class CommBase;
 }
 class RoverRobotics::CommBase {
  public:
-  CommBase() = default;
-  virtual ~CommBase();
-
   /* Accept a vector of unsigned int 32.
    * Convert vector of data into a buffer for then write to serial device*/
   virtual void writetodevice(std::vector<uint32_t> output) = 0;
