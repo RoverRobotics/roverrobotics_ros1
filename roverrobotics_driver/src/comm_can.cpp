@@ -4,8 +4,10 @@
 namespace RoverRobotics {
 CommCan::CommCan(const char *device,
                  std::function<void(std::vector<uint32_t>)> parsefunction) {
+          std::cerr << "initializing can communication" << std::endl;
   if ((s = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0) {
-    throw("Error while opening socket", -1);
+    std::cerr << "error openning socket" << std:: endl;
+    throw(-1);
   }
   strcpy(ifr.ifr_name, device);
   ioctl(s, SIOCGIFINDEX, &ifr);
@@ -13,7 +15,8 @@ CommCan::CommCan(const char *device,
   addr.can_ifindex = ifr.ifr_ifindex;
 
   if (bind(s, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-    throw("Error in socket bind", -2);
+    std::cerr << "error in socket bind" << std:: endl;
+    throw(-2);
   }
   // start read thread
   readthread = std::thread(

@@ -149,7 +149,7 @@ void Pro2ProtocolObject::translate_send_speed(double *controlarray) {
   writemutex.unlock();
 }
 
-  void Pro2ProtocolObject::unpack_comm_response(std::vector<uint32_t> msg) {}
+void Pro2ProtocolObject::unpack_comm_response(std::vector<uint32_t> msg) {}
 
 // void Pro2ProtocolObject::unpack_serial(unsigned char *) {}
 
@@ -297,18 +297,20 @@ void Pro2ProtocolObject::translate_send_speed(double *controlarray) {
 bool Pro2ProtocolObject::isConnected() { return comm_base->isConnect(); }
 
 void Pro2ProtocolObject::register_comm_base(const char *device) {
+  std::cerr << "checking communication interface" << std::endl;
   if (comm_type == "serial") {
     std::cerr << "making serial connection" << std::endl;
     comm_base = std::make_unique<CommSerial>(
         device, [this](std::vector<uint32_t> c) { unpack_comm_response(c); });
   } else if (comm_type == "can") {
+    std::cerr << "making can connection" << std::endl;
     comm_base = std::make_unique<CommCan>(
         device, [this](std::vector<uint32_t> c) { unpack_comm_response(c); });
-    std::cerr << "making can connection" << std::endl;
   }
 }
 
-void Pro2ProtocolObject::sendCommand(int sleeptime, std::vector<uint32_t> datalist) {
+void Pro2ProtocolObject::sendCommand(int sleeptime,
+                                     std::vector<uint32_t> datalist) {
   while (true) {
     // Param 1: 10 to get data, 240 for low speed mode
     for (int x : datalist) {
