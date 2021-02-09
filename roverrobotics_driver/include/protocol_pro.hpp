@@ -28,6 +28,7 @@ class RoverRobotics::ProProtocolObject
   const float MOTOR_RPM_TO_MPS_RATIO = 13749 / 1.26;
   const float MOTOR_RPM_TO_MPS_CFB = -0.07;
   const int MOTOR_NEUTRAL = 125;
+  const int startbit = 253;
   std::unique_ptr<CommBase> comm_base;
   std::string comm_type;
 

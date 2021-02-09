@@ -3,3 +3,4 @@ build/CMakeFiles/cmake.check_cache
 build/CMakeCache.txt
 .vscode/c_cpp_properties.json
 .vscode/settings.json
+rr_openrover_driver/src/workspace.code-workspace

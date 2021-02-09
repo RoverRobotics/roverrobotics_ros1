@@ -126,7 +126,7 @@ void ProProtocolObject::unpack_comm_response(std::vector<uint32_t> robotmsg) {
     std::cerr << data << " ";
   }
   std::cerr << std::endl;
-  const int startbit = 253;
+  
 
   msgqueue.insert(msgqueue.end(), robotmsg.begin(),
                   robotmsg.end());  // insert robotmsg to msg list
