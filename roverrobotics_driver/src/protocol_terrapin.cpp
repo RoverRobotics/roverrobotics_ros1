@@ -1,6 +1,5 @@
 #include "protocol_terrapin.hpp"
 
-
 namespace RoverRobotics {
 
 TerrapinProtocolObject::TerrapinProtocolObject(const char *device,
@@ -157,144 +156,144 @@ void TerrapinProtocolObject::unpack_comm_response(std::vector<uint32_t> msg) {}
 // void TerrapinProtocolObject::unpack_serial(unsigned char *) {}
 
 // void TerrapinProtocolObject::unpack_can(struct can_frame a) {
-  // std::cerr << "unpacking some msg" << std::endl;
-  //   writemutex.lock();
-  //   unsigned char start_byte_read, data1, data2, dataNO;
-  //   int checksum, read_checksum;
-  //   start_byte_read = a[0];
-  //   dataNO = a[1];
-  //   data1 = a[2];
-  //   data2 = a[3];
+// std::cerr << "unpacking some msg" << std::endl;
+//   writemutex.lock();
+//   unsigned char start_byte_read, data1, data2, dataNO;
+//   int checksum, read_checksum;
+//   start_byte_read = a[0];
+//   dataNO = a[1];
+//   data1 = a[2];
+//   data2 = a[3];
 
-  //   // std::cerr << " " << (int)a[0];  // data 1
-  //   // std::cerr << " " << (int)a[1];  // marker
-  //   // std::cerr << " " << (int)a[2];  // data 1
-  //   // std::cerr << " " << (int)a[3];  // data 2
-  //   // std::cerr << " " << (int)a[4];  // checksum
-  //   // std::cerr << std::endl;
-  //   if (int(a[0]) != 253) {  // invalid clear and move on
-  //     // std::cerr << "clearing buffer" << int(a[0]) << std::endl;
-  //     comm_base->clearbuffer();
-  //   } else if (a[0] == 253) {  // if valid starting
-  //     checksum = (255 - int(a[1]) - int(a[2]) - int(a[3])) % 255;
-  //     if (checksum == int(a[4])) {  // verify checksum
-  //       // (data1 << 8) + data2;
-  //       int b = (data1 << 8) + data2;
-  //       switch (int(a[1])) {
-  //         case 0:  // bat total current
-  //         case 2:  // motor1_rpm;
-  //           motor1_prev_t = std::chrono::steady_clock::now();
-  //           robotstatus_.motor1_rpm = b;
-  //           break;
-  //         case 4:  // motor2_rpm;
-  //           motor2_prev_t = std::chrono::steady_clock::now();
-  //           // std::cerr << int(b) << std::endl;
-  //           robotstatus_.motor2_rpm = b;
-  //           break;
-  //         case 6:  // motor 3 sensor 1
-  //           robotstatus_.motor3_sensor1 = b;
-  //           break;
-  //         case 8:  // motor 3 sensor 2
-  //           robotstatus_.motor3_sensor2 = b;
-  //           break;
-  //         case 10:  // motor 1 current
-  //           robotstatus_.motor1_current = b;
-  //           break;
-  //         case 12:  // motor 2 current
-  //           robotstatus_.motor2_current = b;
-  //           break;
-  //         case 14:  // motor 1 motor encoder count
+//   // std::cerr << " " << (int)a[0];  // data 1
+//   // std::cerr << " " << (int)a[1];  // marker
+//   // std::cerr << " " << (int)a[2];  // data 1
+//   // std::cerr << " " << (int)a[3];  // data 2
+//   // std::cerr << " " << (int)a[4];  // checksum
+//   // std::cerr << std::endl;
+//   if (int(a[0]) != 253) {  // invalid clear and move on
+//     // std::cerr << "clearing buffer" << int(a[0]) << std::endl;
+//     comm_base->clearbuffer();
+//   } else if (a[0] == 253) {  // if valid starting
+//     checksum = (255 - int(a[1]) - int(a[2]) - int(a[3])) % 255;
+//     if (checksum == int(a[4])) {  // verify checksum
+//       // (data1 << 8) + data2;
+//       int b = (data1 << 8) + data2;
+//       switch (int(a[1])) {
+//         case 0:  // bat total current
+//         case 2:  // motor1_rpm;
+//           motor1_prev_t = std::chrono::steady_clock::now();
+//           robotstatus_.motor1_rpm = b;
+//           break;
+//         case 4:  // motor2_rpm;
+//           motor2_prev_t = std::chrono::steady_clock::now();
+//           // std::cerr << int(b) << std::endl;
+//           robotstatus_.motor2_rpm = b;
+//           break;
+//         case 6:  // motor 3 sensor 1
+//           robotstatus_.motor3_sensor1 = b;
+//           break;
+//         case 8:  // motor 3 sensor 2
+//           robotstatus_.motor3_sensor2 = b;
+//           break;
+//         case 10:  // motor 1 current
+//           robotstatus_.motor1_current = b;
+//           break;
+//         case 12:  // motor 2 current
+//           robotstatus_.motor2_current = b;
+//           break;
+//         case 14:  // motor 1 motor encoder count
 
-  //         case 16:  // motor 2 motor encoder count
-  //         case 18:  // motor fault
-  //           robotstatus_.robot_fault_flag = b;
-  //           break;
-  //         case 20:  // motor 1 motor temp
-  //           robotstatus_.motor1_temp = b;
-  //           break;
-  //         case 22:  // motor 2 motor temp
-  //           robotstatus_.motor2_temp = b;
-  //           break;
-  //         case 24:  // voltage battery a
+//         case 16:  // motor 2 motor encoder count
+//         case 18:  // motor fault
+//           robotstatus_.robot_fault_flag = b;
+//           break;
+//         case 20:  // motor 1 motor temp
+//           robotstatus_.motor1_temp = b;
+//           break;
+//         case 22:  // motor 2 motor temp
+//           robotstatus_.motor2_temp = b;
+//           break;
+//         case 24:  // voltage battery a
 
-  //         case 26:  // voltage battery b
-  //         case 28:  // motor 1 encoder interval
-  //         case 30:  // motor 2 encoder interval
-  //         case 32:  // motor 3 encoder interval
-  //         case 34:  // battery A %
-  //         case 36:  // battery B %
-  //         case 38:  // battery state of charge
-  //           robotstatus_.battery1_SOC = b;
-  //           break;
-  //         case 40:  // build NO
-  //           robotstatus_.robot_firmware = b;
-  //           break;
-  //         case 42:  // battery A current
-  //         case 44:  // battery B current
-  //         case 46:  // motor 3 angle
-  //           robotstatus_.motor3_angle = b;
-  //           break;
-  //         case 48:  // system fan speed
-  //           robotstatus_.robot_fan_speed = b;
-  //           break;
-  //         case 50:  // speed mode
-  //         case 52:  // battery status A from BMS
-  //         case 54:  // battery status B from BMS
-  //         case 56:  // battery A flag from BMS
-  //           robotstatus_.battery1_fault_flag = b;
-  //           break;
-  //         case 58:  // battery B flag from BMS
-  //           robotstatus_.battery2_fault_flag = b;
-  //           break;
-  //         case 60:  // battery temp A from BMS
-  //           robotstatus_.battery1_temp = b;
-  //           break;
-  //         case 62:  // battery temp B from BMS
-  //           robotstatus_.battery2_temp = b;
-  //           break;
-  //         case 64:  // battery A voltage from BMS
-  //           robotstatus_.battery1_voltage = b;
-  //           break;
-  //         case 66:  // battery B voltage from BMS
-  //           robotstatus_.battery2_voltage = b;
-  //           break;
-  //         case 68:  // battery A current from BMS
-  //           robotstatus_.battery1_current = b;
-  //           break;
-  //         case 70:  // battery B current from BMS
-  //           robotstatus_.battery2_current = b;
-  //           break;
-  //       }
-  //     }
-  //     // THESE VALUES ARE NOT AVAILABLE ON ROVER PRO
-  //     robotstatus_.motor1_id = 0;
-  //     robotstatus_.motor1_mos_temp = 0;
-  //     robotstatus_.motor2_id = 0;
-  //     robotstatus_.motor2_mos_temp = 0;
-  //     robotstatus_.motor3_id = 0;
-  //     robotstatus_.motor3_rpm = 0;
-  //     robotstatus_.motor3_current = 0;
-  //     robotstatus_.motor3_temp = 0;
-  //     robotstatus_.motor3_mos_temp = 0;
-  //     robotstatus_.motor4_id = 0;
-  //     robotstatus_.motor4_rpm = 0;
-  //     robotstatus_.motor4_current = 0;
-  //     robotstatus_.motor4_temp = 0;
-  //     robotstatus_.motor4_mos_temp = 0;
-  //     robotstatus_.robot_guid = 0;
-  //     robotstatus_.robot_speed_limit = 0;
-  //     robotstatus_.battery2_SOC = robotstatus_.battery1_SOC;
-  //     // std::cerr << "From Robot: " << (int)a[0];  // start
-  //     // std::cerr << " " << (int)a[1];  // marker
-  //     // std::cerr << " " << (int)a[2];  // data 1
-  //     // std::cerr << " " << (int)a[3];  // data 2
-  //     // std::cerr << " " << (int)a[4];  // checksum
-  //     // if (checksum == a[4]){
-  //     //   std::cerr << " checksum verified";
-  //     // }
-  //     // std::cerr << std::endl;
-  //   }
-  //   writemutex.unlock();
+//         case 26:  // voltage battery b
+//         case 28:  // motor 1 encoder interval
+//         case 30:  // motor 2 encoder interval
+//         case 32:  // motor 3 encoder interval
+//         case 34:  // battery A %
+//         case 36:  // battery B %
+//         case 38:  // battery state of charge
+//           robotstatus_.battery1_SOC = b;
+//           break;
+//         case 40:  // build NO
+//           robotstatus_.robot_firmware = b;
+//           break;
+//         case 42:  // battery A current
+//         case 44:  // battery B current
+//         case 46:  // motor 3 angle
+//           robotstatus_.motor3_angle = b;
+//           break;
+//         case 48:  // system fan speed
+//           robotstatus_.robot_fan_speed = b;
+//           break;
+//         case 50:  // speed mode
+//         case 52:  // battery status A from BMS
+//         case 54:  // battery status B from BMS
+//         case 56:  // battery A flag from BMS
+//           robotstatus_.battery1_fault_flag = b;
+//           break;
+//         case 58:  // battery B flag from BMS
+//           robotstatus_.battery2_fault_flag = b;
+//           break;
+//         case 60:  // battery temp A from BMS
+//           robotstatus_.battery1_temp = b;
+//           break;
+//         case 62:  // battery temp B from BMS
+//           robotstatus_.battery2_temp = b;
+//           break;
+//         case 64:  // battery A voltage from BMS
+//           robotstatus_.battery1_voltage = b;
+//           break;
+//         case 66:  // battery B voltage from BMS
+//           robotstatus_.battery2_voltage = b;
+//           break;
+//         case 68:  // battery A current from BMS
+//           robotstatus_.battery1_current = b;
+//           break;
+//         case 70:  // battery B current from BMS
+//           robotstatus_.battery2_current = b;
+//           break;
+//       }
+//     }
+//     // THESE VALUES ARE NOT AVAILABLE ON ROVER PRO
+//     robotstatus_.motor1_id = 0;
+//     robotstatus_.motor1_mos_temp = 0;
+//     robotstatus_.motor2_id = 0;
+//     robotstatus_.motor2_mos_temp = 0;
+//     robotstatus_.motor3_id = 0;
+//     robotstatus_.motor3_rpm = 0;
+//     robotstatus_.motor3_current = 0;
+//     robotstatus_.motor3_temp = 0;
+//     robotstatus_.motor3_mos_temp = 0;
+//     robotstatus_.motor4_id = 0;
+//     robotstatus_.motor4_rpm = 0;
+//     robotstatus_.motor4_current = 0;
+//     robotstatus_.motor4_temp = 0;
+//     robotstatus_.motor4_mos_temp = 0;
+//     robotstatus_.robot_guid = 0;
+//     robotstatus_.robot_speed_limit = 0;
+//     robotstatus_.battery2_SOC = robotstatus_.battery1_SOC;
+//     // std::cerr << "From Robot: " << (int)a[0];  // start
+//     // std::cerr << " " << (int)a[1];  // marker
+//     // std::cerr << " " << (int)a[2];  // data 1
+//     // std::cerr << " " << (int)a[3];  // data 2
+//     // std::cerr << " " << (int)a[4];  // checksum
+//     // if (checksum == a[4]){
+//     //   std::cerr << " checksum verified";
+//     // }
+//     // std::cerr << std::endl;
+//   }
+//   writemutex.unlock();
 // }
 
 bool TerrapinProtocolObject::isConnected() { return comm_base->isConnect(); }
@@ -302,8 +301,13 @@ bool TerrapinProtocolObject::isConnected() { return comm_base->isConnect(); }
 void TerrapinProtocolObject::register_comm_base(const char *device) {
   if (comm_type == "serial") {
     std::cerr << "making serial connection" << std::endl;
+    std::vector<uint32_t> setting_;
+    setting_.push_back(4098);
+    setting_.push_back(8);
+    setting_.push_back(8);
     comm_base = std::make_unique<CommSerial>(
-        device, [this](std::vector<uint32_t> c) { unpack_comm_response(c); });
+        device, [this](std::vector<uint32_t> c) { unpack_comm_response(c); },
+        setting_);
   } else if (comm_type == "can") {
     comm_base = std::make_unique<CommCan>(
         device, [this](std::vector<uint32_t> c) { unpack_comm_response(c); });
