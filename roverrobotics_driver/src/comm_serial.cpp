@@ -78,15 +78,18 @@ void CommSerial::readfromdevice(
     std::function<void(std::vector<uint32_t> )> parsefunction) {
   while (true) {
     readmutex.lock();
-    int num_bytes = read(serial_port, &read_buf, sizeof(read_buf));
-    std::vector<uint32_t> a; //TODO
-    parsefunction(a);
+    unsigned char read_buf[5];  
+    int num_bytes = read(serial_port, &read_buf, 5);
+    std::vector<uint32_t> output; //TODO
+    for (int x = 0; x < 5; x++){
+      output.push_back(read_buf[x]);
+    }
+    parsefunction(output);
     readmutex.unlock();
   }
-  // return read_buf;
+  //! THIS DO NOT SUPPORT DATA STREAM THAT IS BIGGER THAN 5 BYTE ATM
 }
 
-void CommSerial::clearbuffer() { read_buf[5] = {0}; }
 bool CommSerial::isConnect() { return (serial_port > 0); }
 
 }  // namespace RoverRobotics

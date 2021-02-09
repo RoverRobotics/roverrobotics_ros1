@@ -12,7 +12,6 @@ class RoverRobotics::CommCan : public RoverRobotics::CommBase {
   void writetodevice(std::vector<uint32_t> msg);
   // void readfromdevice(std::function<void(struct can_frame)>);
   void readfromdevice(std::function<void(std::vector<uint32_t>)>);
-  void clearbuffer();
   bool isConnect();
 
  private:

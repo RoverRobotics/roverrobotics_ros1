@@ -42,6 +42,5 @@ class RoverRobotics::CommBase {
   virtual void writetodevice(std::vector<uint32_t>) = 0;
   // virtual void readfromdevice(std::function<void(unsigned char *)>) = 0;
   virtual void readfromdevice(std::function<void(std::vector<uint32_t>)>) = 0;
-  virtual void clearbuffer() = 0;
   virtual bool isConnect() = 0;
 };

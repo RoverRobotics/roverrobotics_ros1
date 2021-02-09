@@ -13,14 +13,12 @@ class RoverRobotics::CommSerial : public RoverRobotics::CommBase {
   // void readfromdevice(std::function<void(unsigned char *)>);
   void readfromdevice(std::function<void(std::vector<uint32_t>)>);
 
-  void clearbuffer();
   bool isConnect();
 
  private:
   std::mutex writemutex;
   std::mutex readmutex;
   unsigned char write_buffer[7];
-  unsigned char read_buf[5];  // size ?
   int serial_port;
   std::thread readthread;
 };

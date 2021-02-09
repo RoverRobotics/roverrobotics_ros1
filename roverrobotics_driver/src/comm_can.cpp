@@ -59,8 +59,6 @@ void CommCan::readfromdevice(
   // return read_buf;
 }
 
-void CommCan::clearbuffer() {}
-
 bool CommCan::isConnect() {
   if (s < 0) {
     return false;
