@@ -1,9 +1,5 @@
 #include "protocol_pro.hpp"
 
-#include <chrono>
-
-float MOTOR_RPM_TO_MPS_RATIO = 13749 / 1.26;
-float MOTOR_RPM_TO_MPS_CFB = -0.07;
 namespace RoverRobotics {
 
 ProProtocolObject::ProProtocolObject(const char *device,
@@ -16,8 +12,8 @@ ProProtocolObject::ProProtocolObject(const char *device,
   motors_speeds_[1] = 125;
   motors_speeds_[2] = 125;
   pid_ = pid;
-  std::vector<int> fast_data = {2, 4, 28, 30};
-  std::vector<int> slow_data = {10, 12, 20, 22, 38, 40, 64};
+  std::vector<uint32_t> fast_data = {2, 4, 28, 30};
+  std::vector<uint32_t> slow_data = {10, 12, 20, 22, 38, 40, 64};
   motor1_control = OdomControl(closed_loop_, pid_, 250, 0, MOTOR_NEUTRAL);
   motor2_control = OdomControl(closed_loop_, pid_, 250, 0, MOTOR_NEUTRAL);
   register_comm_base(device);
@@ -113,20 +109,16 @@ void ProProtocolObject::translate_send_speed(double *controlarray) {
     std::cerr << "closed loop motor command"
               << " left:" << motors_speeds_[0] << " right:" << motors_speeds_[1]
               << std::endl;
-  }
-  else
-  {
+  } else {
     motors_speeds_[0] = MOTOR_NEUTRAL;
     motors_speeds_[1] = MOTOR_NEUTRAL;
     motors_speeds_[2] = MOTOR_NEUTRAL;
-    
   }
-  
+
   writemutex.unlock();
   // sendCommand(0, 0);
 }
-
-void ProProtocolObject::unpack_robot_response(unsigned char *a) {
+void ProProtocolObject::unpack_comm_response(std::vector<uint32_t> a) {
   writemutex.lock();
   unsigned char start_byte_read, data1, data2, dataNO;
   int checksum, read_checksum;
@@ -142,8 +134,16 @@ void ProProtocolObject::unpack_robot_response(unsigned char *a) {
   // std::cerr << " " << (int)a[4];  // checksum
   // std::cerr << std::endl;
   if (int(a[0]) != 253) {  // invalid clear and move on
-    // std::cerr << "clearing buffer" << int(a[0]) << std::endl;
-    comm_base->clearbuffer();
+    // // std::cerr << "clearing buffer" << int(a[0]) << std::endl;
+    // std::cerr << "Invalid Stream From Robot: " << (int)a[0];  // start
+    // std::cerr << " " << (int)a[1];  // marker
+    // std::cerr << " " << (int)a[2];  // data 1
+    // std::cerr << " " << (int)a[3];  // data 2
+    // std::cerr << " " << (int)a[4];  // checksum
+    // if (checksum == a[4]){
+    //   std::cerr << " checksum verified";
+    // }
+    // std::cerr << std::endl;
   } else if (a[0] == 253) {  // if valid starting
     checksum = (255 - int(a[1]) - int(a[2]) - int(a[3])) % 255;
     if (checksum == int(a[4])) {  // verify checksum
@@ -253,21 +253,13 @@ void ProProtocolObject::unpack_robot_response(unsigned char *a) {
     robotstatus_.robot_guid = 0;
     robotstatus_.robot_speed_limit = 0;
     robotstatus_.battery2_SOC = robotstatus_.battery1_SOC;
-    // std::cerr << "From Robot: " << (int)a[0];  // start
-    // std::cerr << " " << (int)a[1];  // marker
-    // std::cerr << " " << (int)a[2];  // data 1
-    // std::cerr << " " << (int)a[3];  // data 2
-    // std::cerr << " " << (int)a[4];  // checksum
-    // if (checksum == a[4]){
-    //   std::cerr << " checksum verified";
-    // }
-    // std::cerr << std::endl;
+    
   }
   writemutex.unlock();
 }
 
 bool ProProtocolObject::isConnected() {
-  return true;
+  comm_base->isConnect();
   // TODO: TBD
 }
 
@@ -275,15 +267,17 @@ void ProProtocolObject::register_comm_base(const char *device) {
   if (comm_type == "serial") {
     std::cerr << "making serial connection" << std::endl;
     comm_base = std::make_unique<CommSerial>(
-        device, [this](unsigned char *c) { unpack_robot_response(c); });
+        device, [this](std::vector<uint32_t> c) { unpack_comm_response(c); });
   } else if (comm_type == "can") {
-    comm_base = std::make_unique<CommCan>(
-        device, [this](unsigned char *c) { unpack_robot_response(c); });
-    std::cerr << "making can connection" << std::endl;
+    std::cerr << "not available" << std::endl;
+    // comm_base = std::make_unique<CommCan>(
+    //     device, [this](unsigned char *c) { unpack_robot_response(c); });
+    // std::cerr << "making can connection" << std::endl;
   }
 }
 
-void ProProtocolObject::sendCommand(int sleeptime, std::vector<int> datalist) {
+void ProProtocolObject::sendCommand(int sleeptime,
+                                    std::vector<uint32_t> datalist) {
   while (true) {
     // Param 1: 10 to get data, 240 for low speed mode
     for (int x : datalist) {
@@ -291,24 +285,13 @@ void ProProtocolObject::sendCommand(int sleeptime, std::vector<int> datalist) {
           std::chrono::milliseconds(sleeptime));  // 20Hz
       if (comm_type == "serial") {
         writemutex.lock();
-        write_buffer[0] = (unsigned char)253;
-        write_buffer[1] = (unsigned char)motors_speeds_[0];  // left motor
-        write_buffer[2] = (unsigned char)motors_speeds_[1];  // right motor
-        write_buffer[3] = (unsigned char)motors_speeds_[2];  // flipper
-        write_buffer[4] = (unsigned char)10;
-        write_buffer[5] = (unsigned char)x;  // Param 2:
-        // Calculate Checksum
-        write_buffer[6] =
-            (char)255 - (write_buffer[1] + write_buffer[2] + write_buffer[3] +
-                         write_buffer[4] + write_buffer[5]) %
-                            255;
+        std::vector<uint32_t> write_buffer = {(unsigned char)253,
+                                              (unsigned char)motors_speeds_[0],
+                                              (unsigned char)motors_speeds_[1],
+                                              (unsigned char)motors_speeds_[2],
+                                              (unsigned char)10,
+                                              (unsigned char)x};
         comm_base->writetodevice(write_buffer);
-        // std::cerr << "To Robot: ";
-        // for (int i = 0; i < sizeof(write_buffer); i++) {
-        //   std::cerr << int(write_buffer[i]) << " ";
-        //   // std::cerr <<  std::dec <<int(write_buffer[i]) << " ";
-        // }
-        // std::cout << std::endl;
         writemutex.unlock();
       } else if (comm_type == "can") {
         return;  //* no CAN for rover pro yet

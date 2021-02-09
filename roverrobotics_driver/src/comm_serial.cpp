@@ -3,7 +3,7 @@
 
 namespace RoverRobotics {
 CommSerial::CommSerial(const char *device,
-                       std::function<void(unsigned char *)> parsefunction) {
+                       std::function<void(std::vector<uint32_t>)> parsefunction) {
   // open serial port at specified port
   serial_port = open(device, 02);
 
@@ -52,28 +52,44 @@ CommSerial::CommSerial(const char *device,
 
 CommSerial::~CommSerial() { close(serial_port); }
 
-void CommSerial::writetodevice(unsigned char *msg) {
-  writemutex.lock();  // Over Protective
-  write(serial_port, msg, sizeof(msg));
+// void CommSerial::writetodevice(unsigned char *msg) {
+//   writemutex.lock();  // Over Protective
+//   write(serial_port, msg, sizeof(msg));
+//   writemutex.unlock();
+// }
+void CommSerial::writetodevice(std::vector<uint32_t> msg) {
+  writemutex.lock();
+  write_buffer[0] = (unsigned char)msg[0];
+  write_buffer[1] = (unsigned char)msg[1];  // left motor
+  write_buffer[2] = (unsigned char)msg[2];  // right motor
+  write_buffer[3] = (unsigned char)msg[3];  // flipper
+  write_buffer[4] = (unsigned char)msg[4];
+  write_buffer[5] = (unsigned char)msg[5];  // Param 2:
+  // Calculate Checksum
+  write_buffer[6] =
+      (char)255 - (write_buffer[1] + write_buffer[2] + write_buffer[3] +
+                   write_buffer[4] + write_buffer[5]) %
+                      255;
+  write(serial_port, write_buffer, sizeof(write_buffer));
   writemutex.unlock();
 }
 
 void CommSerial::readfromdevice(
-    std::function<void(unsigned char *)> parsefunction) {
+    std::function<void(std::vector<uint32_t> )> parsefunction) {
   while (true) {
     readmutex.lock();
-    int num_bytes = read(serial_port, &read_buf, sizeof(read_buf));
-    parsefunction(read_buf);
+    unsigned char read_buf[5];  
+    int num_bytes = read(serial_port, &read_buf, 5);
+    std::vector<uint32_t> output; //TODO
+    for (int x = 0; x < 5; x++){
+      output.push_back(read_buf[x]);
+    }
+    parsefunction(output);
     readmutex.unlock();
   }
-  // return read_buf;
+  //! THIS DO NOT SUPPORT DATA STREAM THAT IS BIGGER THAN 5 BYTE ATM
 }
 
-void CommSerial::clearbuffer() {
-  read_buf[5] = {0};
-}
-bool CommSerial::isConnect(){
-  return (serial_port > 0);
-}
+bool CommSerial::isConnect() { return (serial_port > 0); }
 
 }  // namespace RoverRobotics

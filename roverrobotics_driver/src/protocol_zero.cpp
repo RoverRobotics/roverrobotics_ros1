@@ -3,7 +3,16 @@
 
 namespace RoverRobotics {
 ZeroProtocolObject::ZeroProtocolObject(const char* device,
-                                       std::string new_comm_type,bool closed_loop, PidGains pid) {}
+                                       std::string new_comm_type,
+                                       bool closed_loop, PidGains pid) {
+//   comm_type == new_comm_type;
+//   closed_loop_ = closed_loop;
+//   estop_ = false;
+//   motors_speed_[0] = 0;
+//   motors_speed_[1] = 0;
+//   motors_speed_[2] = 0;
+//   motors_speed_[3] = 0;
+}
 
 ZeroProtocolObject::~ZeroProtocolObject() {}
 
@@ -17,7 +26,12 @@ statusData ZeroProtocolObject::translate_send_robot_info_request() {}
 
 void ZeroProtocolObject::translate_send_speed(double*) {}
 
-void ZeroProtocolObject::unpack_robot_response(unsigned char * a) {}
+void ZeroProtocolObject::unpack_comm_response(std::vector<uint32_t> ) {}
+
+// void ZeroProtocolObject::unpack_serial(unsigned char* a) {}
+
+// void ZeroProtocolObject::unpack_can(struct can_frame a) {}
+
 
 bool ZeroProtocolObject::isConnected() {}
 
