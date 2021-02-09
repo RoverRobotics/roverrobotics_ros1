@@ -48,6 +48,8 @@ include_directories(
 
 add_library(support_lib src/protocol_pro.cpp
                          src/protocol_zero.cpp
+                         src/protocol_pro2.cpp
+                         src/protocol_terrapin.cpp
                          src/protocol_base.cpp
                          src/comm_serial.cpp
                          src/comm_can.cpp

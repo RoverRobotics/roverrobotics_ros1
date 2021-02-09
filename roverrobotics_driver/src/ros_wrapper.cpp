@@ -5,6 +5,7 @@
 #include "geometry_msgs/Twist.h"
 #include "protocol_base.hpp"
 #include "protocol_pro.hpp"
+#include "protocol_pro2.hpp"
 #include "protocol_zero.hpp"
 #include "ros/node_handle.h"
 #include "ros/ros.h"
@@ -19,6 +20,7 @@ class ROSWrapper;
 }
 class RoverRobotics::ROSWrapper {
  private:
+  int motors_id_[4];
   //
   std::unique_ptr<BaseProtocolObject> robot_;
   // Pub Sub
@@ -67,9 +69,21 @@ class RoverRobotics::ROSWrapper {
 };
 
 RoverRobotics::ROSWrapper::ROSWrapper(ros::NodeHandle *nh) {
+  motors_id_[4] = {0};
   estop_state = false;
   // IMPORTANT robot parameter
   // robot type check; if fail will stop this whole node.
+  if (!ros::param::get("motor1_id", motors_id_[0])) {
+  }
+  if (!ros::param::get("motor2_id", motors_id_[1])) {
+  }
+  if (!ros::param::get("motor3_id", motors_id_[2])) {
+  }
+  if (!ros::param::get("motor4_id", motors_id_[3])) {
+  }
+  for (int i = 0; i < 4; i++) {
+    std::cerr << "motor " << i + 1 << " id:" << motors_id_[i] << std::endl;
+  }
   if (!ros::param::get("device_port", device_port_)) {
     ROS_FATAL("No 'device_port' set, Shutting down Driver Node");
     ros::shutdown();
@@ -104,6 +118,9 @@ RoverRobotics::ROSWrapper::ROSWrapper(ros::NodeHandle *nh) {
   } else if (robot_type_ == "zero") {
     robot_ = std::make_unique<ZeroProtocolObject>(
         device_port_.c_str(), comm_type_, closed_loop, pidGains_);
+  } else if (robot_type_ == "pro2") {
+    robot_ = std::make_unique<Pro2ProtocolObject>(
+        device_port_.c_str(), comm_type_, closed_loop, pidGains_, motors_id_);
   } else {
     ROS_FATAL("Unknown Robot Type. Shutting down ROS");
     ros::shutdown();
