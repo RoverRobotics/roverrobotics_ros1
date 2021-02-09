@@ -15,11 +15,11 @@ class RoverRobotics::CommCan : public RoverRobotics::CommBase {
  private:
   std::mutex writemutex;
   std::mutex readmutex;
-  struct sockaddr_can addr;        // can address
-  struct can_frame frame;          // Can Frame to robot
-  struct ifreq ifr;                // can freq
-  int s;                           // socket status
-  struct can_frame receive_frame;  // Can Frame from robot
+  struct sockaddr_can addr;        // ! Can address
+  struct can_frame frame;          // ! Can Frame to robot
+  struct ifreq ifr;                // ! Can freq
+  int s;                           // ! socket status
+  struct can_frame receive_frame;  // ! Can Frame from robot
 
   std::thread readthread;
 };
