@@ -5,8 +5,6 @@
 #include "geometry_msgs/Twist.h"
 #include "protocol_base.hpp"
 #include "protocol_pro.hpp"
-#include "protocol_pro2.hpp"
-#include "protocol_zero.hpp"
 #include "ros/node_handle.h"
 #include "ros/ros.h"
 #include "status_data.hpp"

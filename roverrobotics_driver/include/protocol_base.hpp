@@ -1,7 +1,6 @@
 #pragma once
 
 #include "comm_base.hpp"
-#include "comm_can.hpp"
 #include "comm_serial.hpp"
 
 namespace RoverRobotics {
