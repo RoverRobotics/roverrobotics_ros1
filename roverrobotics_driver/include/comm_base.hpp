@@ -1,7 +1,5 @@
 #pragma once
-/*
-This is the serial communication layer to the robot .
-*/
+
 #include <errno.h>
 #include <fcntl.h>
 #include <linux/can.h>
