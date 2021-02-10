@@ -13,13 +13,13 @@ class RoverRobotics::BaseProtocolObject {
    * driving straight */
   virtual void update_drivetrim(double) = 0;
   /* Handle Software Estop Event */
-  virtual void translate_send_estop(bool) = 0;
+  virtual void send_estop(bool) = 0;
   /* Accept a double array of speeds to send to the robot*/
-  virtual void translate_send_speed(double*) = 0;
+  virtual void send_speed(double*) = 0;
   /* Handle robot status request*/
-  virtual statusData translate_send_robot_status_request() = 0;
+  virtual statusData status_request() = 0;
   /* Handle robot unique info request*/
-  virtual statusData translate_send_robot_info_request() = 0;
+  virtual statusData info_request() = 0;
   /* Accept vector of unsigned int 32
    * Callback function to handle message from robot*/
   virtual void unpack_comm_response(std::vector<uint32_t>) = 0;

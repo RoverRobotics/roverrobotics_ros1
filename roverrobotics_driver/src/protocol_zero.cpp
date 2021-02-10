@@ -16,13 +16,13 @@ ZeroProtocolObject::ZeroProtocolObject(const char* device,
 
 void ZeroProtocolObject::update_drivetrim(double) {}
 
-void ZeroProtocolObject::translate_send_estop(bool) {}
+void ZeroProtocolObject::send_estop(bool) {}
 
-statusData ZeroProtocolObject::translate_send_robot_status_request() {}
+statusData ZeroProtocolObject::status_request() {}
 
-statusData ZeroProtocolObject::translate_send_robot_info_request() {}
+statusData ZeroProtocolObject::info_request() {}
 
-void ZeroProtocolObject::translate_send_speed(double*) {}
+void ZeroProtocolObject::send_speed(double*) {}
 
 void ZeroProtocolObject::unpack_comm_response(std::vector<uint32_t> ) {}
 

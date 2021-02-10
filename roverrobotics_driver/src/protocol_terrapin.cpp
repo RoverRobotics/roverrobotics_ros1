@@ -39,21 +39,21 @@ void TerrapinProtocolObject::update_drivetrim(double value) {
   trimvalue = value;
 }
 
-void TerrapinProtocolObject::translate_send_estop(bool estop) {
+void TerrapinProtocolObject::send_estop(bool estop) {
   writemutex.lock();
   estop_ = estop;
   writemutex.unlock();
 }
 
-statusData TerrapinProtocolObject::translate_send_robot_status_request() {
+statusData TerrapinProtocolObject::status_request() {
   return robotstatus_;
 }
 
-statusData TerrapinProtocolObject::translate_send_robot_info_request() {
+statusData TerrapinProtocolObject::info_request() {
   return robotstatus_;
 }
 
-void TerrapinProtocolObject::translate_send_speed(double *controlarray) {
+void TerrapinProtocolObject::send_speed(double *controlarray) {
   // prevent constant lock
   writemutex.lock();
   std::chrono::steady_clock::time_point motor1_prev_temp;

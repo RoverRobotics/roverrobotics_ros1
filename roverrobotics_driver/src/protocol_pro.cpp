@@ -29,21 +29,21 @@ ProProtocolObject::ProProtocolObject(const char *device,
 
 void ProProtocolObject::update_drivetrim(double value) { trimvalue = value; }
 
-void ProProtocolObject::translate_send_estop(bool estop) {
+void ProProtocolObject::send_estop(bool estop) {
   writemutex.lock();
   estop_ = estop;
   writemutex.unlock();
 }
 
-statusData ProProtocolObject::translate_send_robot_status_request() {
+statusData ProProtocolObject::status_request() {
   return robotstatus_;
 }
 
-statusData ProProtocolObject::translate_send_robot_info_request() {
+statusData ProProtocolObject::info_request() {
   return robotstatus_;
 }
 
-void ProProtocolObject::translate_send_speed(double *controlarray) {
+void ProProtocolObject::send_speed(double *controlarray) {
   // prevent constant lock
   writemutex.lock();
   std::chrono::steady_clock::time_point motor1_prev_temp;

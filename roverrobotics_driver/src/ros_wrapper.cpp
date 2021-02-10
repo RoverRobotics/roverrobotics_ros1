@@ -32,8 +32,6 @@ class RoverRobotics::ROSWrapper {
   ros::Subscriber robot_info_subscriber;  // listen to robot_info request
   ros::Publisher robot_info_publisher;    // publish robot_unique info
 
-  ros::Subscriber
-      robot_status_subscriber;  // listen to user togglable inputs i.e estop
   ros::Publisher robot_status_publisher_;  // publish robot state (battery,
                                            // estop_status, speed)
 
@@ -203,7 +201,7 @@ void RoverRobotics::ROSWrapper::publishRobotStatus(
     robot_status_timer_.stop();
     ros::shutdown();
   }
-  statusData data = robot_->translate_send_robot_status_request();
+  statusData data = robot_->status_request();
   std_msgs::Float32MultiArray robot_status;
   robot_status.data.clear();
   // Motor Infos
@@ -262,7 +260,7 @@ void RoverRobotics::ROSWrapper::publishRobotInfo() {
     ros::shutdown();
     return;
   }
-  statusData data = robot_->translate_send_robot_info_request();
+  statusData data = robot_->info_request();
   std_msgs::Float32MultiArray robot_info;
   robot_info.data.clear();
   robot_info.data.push_back(data.robot_guid);
@@ -279,7 +277,7 @@ void RoverRobotics::ROSWrapper::callbackSpeedCommand(
   speeddata[0] = msg.linear.x;
   speeddata[1] = msg.angular.z;
   speeddata[2] = msg.angular.y;
-  robot_->translate_send_speed(speeddata);
+  robot_->send_speed(speeddata);
 }
 
 void RoverRobotics::ROSWrapper::callbackInfo(
@@ -292,13 +290,13 @@ void RoverRobotics::ROSWrapper::callbackInfo(
 void RoverRobotics::ROSWrapper::callbackEstopTrigger(
     const std_msgs::Bool::ConstPtr &msg) {
   estop_state = true;
-  robot_->translate_send_estop(estop_state);
+  robot_->send_estop(estop_state);
 }
 
 void RoverRobotics::ROSWrapper::callbackEstopReset(
     const std_msgs::Bool::ConstPtr &msg) {
   estop_state = false;
-  robot_->translate_send_estop(estop_state);
+  robot_->send_estop(estop_state);
 }
 
 void RoverRobotics::ROSWrapper::callbackTrim(

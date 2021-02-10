@@ -12,10 +12,10 @@ class RoverRobotics::Pro2ProtocolObject
                      bool closed_loop, PidGains pid, int motors_id[]);
   // ~Pro2ProtocolObject() override;
   void update_drivetrim(double) override;
-  void translate_send_estop(bool) override;
-  statusData translate_send_robot_status_request() override;
-  statusData translate_send_robot_info_request() override;
-  void translate_send_speed(double*) override;
+  void send_estop(bool) override;
+  statusData status_request() override;
+  statusData info_request() override;
+  void send_speed(double*) override;
   void unpack_comm_response(std::vector<uint32_t>) override;
   bool isConnected() override;
   void register_comm_base(const char* device) override;
