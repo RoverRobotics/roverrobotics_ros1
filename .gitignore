@@ -4,3 +4,4 @@ build/CMakeCache.txt
 .vscode/c_cpp_properties.json
 .vscode/settings.json
 workspace.code-workspace
+.vscode/settings.json
