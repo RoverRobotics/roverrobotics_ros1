@@ -111,12 +111,6 @@ RoverRobotics::ROSWrapper::ROSWrapper(ros::NodeHandle *nh) {
   } else if (robot_type_ == "pro") {
     robot_ = std::make_unique<ProProtocolObject>(
         device_port_.c_str(), comm_type_, closed_loop, pidGains_);
-  } else if (robot_type_ == "zero") {
-    robot_ = std::make_unique<ZeroProtocolObject>(
-        device_port_.c_str(), comm_type_, closed_loop, pidGains_);
-  } else if (robot_type_ == "pro2") {
-    robot_ = std::make_unique<Pro2ProtocolObject>(
-        device_port_.c_str(), comm_type_, closed_loop, pidGains_, motors_id_);
   } else {
     ROS_FATAL("Unknown Robot Type. Shutting down ROS");
     ros::shutdown();
