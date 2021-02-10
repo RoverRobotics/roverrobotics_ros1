@@ -113,15 +113,15 @@ unsigned char OdomControl::run(double commanded_vel, double measured_vel,
   if (use_control_) {
     velocity_error_ = commanded_vel - velocity_filtered_;
     if (!skip_measurement_) {
-      motor_speed_ =
+      motor_command_ =
           feedThroughControl() + int(round(PID(velocity_error_, dt)));
     }
   } else {
-    motor_speed_ = feedThroughControl();
+    motor_command_ = feedThroughControl();
   }
 
-  motor_speed_ = boundMotorSpeed(motor_speed_, MOTOR_MAX_, MOTOR_MIN_);
-  return (unsigned char)motor_speed_;
+  motor_command_ = boundMotorSpeed(motor_command_, MOTOR_MAX_, MOTOR_MIN_);
+  return (unsigned char)motor_command_;
 }
 
 int OdomControl::feedThroughControl() {
@@ -136,7 +136,7 @@ void OdomControl::reset() {
   velocity_filtered_ = 0;
   std::fill(velocity_filtered_history_.begin(),
             velocity_filtered_history_.end(), 0);
-  motor_speed_ = MOTOR_NEUTRAL_;
+  motor_command_ = MOTOR_NEUTRAL_;
   skip_measurement_ = false;
 }
 

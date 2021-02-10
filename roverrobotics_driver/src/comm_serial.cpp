@@ -42,8 +42,7 @@ CommSerial::CommSerial(const char *device,
   // Set in/out baud rate
   cfsetispeed(&tty, (int)setting[0]);
   cfsetospeed(&tty, (int)setting[0]);
-  write_size_ = (int)setting[1];
-  read_size_ = (int)setting[2];
+  read_size_ = (int)setting[1];
   std::cerr << "baudrate " << (int)setting[0] << " write size " << write_size_ << " read size "<< read_size_ << std::endl;
   // Save tty settings, also checking for error
   if (tcsetattr(serial_port, TCSANOW, &tty) != 0) {
@@ -57,12 +56,12 @@ CommSerial::~CommSerial() { close(serial_port); }
 
 void CommSerial::writetodevice(std::vector<uint32_t> msg) {
   writemutex.lock();
-  unsigned char write_buffer[write_size_];
+  unsigned char write_buffer[msg.size()];
   for (int x = 0 ; x < msg.size(); x ++){
     write_buffer[x] = msg[x];
   }
 
-  write(serial_port, write_buffer, sizeof(write_buffer));
+  write(serial_port, write_buffer, msg.size());
   writemutex.unlock();
 }
 

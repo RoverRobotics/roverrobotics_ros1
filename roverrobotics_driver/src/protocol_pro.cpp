@@ -8,9 +8,9 @@ ProProtocolObject::ProProtocolObject(const char *device,
   comm_type = new_comm_type;
   closed_loop_ = closed_loop;
   estop_ = false;
-  motors_speeds_[0] = MOTOR_NEUTRAL;
-  motors_speeds_[1] = MOTOR_NEUTRAL;
-  motors_speeds_[2] = MOTOR_NEUTRAL;
+  motors_speeds_[LEFT_MOTOR] = MOTOR_NEUTRAL;
+  motors_speeds_[RIGHT_MOTOR] = MOTOR_NEUTRAL;
+  motors_speeds_[FLIPPER_MOTOR] = MOTOR_NEUTRAL;
   std::vector<uint32_t> fast_data = {REG_MOTOR_FB_RPM_LEFT,
                                      REG_MOTOR_FB_RPM_RIGHT, EncoderInterval_0,
                                      EncoderInterval_1};
@@ -28,11 +28,12 @@ ProProtocolObject::ProProtocolObject(const char *device,
   motor1_prev_t = std::chrono::steady_clock::now();
   motor2_prev_t = std::chrono::steady_clock::now();
 
+  // Create a New Thread with 20 mili seconds sleep timer
   writethread =
-      std::thread([this, fast_data]() { this->sendCommand(50, fast_data); });
-
+      std::thread([this, fast_data]() { this->sendCommand(20, fast_data); });
+  // Create a new Thread with 50 mili seconds sleep timer
   writethread2 =
-      std::thread([this, slow_data]() { this->sendCommand(20, slow_data); });
+      std::thread([this, slow_data]() { this->sendCommand(50, slow_data); });
 }
 
 void ProProtocolObject::update_drivetrim(double value) { trimvalue = value; }
@@ -80,7 +81,8 @@ void ProProtocolObject::send_speed(double *controlarray) {
     double motor2_measured_vel =
         rpm2 / MOTOR_RPM_TO_MPS_RATIO + MOTOR_RPM_TO_MPS_CFB;
 
-    motors_speeds_[2] = (int)round(flipper_rate + MOTOR_NEUTRAL) % MOTOR_MAX;
+    motors_speeds_[FLIPPER_MOTOR] =
+        (int)round(flipper_rate + MOTOR_NEUTRAL) % MOTOR_MAX;
     std::cerr << "commanded motor speed from ROS (m/s): "
               << "left:" << motor1_vel << " right:" << motor2_vel << std::endl;
     std::cerr << "measured motor speed (m/s)"
@@ -88,14 +90,14 @@ void ProProtocolObject::send_speed(double *controlarray) {
               << " right:" << motor2_measured_vel << std::endl;
     std::chrono::steady_clock::time_point current_time =
         std::chrono::steady_clock::now();
-    motors_speeds_[0] = motor1_control.run(
+    motors_speeds_[LEFT_MOTOR] = motor1_control.run(
         motor1_vel, motor1_measured_vel,
         std::chrono::duration_cast<std::chrono::microseconds>(current_time -
                                                               motor1_prev_temp)
                 .count() /
             1000000.0,
         firmware);
-    motors_speeds_[1] = motor2_control.run(
+    motors_speeds_[RIGHT_MOTOR] = motor2_control.run(
         motor2_vel, motor2_measured_vel,
         std::chrono::duration_cast<std::chrono::microseconds>(current_time -
                                                               motor2_prev_temp)
@@ -111,13 +113,12 @@ void ProProtocolObject::send_speed(double *controlarray) {
               << " left:" << motors_speeds_[0] << " right:" << motors_speeds_[1]
               << std::endl;
   } else {
-    motors_speeds_[0] = MOTOR_NEUTRAL;
-    motors_speeds_[1] = MOTOR_NEUTRAL;
-    motors_speeds_[2] = MOTOR_NEUTRAL;
+    motors_speeds_[LEFT_MOTOR] = MOTOR_NEUTRAL;
+    motors_speeds_[RIGHT_MOTOR] = MOTOR_NEUTRAL;
+    motors_speeds_[FLIPPER_MOTOR] = MOTOR_NEUTRAL;
   }
 
   writemutex.unlock();
-  // sendCommand(0, 0);
 }
 void ProProtocolObject::unpack_comm_response(std::vector<uint32_t> robotmsg) {
   static std::vector<uint32_t> msgqueue;
@@ -135,17 +136,18 @@ void ProProtocolObject::unpack_comm_response(std::vector<uint32_t> robotmsg) {
     std::cerr << a << " ";
   }
   std::cerr << std::endl;
-  // ! reduce until finding the first startbit
-  std::cerr << "finding start bit";
-  if (msgqueue[0] != startbit && msgqueue.size() > 5) {
+  // ! reduce until finding the first startbyte
+  std::cerr << "finding start byte";
+  if (msgqueue[0] != startbyte && msgqueue.size() > readbuffer_size) {
     int startbyte_index = 0;
-    while (msgqueue[startbyte_index] != startbit &&
+    // !Did not find valid start byte in buffer
+    while (msgqueue[startbyte_index] != startbyte &&
            startbyte_index < msgqueue.size())
       startbyte_index++;
     if (startbyte_index > msgqueue.size()) {
-      msgqueue.clear();
+      msgqueue.clear(); 
       return;
-    } else {
+    } else { // !Reconstruct the vector so that the start byte is at the 0 position
       std::vector<uint32_t> temp;
       for (int x = startbyte_index; x < msgqueue.size(); x++) {
         temp.push_back(msgqueue[x]);
@@ -156,8 +158,8 @@ void ProProtocolObject::unpack_comm_response(std::vector<uint32_t> robotmsg) {
       temp.clear();
     }
   }
-  if (msgqueue[0] == startbit) {  // if valid start bit
-    std::cerr << "start bit found!";
+  if (msgqueue[0] == startbyte) {  // if valid start byte
+    std::cerr << "start byte found!";
     unsigned char start_byte_read, data1, data2, dataNO;
     int checksum, read_checksum;
     start_byte_read = msgqueue[0];
@@ -275,14 +277,15 @@ void ProProtocolObject::unpack_comm_response(std::vector<uint32_t> robotmsg) {
       robotstatus_.robot_speed_limit = 0;
 
       std::vector<uint32_t> temp;
-      for (int x = 5; x < msgqueue.size(); x++) {
+      // !Remove processed msg from queue
+      for (int x = readbuffer_size; x < msgqueue.size(); x++) {
         temp.push_back(msgqueue[x]);
       }
       msgqueue.clear();
       msgqueue.resize(0);
       msgqueue = temp;
       temp.clear();
-    } else {
+    } else { // !Found start byte but the msg contents were invalid, throw away broken message
       std::cerr << "failed checksum" << std::endl;
       std::vector<uint32_t> temp;
       for (int x = 1; x < msgqueue.size(); x++) {
@@ -296,15 +299,7 @@ void ProProtocolObject::unpack_comm_response(std::vector<uint32_t> robotmsg) {
 
   } else {
     // !ran out of data; waiting for more
-    std::cerr << "no start bit found!";
-    // std::cerr << " " << (int)a[1];  // marker
-    // std::cerr << " " << (int)a[2];  // data 1
-    // std::cerr << " " << (int)a[3];  // data 2
-    // std::cerr << " " << (int)a[4];  // checksum
-    // if (checksum == a[4]){
-    //   std::cerr << " checksum verified";
-    // }
-    // std::cerr << std::endl;
+    std::cerr << "no start byte found!";
   }
   std::cerr << std::endl;
   writemutex.unlock();
@@ -317,8 +312,7 @@ void ProProtocolObject::register_comm_base(const char *device) {
     std::cerr << "making serial connection" << std::endl;
     std::vector<uint32_t> setting_;
     setting_.push_back(baudrate);
-    setting_.push_back(writebuffer);
-    setting_.push_back(readbuffer);
+    setting_.push_back(readbuffer_size);
     comm_base = std::make_unique<CommSerial>(
         device, [this](std::vector<uint32_t> c) { unpack_comm_response(c); },
         setting_);
@@ -336,14 +330,18 @@ void ProProtocolObject::sendCommand(int sleeptime,
       if (comm_type == "serial") {
         writemutex.lock();
         std::vector<uint32_t> write_buffer = {
-            (unsigned char)startbit,          (unsigned char)motors_speeds_[0],
-            (unsigned char)motors_speeds_[1], (unsigned char)motors_speeds_[2],
-            (unsigned char)requestbit,        (unsigned char)x};
+            (unsigned char)startbyte,
+            (unsigned char)motors_speeds_[LEFT_MOTOR],
+            (unsigned char)motors_speeds_[RIGHT_MOTOR],
+            (unsigned char)motors_speeds_[FLIPPER_MOTOR],
+            (unsigned char)requestbyte,
+            (unsigned char)x};
 
-        write_buffer.push_back((char)255 -
-                               (motors_speeds_[0] + motors_speeds_[1] +
-                                motors_speeds_[2] + requestbit + x) %
-                                   255);
+        write_buffer.push_back(
+            (char)255 -
+            (motors_speeds_[LEFT_MOTOR] + motors_speeds_[RIGHT_MOTOR] +
+             motors_speeds_[FLIPPER_MOTOR] + requestbyte + x) %
+                255);
         comm_base->writetodevice(write_buffer);
         writemutex.unlock();
       } else if (comm_type == "can") {

@@ -56,7 +56,7 @@ class OdomControl {
   double velocity_error_;
 
   // Returned value
-  int motor_speed_;  // value between 0-250; (rover pro valeu)
+  int motor_command_; 
   unsigned char deadband_offset_;
 
   // velocity feedback

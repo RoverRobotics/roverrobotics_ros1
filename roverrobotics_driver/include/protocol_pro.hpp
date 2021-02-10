@@ -27,11 +27,10 @@ class RoverRobotics::ProProtocolObject
   const int MOTOR_NEUTRAL = 125;
   const int MOTOR_MAX = 250;
   const int MOTOR_MIN = 0;
-  const int startbit = 253;
-  const int requestbit = 10;
+  const int startbyte = 253;
+  const int requestbyte = 10;
   const int baudrate = 4097;
-  const int writebuffer = 7;
-  const int readbuffer = 5;
+  const int readbuffer_size = 5;
   // const int commandbit = 20;
   std::unique_ptr<CommBase> comm_base;
   std::string comm_type;
@@ -50,6 +49,13 @@ class RoverRobotics::ProProtocolObject
   PidGains pid_;
   std::chrono::steady_clock::time_point motor1_prev_t;
   std::chrono::steady_clock::time_point motor2_prev_t;
+
+  enum robot_motors{
+    LEFT_MOTOR,
+    RIGHT_MOTOR,
+    FLIPPER_MOTOR
+  };
+
   enum uart_param {
     REG_PWR_TOTAL_CURRENT,
     REG_MOTOR_FB_RPM_LEFT = 2,
