@@ -73,9 +73,11 @@ void ProProtocolObject::send_speed(double *controlarray) {
         turn_rate = -trimvalue;
       }
     }
+    // !Applying some Skid-steer math
     double diff_vel_commanded = turn_rate;
     double motor1_vel = linear_rate - 0.5 * diff_vel_commanded;
     double motor2_vel = linear_rate + 0.5 * diff_vel_commanded;
+
     double motor1_measured_vel =
         rpm1 / MOTOR_RPM_TO_MPS_RATIO + MOTOR_RPM_TO_MPS_CFB;
     double motor2_measured_vel =
@@ -136,8 +138,8 @@ void ProProtocolObject::unpack_comm_response(std::vector<uint32_t> robotmsg) {
     std::cerr << a << " ";
   }
   std::cerr << std::endl;
-  // ! reduce until finding the first startbyte
   std::cerr << "finding start byte";
+  // ! Delete bytes until valid start byte is found
   if (msgqueue[0] != startbyte && msgqueue.size() > readbuffer_size) {
     int startbyte_index = 0;
     // !Did not find valid start byte in buffer
@@ -145,9 +147,10 @@ void ProProtocolObject::unpack_comm_response(std::vector<uint32_t> robotmsg) {
            startbyte_index < msgqueue.size())
       startbyte_index++;
     if (startbyte_index > msgqueue.size()) {
-      msgqueue.clear(); 
+      msgqueue.clear();
       return;
-    } else { // !Reconstruct the vector so that the start byte is at the 0 position
+    } else {  // !Reconstruct the vector so that the start byte is at the 0
+              // position
       std::vector<uint32_t> temp;
       for (int x = startbyte_index; x < msgqueue.size(); x++) {
         temp.push_back(msgqueue[x]);
@@ -285,7 +288,8 @@ void ProProtocolObject::unpack_comm_response(std::vector<uint32_t> robotmsg) {
       msgqueue.resize(0);
       msgqueue = temp;
       temp.clear();
-    } else { // !Found start byte but the msg contents were invalid, throw away broken message
+    } else {  // !Found start byte but the msg contents were invalid, throw away
+              // broken message
       std::cerr << "failed checksum" << std::endl;
       std::vector<uint32_t> temp;
       for (int x = 1; x < msgqueue.size(); x++) {
