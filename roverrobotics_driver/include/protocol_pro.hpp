@@ -29,6 +29,9 @@ class RoverRobotics::ProProtocolObject
   const int MOTOR_MIN = 0;
   const int startbit = 253;
   const int requestbit = 10;
+  const int baudrate = 4097;
+  const int writebuffer = 7;
+  const int readbuffer = 5;
   // const int commandbit = 20;
   std::unique_ptr<CommBase> comm_base;
   std::string comm_type;
@@ -37,7 +40,6 @@ class RoverRobotics::ProProtocolObject
   statusData robotstatus_;
   int motors_speeds_[3];
   double trimvalue;
-  char* read_buffer[7];
   std::thread writethread;
   std::thread writethread2;
   bool estop_;

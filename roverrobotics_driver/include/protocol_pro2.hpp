@@ -23,9 +23,13 @@ class RoverRobotics::Pro2ProtocolObject
   float clip(float n, float lower, float upper);
 
  private:
+  const int MOTOR_NEUTRAL = 125;
+  const int MOTOR_MAX = 250;
+  const int MOTOR_MIN = 0;
+  const int startbit = 253;
+  const int requestbit = 10;
   const float MOTOR_RPM_TO_MPS_RATIO = 13749 / 1.26;
   const float MOTOR_RPM_TO_MPS_CFB = -0.07;
-  const int MOTOR_NEUTRAL = 0;
   std::unique_ptr<CommBase> comm_base;
   std::string comm_type;
   struct can_frame frame;
