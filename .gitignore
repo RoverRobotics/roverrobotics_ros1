@@ -1,0 +1,7 @@
+build/.cmake/api/v1/query/client-vscode/query.json
+build/CMakeFiles/cmake.check_cache
+build/CMakeCache.txt
+.vscode/c_cpp_properties.json
+.vscode/settings.json
+workspace.code-workspace
+.vscode/settings.json

@@ -1,0 +1,47 @@
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Changelog for package roverrobotics_simulation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2.0.1 (2020-12-14)
+------------------
+
+2.0.0 (2020-11-10)
+------------------
+
+1.2.0 (2020-11-05)
+------------------
+
+1.1.1 (2020-06-15)
+------------------
+* add pyserial to package.xml
+* Contributors: padiln
+
+1.1.0 (2020-06-08)
+------------------
+* release to melodic
+
+1.0.0 (2020-06-08)
+------------------
+* update simulation package version
+* Merge pull request `#69 <https://github.com/RoverRobotics/roverrobotics_stack/issues/69>`_ from RoverRobotics/feature/rook/gazebo-xcontroller
+  Xbox controller input for Gazebo simulation
+* clean up launch files
+* fix file reference
+* ungroup launch files
+* Xbox controller input for Gazebo simulation
+* add world_name args to gazebo launch files
+* cleanup simulation launch files
+* adding rviz and gazebo simulation to rr_openrover stack
+* added support for gazebo and rviz simulation for 2wd and 4wd rovers
+* Contributors: William Rook, padiln
+
+0.8.0 (2020-03-25)
+------------------
+
+0.7.4 (2020-02-19)
+------------------
+
+0.7.3 (2019-10-14)
+------------------
+
+0.7.2 (2019-07-18)
+------------------

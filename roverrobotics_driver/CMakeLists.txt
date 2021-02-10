@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(roverrobotics_driver)
 
-add_compile_options(-std=c++11)
+add_compile_options(-std=c++14)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
@@ -46,13 +46,11 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_library(support_lib src/protocol_base.cpp
-                         src/protocol_pro.cpp
-                         src/protocol_zero.cpp
-                         src/comm_manager.cpp
+add_library(support_lib src/protocol_pro.cpp
+                         src/comm_serial.cpp
                          src/utils.cpp)
 
-add_executable(roverrobotics_driver_node src/ros_top_node.cpp)
+add_executable(roverrobotics_driver_node src/ros_wrapper.cpp)
 ##add_dependencies(roverrobotics_driver_node roverrobotics_driver_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
 target_link_libraries(roverrobotics_driver_node ${catkin_LIBRARIES} support_lib)
 
