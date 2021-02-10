@@ -30,7 +30,7 @@ class RoverRobotics::ProProtocolObject
   const int startbyte = 253;
   const int requestbyte = 10;
   const int baudrate = 4097;
-  const int readbuffer_size = 5;
+  const int RECEIVE_MSG_LEN = 5;
   // const int commandbit = 20;
   std::unique_ptr<CommBase> comm_base;
   std::string comm_type;

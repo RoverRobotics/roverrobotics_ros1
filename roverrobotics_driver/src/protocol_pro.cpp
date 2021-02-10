@@ -140,7 +140,7 @@ void ProProtocolObject::unpack_comm_response(std::vector<uint32_t> robotmsg) {
   std::cerr << std::endl;
   std::cerr << "finding start byte";
   // ! Delete bytes until valid start byte is found
-  if (msgqueue[0] != startbyte && msgqueue.size() > readbuffer_size) {
+  if (msgqueue[0] != startbyte && msgqueue.size() > RECEIVE_MSG_LEN) {
     int startbyte_index = 0;
     // !Did not find valid start byte in buffer
     while (msgqueue[startbyte_index] != startbyte &&
@@ -281,7 +281,7 @@ void ProProtocolObject::unpack_comm_response(std::vector<uint32_t> robotmsg) {
 
       std::vector<uint32_t> temp;
       // !Remove processed msg from queue
-      for (int x = readbuffer_size; x < msgqueue.size(); x++) {
+      for (int x = RECEIVE_MSG_LEN; x < msgqueue.size(); x++) {
         temp.push_back(msgqueue[x]);
       }
       msgqueue.clear();
@@ -316,7 +316,7 @@ void ProProtocolObject::register_comm_base(const char *device) {
     std::cerr << "making serial connection" << std::endl;
     std::vector<uint32_t> setting_;
     setting_.push_back(baudrate);
-    setting_.push_back(readbuffer_size);
+    setting_.push_back(RECEIVE_MSG_LEN);
     comm_base = std::make_unique<CommSerial>(
         device, [this](std::vector<uint32_t> c) { unpack_comm_response(c); },
         setting_);
