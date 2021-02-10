@@ -16,10 +16,11 @@ Pro2ProtocolObject::Pro2ProtocolObject(const char *device,
   motors_id_[3] = motor_id[3];
 
   pid_ = pid;
-  // !  std::vector<uint32_t> fast_data = {2, 4, 28, 30};
-  // !  std::vector<uint32_t> slow_data = {10, 12, 20, 22, 38, 40, 64};
   motor1_control = OdomControl(closed_loop_, pid_, 250, 0, MOTOR_NEUTRAL);
   motor2_control = OdomControl(closed_loop_, pid_, 250, 0, MOTOR_NEUTRAL);
+  motor3_control = OdomControl(closed_loop_, pid_, 250, 0, MOTOR_NEUTRAL);
+  motor4_control = OdomControl(closed_loop_, pid_, 250, 0, MOTOR_NEUTRAL);
+
   register_comm_base(device);
   motor1_prev_t = std::chrono::steady_clock::now();
   motor2_prev_t = std::chrono::steady_clock::now();
