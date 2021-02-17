@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.8.0)
 project(roverrobotics_driver)
 
 add_compile_options(-std=c++14)
@@ -11,29 +11,17 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   nav_msgs
   tf2
-  ##roverrobotics_driver_msgs
   pluginlib
-  ##serial
 )
 
-##generate_messages(
-##   DEPENDENCIES
-##   std_msgs
-##   geometry_msgs
-##   nav_msgs
-   ##roverrobotics_driver_msgs
-##)
-
 catkin_package(
-  INCLUDE_DIRS include
+  INCLUDE_DIRS
   CATKIN_DEPENDS 
   message_runtime 
   pluginlib 
   roscpp 
   std_msgs 
-  ##roverrobotics_driver_msgs 
   sensor_msgs 
-  ##serial 
   ds4_driver
 )
 
@@ -46,15 +34,18 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_library(support_lib src/protocol_pro.cpp
-                         src/comm_serial.cpp
-                         src/utils.cpp)
-
+add_library(librover SHARED IMPORTED)
+set_target_properties(librover PROPERTIES
+  IMPORTED_LOCATION "/usr/local/lib/liblibrover.so"
+  INTERFACE_INCLUDE_DIRECTORIES "/usr/local/include/librover")
 add_executable(roverrobotics_driver_node src/ros_wrapper.cpp)
 ##add_dependencies(roverrobotics_driver_node roverrobotics_driver_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
-target_link_libraries(roverrobotics_driver_node ${catkin_LIBRARIES} support_lib)
+message(STATUS "librover dir: ${IMPORTED_LOCATION}")
+message(STATUS "librover include dir: ${INTERFACE_INCLUDE_DIRECTORIES}")
+target_link_libraries(roverrobotics_driver_node ${catkin_LIBRARIES} librover)
 
-
+message(STATUS "librover dir: ${IMPORTED_LOCATION}")
+message(STATUS "librover include dir: ${INTERFACE_INCLUDE_DIRECTORIES}")
 #############
 ## Install ##
 #############
@@ -64,10 +55,10 @@ install(TARGETS roverrobotics_driver_node
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-##Install Linked Library
-install(TARGETS support_lib
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-)
+# ##Install Linked Library
+# install(TARGETS librover
+#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+# )
 
 ## Copy launch files
 install(DIRECTORY launch/
