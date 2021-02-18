@@ -167,8 +167,8 @@ RoverRobotics::ROSWrapper::ROSWrapper(ros::NodeHandle *nh) {
     robot_status_frequency = 1.00;
   }
   if (!ros::param::get("odom_frequency", robot_odom_frequency)) {
-    ROS_INFO("no 'odom_frequency' set; using the default value: '1.00'");
-    robot_odom_frequency = 1;
+    ROS_INFO("no 'odom_frequency' set; using the default value: '30.00'");
+    robot_odom_frequency = 30.00;
   }
   if (!ros::param::get("info_request_topic", robot_info_request_topic_)) {
     ROS_INFO(
@@ -279,10 +279,8 @@ void RoverRobotics::ROSWrapper::publishOdometry(const ros::TimerEvent &event) {
   odom_msg.header.stamp = ros::Time::now();
   odom_msg.header.frame_id = "odom";
   odom_msg.child_frame_id = "base_link";
-
   odom_msg.twist.twist.linear.x = data.linear_vel;
   odom_msg.twist.twist.angular.z = data.angular_vel;
-
   robot_odom_publisher_.publish(odom_msg);
 }
 
