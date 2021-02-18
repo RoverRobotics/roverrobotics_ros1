@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   nav_msgs
   tf2
   pluginlib
+  nav_msgs
 )
 
 catkin_package(
@@ -23,6 +24,7 @@ catkin_package(
   std_msgs 
   sensor_msgs 
   ds4_driver
+  nav_msgs
 )
 
 ###########

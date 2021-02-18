@@ -6,12 +6,16 @@
 #include "librover/protocol_pro.hpp"
 // #include "protocol_base.hpp"
 // #include "protocol_pro.hpp"
+#include <tf2_ros/transform_broadcaster.h>
+
+#include "nav_msgs/Odometry.h"
 #include "ros/node_handle.h"
 #include "ros/ros.h"
 #include "status_data.hpp"
 #include "std_msgs/Bool.h"
 #include "std_msgs/Float32.h"
 #include "std_msgs/Float32MultiArray.h"
+#include "tf2_geometry_msgs/tf2_geometry_msgs.h"
 #include "time.h"
 
 namespace RoverRobotics {
@@ -33,22 +37,27 @@ class RoverRobotics::ROSWrapper {
 
   ros::Publisher robot_status_publisher_;  // publish robot state (battery,
                                            // estop_status, speed)
-
+  ros::Publisher robot_odom_publisher_;    // publish odometry
   // parameter variables
   std::string speed_topic_;
   std::string estop_trigger_topic_;
   std::string estop_reset_topic_;
   std::string robot_status_topic_;
   float robot_status_frequency;
+  float robot_odom_frequency;
   std::string robot_info_request_topic_;
   std::string robot_info_topic_;
   std::string robot_type_;
   std::string trim_topic_;
+  float odom_angular_coef_;
+  float odom_traction_factor_;
+
   float trimvalue;
   std::string device_port_;
   std::string comm_type_;
   // Timer
   ros::Timer robot_status_timer_;
+  ros::Timer odom_publish_timer_;
   PidGains pidGains_ = {0, 0, 0};
   bool estop_state;
   bool closed_loop;
@@ -57,6 +66,7 @@ class RoverRobotics::ROSWrapper {
   ROSWrapper(ros::NodeHandle *nh);
   ~ROSWrapper();
   void publishRobotStatus(const ros::TimerEvent &event);
+  void publishOdometry(const ros::TimerEvent &event);
   void publishRobotInfo();
   void callbackSpeedCommand(const geometry_msgs::Twist &msg);
   void callbackTrim(const std_msgs::Float32::ConstPtr &msg);
@@ -101,9 +111,18 @@ RoverRobotics::ROSWrapper::ROSWrapper(ros::NodeHandle *nh) {
     ROS_INFO("no 'Ki' set; using the default value: '30'");
     pidGains_.Kd = 30;
   }
+
   if (!ros::param::get("Kd", pidGains_.Kd)) {
     ROS_INFO("no 'Kd' set; using the default value: '0'");
     pidGains_.Kd = 0;
+  }
+  if (!ros::param::get("angular_coef", odom_angular_coef_)) {
+    ROS_INFO("no 'angular_coef' set; using the default value: '0'");
+    odom_angular_coef_ = 0;
+  }
+  if (!ros::param::get("traction_factor", odom_traction_factor_)) {
+    ROS_INFO("no 'traction_factor' set; using the default value: '0'");
+    odom_traction_factor_ = 0;
   }
   if (!ros::param::get("robot_type", robot_type_)) {
     ROS_FATAL(
@@ -147,6 +166,10 @@ RoverRobotics::ROSWrapper::ROSWrapper(ros::NodeHandle *nh) {
     ROS_INFO("no 'status_frequency' set; using the default value: '1.00'");
     robot_status_frequency = 1.00;
   }
+  if (!ros::param::get("odom_frequency", robot_odom_frequency)) {
+    ROS_INFO("no 'odom_frequency' set; using the default value: '1.00'");
+    robot_odom_frequency = 1;
+  }
   if (!ros::param::get("info_request_topic", robot_info_request_topic_)) {
     ROS_INFO(
         "no 'info_request_topic' set; using the default value: "
@@ -183,6 +206,10 @@ RoverRobotics::ROSWrapper::ROSWrapper(ros::NodeHandle *nh) {
   robot_status_timer_ =
       nh->createTimer(ros::Duration(1.0 / robot_status_frequency),
                       &ROSWrapper::publishRobotStatus, this);
+  robot_odom_publisher_ = nh->advertise<nav_msgs::Odometry>("odom", 1);
+  odom_publish_timer_ =
+      nh->createTimer(ros::Duration(1.0 / robot_odom_frequency),
+                      &ROSWrapper::publishOdometry, this);
   ROS_INFO("Subscribers and Publishers are running...");
   ROS_INFO("ROBOT ESTOP STATE %d", estop_state);
 }
@@ -244,6 +271,19 @@ void RoverRobotics::ROSWrapper::publishRobotStatus(
 
   robot_status_publisher_.publish(robot_status);
   // ROS_INFO("publishing some robot state");
+}
+
+void RoverRobotics::ROSWrapper::publishOdometry(const ros::TimerEvent &event) {
+  statusData data = robot_->status_request();
+  nav_msgs::Odometry odom_msg;
+  odom_msg.header.stamp = ros::Time::now();
+  odom_msg.header.frame_id = "odom";
+  odom_msg.child_frame_id = "base_link";
+
+  odom_msg.twist.twist.linear.x = data.linear_vel;
+  odom_msg.twist.twist.angular.z = data.angular_vel;
+
+  robot_odom_publisher_.publish(odom_msg);
 }
 
 void RoverRobotics::ROSWrapper::publishRobotInfo() {
