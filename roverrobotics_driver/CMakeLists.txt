@@ -40,12 +40,10 @@ set_target_properties(librover PROPERTIES
   INTERFACE_INCLUDE_DIRECTORIES "/usr/local/include/librover")
 add_executable(roverrobotics_driver_node src/ros_wrapper.cpp)
 ##add_dependencies(roverrobotics_driver_node roverrobotics_driver_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
-message(STATUS "librover dir: ${IMPORTED_LOCATION}")
-message(STATUS "librover include dir: ${INTERFACE_INCLUDE_DIRECTORIES}")
+
+
 target_link_libraries(roverrobotics_driver_node ${catkin_LIBRARIES} librover)
 
-message(STATUS "librover dir: ${IMPORTED_LOCATION}")
-message(STATUS "librover include dir: ${INTERFACE_INCLUDE_DIRECTORIES}")
 #############
 ## Install ##
 #############
