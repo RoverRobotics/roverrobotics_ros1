@@ -105,11 +105,11 @@ RoverRobotics::ROSWrapper::ROSWrapper(ros::NodeHandle *nh) {
   }
   if (!ros::param::get("Kp", pidGains_.Kp)) {
     ROS_INFO("no 'Kp' set; using the default value: '10'");
-    pidGains_.Kp = 10;
+    pidGains_.Kp = .1;
   }
   if (!ros::param::get("Ki", pidGains_.Ki)) {
     ROS_INFO("no 'Ki' set; using the default value: '30'");
-    pidGains_.Kd = 30;
+    pidGains_.Kd = .3;
   }
 
   if (!ros::param::get("Kd", pidGains_.Kd)) {
