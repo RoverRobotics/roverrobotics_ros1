@@ -216,12 +216,12 @@ RoverRobotics::ROSWrapper::ROSWrapper(ros::NodeHandle *nh) {
 
 void RoverRobotics::ROSWrapper::publishRobotStatus(
     const ros::TimerEvent &event) {
-  if (!robot_->isConnected()) {
+  if (!robot_->is_connected()) {
     ROS_FATAL("Unexpectedly disconnected from serial port.");
     robot_status_timer_.stop();
     ros::shutdown();
   }
-  statusData data = robot_->status_request();
+  robotData data = robot_->status_request();
   std_msgs::Float32MultiArray robot_status;
   robot_status.data.clear();
   // Motor Infos
@@ -274,7 +274,7 @@ void RoverRobotics::ROSWrapper::publishRobotStatus(
 }
 
 void RoverRobotics::ROSWrapper::publishOdometry(const ros::TimerEvent &event) {
-  statusData data = robot_->status_request();
+  robotData data = robot_->status_request();
   nav_msgs::Odometry odom_msg;
   odom_msg.header.stamp = ros::Time::now();
   odom_msg.header.frame_id = "odom";
@@ -285,13 +285,13 @@ void RoverRobotics::ROSWrapper::publishOdometry(const ros::TimerEvent &event) {
 }
 
 void RoverRobotics::ROSWrapper::publishRobotInfo() {
-  if (!robot_->isConnected()) {
+  if (!robot_->is_connected()) {
     ROS_FATAL("Unexpectedly disconnected from serial port.");
     robot_status_timer_.stop();
     ros::shutdown();
     return;
   }
-  statusData data = robot_->info_request();
+  robotData data = robot_->info_request();
   std_msgs::Float32MultiArray robot_info;
   robot_info.data.clear();
   robot_info.data.push_back(data.robot_guid);
@@ -304,11 +304,11 @@ void RoverRobotics::ROSWrapper::publishRobotInfo() {
 // call everytime speed_topic_ get data
 void RoverRobotics::ROSWrapper::callbackSpeedCommand(
     const geometry_msgs::Twist &msg) {
-  double speeddata[2];
-  speeddata[0] = msg.linear.x;
-  speeddata[1] = msg.angular.z;
-  speeddata[2] = msg.angular.y;
-  robot_->send_speed(speeddata);
+  double velocity_data[2];
+  velocity_data[0] = msg.linear.x;
+  velocity_data[1] = msg.angular.z;
+  velocity_data[2] = msg.angular.y;
+  robot_->set_robot_velocity(velocity_data);
 }
 
 void RoverRobotics::ROSWrapper::callbackInfo(
