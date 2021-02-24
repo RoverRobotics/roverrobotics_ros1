@@ -103,7 +103,7 @@ RoverRobotics::ROSWrapper::ROSWrapper(ros::NodeHandle *nh) {
     ROS_INFO("no 'closed_loop_control' set; using the default value: 'false'");
     closed_loop = false;
   }
-  //TODO update string to update as value change
+  // TODO update string to update as value change
   if (!ros::param::get("Kp", pidGains_.Kp)) {
     pidGains_.Kp = .5;
     ROS_INFO("no 'Kp' set; using the default value: '.5'");
@@ -140,8 +140,8 @@ RoverRobotics::ROSWrapper::ROSWrapper(ros::NodeHandle *nh) {
 
   // Check if launch files have parameters set; Otherwise use hardcoded values
   if (!ros::param::get("trim_topic", trim_topic_)) {
-    ROS_INFO("no 'trim_topic' set; using the default value: '/trim'");
-    trim_topic_ = "/trim";
+    ROS_INFO("no 'trim_topic' set; using the default value: '/trim_increment'");
+    trim_topic_ = "/trim_increment";
   }
   if (!ros::param::get("speed_topic", speed_topic_)) {
     ROS_INFO(
@@ -151,13 +151,14 @@ RoverRobotics::ROSWrapper::ROSWrapper(ros::NodeHandle *nh) {
   if (!ros::param::get("estop_trigger_topic", estop_trigger_topic_)) {
     ROS_INFO(
         "no 'estop_trigger_topic' set; using the default value: "
-        "'/estop_trigger'");
-    estop_trigger_topic_ = "/soft_estop_trigger";
+        "'/soft_estop/trigger'");
+    estop_trigger_topic_ = "/soft_estop/trigger";
   }
   if (!ros::param::get("estop_reset_topic", estop_reset_topic_)) {
     ROS_INFO(
-        "no 'estop_reset_topic' set; using the default value: '/estop_reset'");
-    estop_reset_topic_ = "/soft_estop_reset";
+        "no 'estop_reset_topic' set; using the default value: "
+        "'/soft_estop/reset'");
+    estop_reset_topic_ = "/soft_estop/reset";
   }
   if (!ros::param::get("status_topic", robot_status_topic_)) {
     ROS_INFO("no 'status_topic' set; using the default value: '/robot_status'");
@@ -308,14 +309,18 @@ void RoverRobotics::ROSWrapper::callbackInfo(
 
 void RoverRobotics::ROSWrapper::callbackEstopTrigger(
     const std_msgs::Bool::ConstPtr &msg) {
-  estop_state = true;
-  robot_->send_estop(estop_state);
+  if (msg->data == true) {
+    estop_state = true;
+    robot_->send_estop(estop_state);
+  }
 }
 
 void RoverRobotics::ROSWrapper::callbackEstopReset(
     const std_msgs::Bool::ConstPtr &msg) {
-  estop_state = false;
-  robot_->send_estop(estop_state);
+  if (msg->data == true) {
+    estop_state = false;
+    robot_->send_estop(estop_state);
+  }
 }
 
 void RoverRobotics::ROSWrapper::callbackTrim(
