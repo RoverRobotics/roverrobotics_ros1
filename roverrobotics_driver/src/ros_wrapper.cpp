@@ -103,13 +103,14 @@ RoverRobotics::ROSWrapper::ROSWrapper(ros::NodeHandle *nh) {
     ROS_INFO("no 'closed_loop_control' set; using the default value: 'false'");
     closed_loop = false;
   }
+  //TODO update string to update as value change
   if (!ros::param::get("Kp", pidGains_.Kp)) {
-    ROS_INFO("no 'Kp' set; using the default value: '10'");
-    pidGains_.Kp = .1;
+    pidGains_.Kp = .5;
+    ROS_INFO("no 'Kp' set; using the default value: '.5'");
   }
   if (!ros::param::get("Ki", pidGains_.Ki)) {
-    ROS_INFO("no 'Ki' set; using the default value: '30'");
-    pidGains_.Kd = .3;
+    pidGains_.Ki = 0;
+    ROS_INFO("no 'Ki' set; using the default value: '.0'");
   }
 
   if (!ros::param::get("Kd", pidGains_.Kd)) {
@@ -168,7 +169,7 @@ RoverRobotics::ROSWrapper::ROSWrapper(ros::NodeHandle *nh) {
   }
   if (!ros::param::get("odom_frequency", robot_odom_frequency)) {
     ROS_INFO("no 'odom_frequency' set; using the default value: '30.00'");
-    robot_odom_frequency = 30.00;
+    robot_odom_frequency = 50.00;
   }
   if (!ros::param::get("info_request_topic", robot_info_request_topic_)) {
     ROS_INFO(
