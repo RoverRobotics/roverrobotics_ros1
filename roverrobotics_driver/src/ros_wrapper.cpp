@@ -152,12 +152,12 @@ RoverRobotics::ROSWrapper::ROSWrapper(ros::NodeHandle *nh) {
     ROS_INFO(
         "no 'estop_trigger_topic' set; using the default value: "
         "'/estop_trigger'");
-    estop_trigger_topic_ = "/estop_trigger";
+    estop_trigger_topic_ = "/soft_estop_trigger";
   }
   if (!ros::param::get("estop_reset_topic", estop_reset_topic_)) {
     ROS_INFO(
         "no 'estop_reset_topic' set; using the default value: '/estop_reset'");
-    estop_reset_topic_ = "/estop_reset";
+    estop_reset_topic_ = "/soft_estop_reset";
   }
   if (!ros::param::get("status_topic", robot_status_topic_)) {
     ROS_INFO("no 'status_topic' set; using the default value: '/robot_status'");
@@ -257,13 +257,6 @@ void RoverRobotics::ROSWrapper::publishRobotStatus(
   robot_status.data.push_back(data.battery2_SOC);
   robot_status.data.push_back(data.battery1_fault_flag);
   robot_status.data.push_back(data.battery2_fault_flag);
-
-  // Robot Infos
-  robot_status.data.push_back(data.robot_guid);
-  robot_status.data.push_back(data.robot_firmware);
-  robot_status.data.push_back(data.robot_fault_flag);
-  robot_status.data.push_back(data.robot_fan_speed);
-  robot_status.data.push_back(data.robot_speed_limit);
 
   // Flipper Infos
   robot_status.data.push_back(data.motor3_angle);
