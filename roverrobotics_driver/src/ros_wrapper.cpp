@@ -182,12 +182,6 @@ RoverRobotics::ROSWrapper::ROSWrapper(ros::NodeHandle *nh) {
         "no 'info_topic' set; using the default value: '/robot_unique_info'");
     robot_info_topic_ = "/robot_unique_info";
   }
-  // if (!ros::param::get("estop_state", estop_state)) {
-  //   ROS_INFO(
-  //       "No 'estop_state' set; using the default value:
-  //       '/robot_unique_info'");
-  //   estop_state = false
-  // }
   trim_command_subscriber_ =
       nh->subscribe(trim_topic_, 1, &ROSWrapper::callbackTrim, this);
   speed_command_subscriber_ =
