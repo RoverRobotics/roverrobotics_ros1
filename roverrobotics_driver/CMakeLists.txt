@@ -38,8 +38,8 @@ include_directories(
 
 add_library(librover SHARED IMPORTED)
 set_target_properties(librover PROPERTIES
-  IMPORTED_LOCATION "/usr/local/lib/liblibrover.so"
-  INTERFACE_INCLUDE_DIRECTORIES "/usr/local/include/librover")
+  IMPORTED_LOCATION "/usr/lib/liblibrover.so"
+  INTERFACE_INCLUDE_DIRECTORIES "/usr/include/librover")
 add_executable(roverrobotics_driver_node src/ros_wrapper.cpp)
 ##add_dependencies(roverrobotics_driver_node roverrobotics_driver_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
 
