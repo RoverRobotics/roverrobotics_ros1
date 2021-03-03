@@ -1,9 +1,36 @@
-# roverrobotics_ros1
-A ROS1 stack that handles communication between Rover Robotics rover platforms and computer payloads.
-The rover platform accept velocity commands and publishes wheel encoder data and power information.
+# Roverrobotics_ros1
+## About:
+- This is a ROS wrapper to interface with roverrobotics' robots
+- Librover is required in order to use this wrapper
 
-Documentation for this package can be found at http://wiki.ros.org/roverrobotics_ros1
+## Installation instructions
 
-Master|Develop|
----|---|---
-[![CircleCI](https://circleci.com/gh/RoverRobotics/roverrobotics_ros1/tree/master.svg?style=svg)](https://circleci.com/gh/RoverRobotics/roverrobotics_ros1/tree/master)|[![CircleCI](https://circleci.com/gh/RoverRobotics/roverrobotics_ros1/tree/develop.svg?style=svg)](https://circleci.com/gh/RoverRobotics/roverrobotics_ros1/tree/develop)
+1. Cloning this repository into your workspace
+```
+cd workspace/src/
+git clone https://github.com/RoverRobotics/roverrobotics_ros1
+```
+2. Install shared library
+``` 
+cd ~/
+mkdir library/
+cd library/
+git clone https://github.com/RoverRobotics/librover
+cd librover/
+cmake .
+make
+sudo make install 
+```
+2. Rebuild your workspace
+```
+cd workspace/
+catkin_make
+```
+3. Update auto complete
+```
+source devels/setup.bash
+```
+4. Launch Robot (replace <launch file name> with your robot config.)
+```
+roslaunch roverrobotics_driver pro.launch
+```
