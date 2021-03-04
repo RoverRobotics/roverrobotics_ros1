@@ -20,18 +20,6 @@
         <rosparam file="$(arg config_topics)" command="load" />
     </node>
 
-    <!-- PS4 Ubuntu Driver -->
-    <include file="$(find ds4_driver)/launch/ds4_driver.launch">
-        <arg name="addr" value="" />
-        <arg name="use_standard_msgs" value="false" />
-    </include>
-
-    <!-- PS4 Mapper -->
-    <node pkg="roverrobotics_input_manager" type="ps4_mapper.py" name="ps4_mapper" output="screen">
-        <rosparam command="load" file="$(find roverrobotics_input_manager)/config/controller_config.yaml" />
-        <param name="stamped" value="True" />
-    </node>
-
     <!-- Control input manager -->
     <node pkg="roverrobotics_input_manager" type="control_input_manager.py" name="roverrobotics_input_manager_node" output="log">
         <rosparam file="$(find roverrobotics_input_manager)/config/input_topics.yaml" command="load" />
