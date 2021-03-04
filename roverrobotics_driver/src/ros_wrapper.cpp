@@ -112,6 +112,9 @@ RoverRobotics::ROSWrapper::ROSWrapper(ros::NodeHandle *nh)
     ROS_INFO("no 'closed_loop_control' set; using the default value: 'false'");
     closed_loop = false;
   }
+  if (closed_loop){
+    ROS_WARN("Closed Loop Control is ACTIVE. Please make sure your PID is properly tuned");
+  }
   // TODO update string to update as value change
   if (!ros::param::get("Kp", pidGains_.Kp))
   {
@@ -412,7 +415,7 @@ void RoverRobotics::ROSWrapper::callbackTrim(
 RoverRobotics::ROSWrapper::~ROSWrapper() {}
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "Rover Robotics ROS Driver");
+  ros::init(argc, argv, "RoverRobotics_Driver_Wrapper_Node");
   ros::NodeHandle nh;
   ros::AsyncSpinner spinner(0); // Prevent Callback bottleneck
   spinner.start();
