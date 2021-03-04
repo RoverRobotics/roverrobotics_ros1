@@ -283,7 +283,7 @@ void RoverRobotics::ROSWrapper::publishRobotStatus(
 {
   if (!robot_->is_connected())
   {
-    ROS_FATAL("Unexpectedly disconnected from serial port.");
+    ROS_FATAL("Unexpectedly disconnected from serial port. Check connection to robot and reset Estop");
     robot_status_timer_.stop();
     ros::shutdown();
   }
@@ -348,7 +348,7 @@ void RoverRobotics::ROSWrapper::publishRobotInfo()
 {
   if (!robot_->is_connected())
   {
-    ROS_FATAL("Unexpectedly disconnected from serial port.");
+    ROS_FATAL("Unexpectedly disconnected from serial port. Check connection to robot and reset Estop");
     robot_status_timer_.stop();
     ros::shutdown();
     return;
