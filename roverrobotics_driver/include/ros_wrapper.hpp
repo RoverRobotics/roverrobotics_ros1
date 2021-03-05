@@ -8,7 +8,6 @@
 #include "nav_msgs/Odometry.h"
 #include "ros/node_handle.h"
 #include "ros/ros.h"
-#include "status_data.hpp"
 #include "std_msgs/Bool.h"
 #include "std_msgs/Float32.h"
 #include "std_msgs/Float32MultiArray.h"
