@@ -16,7 +16,7 @@
 
 namespace RoverRobotics {
 
-class ROSWrapper {
+class ROSDriver {
  private:
   int motors_id_[4];
   //
@@ -66,8 +66,8 @@ class ROSWrapper {
   bool closed_loop;
 
  public:
-  ROSWrapper(ros::NodeHandle *nh);
-  ~ROSWrapper();
+  ROSDriver(ros::NodeHandle *nh);
+  ~ROSDriver();
   void publishRobotStatus(const ros::TimerEvent &event);
   void publishOdometry(const ros::TimerEvent &event);
   void publishRobotInfo();

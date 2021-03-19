@@ -1,22 +1,8 @@
-#include "ros_wrapper.hpp"
+#include "roverrobotics_ros_driver.hpp"
 namespace RoverRobotics {
 
-ROSWrapper::ROSWrapper(ros::NodeHandle *nh) {
-  motors_id_[4] = {0};
+ROSDriver::ROSDriver(ros::NodeHandle *nh) {
   estop_state = false;
-  // IMPORTANT robot parameter
-  // robot type check; if fail will stop this whole node.
-  if (!ros::param::get("motor1_id", motors_id_[0])) {
-  }
-  if (!ros::param::get("motor2_id", motors_id_[1])) {
-  }
-  if (!ros::param::get("motor3_id", motors_id_[2])) {
-  }
-  if (!ros::param::get("motor4_id", motors_id_[3])) {
-  }
-  for (int i = 0; i < 4; i++) {
-    std::cerr << "motor " << i + 1 << " id:" << motors_id_[i] << std::endl;
-  }
   if (!ros::param::get("device_port", device_port_)) {
     ROS_FATAL("No 'device_port' set, Shutting down Driver Node");
     ros::shutdown();
@@ -145,15 +131,15 @@ ROSWrapper::ROSWrapper(ros::NodeHandle *nh) {
     robot_info_topic_ = "/robot_unique_info";
   }
   trim_command_subscriber_ =
-      nh->subscribe(trim_topic_, 1, &ROSWrapper::callbackTrim, this);
+      nh->subscribe(trim_topic_, 1, &ROSDriver::callbackTrim, this);
   speed_command_subscriber_ =
-      nh->subscribe(speed_topic_, 10, &ROSWrapper::callbackSpeedCommand, this);
+      nh->subscribe(speed_topic_, 10, &ROSDriver::callbackSpeedCommand, this);
   estop_trigger_subscriber_ = nh->subscribe(
-      estop_trigger_topic_, 10, &ROSWrapper::callbackEstopTrigger, this);
+      estop_trigger_topic_, 10, &ROSDriver::callbackEstopTrigger, this);
   estop_reset_subscriber_ = nh->subscribe(
-      estop_reset_topic_, 10, &ROSWrapper::callbackEstopReset, this);
+      estop_reset_topic_, 10, &ROSDriver::callbackEstopReset, this);
   robot_info_subscriber =
-      nh->subscribe(robot_info_request_topic_, 10, &ROSWrapper::callbackInfo,
+      nh->subscribe(robot_info_request_topic_, 10, &ROSDriver::callbackInfo,
                     this);  // listen to robot_info request
   robot_info_publisher = nh->advertise<std_msgs::Float32MultiArray>(
       robot_info_topic_, 1);  // publish robot_unique info
@@ -162,16 +148,16 @@ ROSWrapper::ROSWrapper(ros::NodeHandle *nh) {
       nh->advertise<std_msgs::Float32MultiArray>(robot_status_topic_, 10);
   robot_status_timer_ =
       nh->createTimer(ros::Duration(1.0 / robot_status_frequency),
-                      &ROSWrapper::publishRobotStatus, this);
+                      &ROSDriver::publishRobotStatus, this);
   robot_odom_publisher_ = nh->advertise<nav_msgs::Odometry>("odom", 1);
   odom_publish_timer_ =
       nh->createTimer(ros::Duration(1.0 / robot_odom_frequency),
-                      &ROSWrapper::publishOdometry, this);
+                      &ROSDriver::publishOdometry, this);
   ROS_INFO("Subscribers and Publishers are running...");
   ROS_INFO("ROBOT ESTOP STATE %d", estop_state);
 }
 
-void ROSWrapper::publishRobotStatus(const ros::TimerEvent &event) {
+void ROSDriver::publishRobotStatus(const ros::TimerEvent &event) {
   if (!robot_->is_connected()) {
     ROS_FATAL(
         "Unexpectedly disconnected from serial port. Check connection to robot "
@@ -224,7 +210,7 @@ void ROSWrapper::publishRobotStatus(const ros::TimerEvent &event) {
   // ROS_INFO("publishing some robot state");
 }
 
-void ROSWrapper::publishOdometry(const ros::TimerEvent &event) {
+void ROSDriver::publishOdometry(const ros::TimerEvent &event) {
   robotData data = robot_->status_request();
   nav_msgs::Odometry odom_msg;
   odom_msg.header.stamp = ros::Time::now();
@@ -235,7 +221,7 @@ void ROSWrapper::publishOdometry(const ros::TimerEvent &event) {
   robot_odom_publisher_.publish(odom_msg);
 }
 
-void ROSWrapper::publishRobotInfo() {
+void ROSDriver::publishRobotInfo() {
   if (!robot_->is_connected()) {
     ROS_FATAL(
         "Unexpectedly disconnected from serial port. Check connection to robot "
@@ -255,7 +241,7 @@ void ROSWrapper::publishRobotInfo() {
   robot_info_publisher.publish(robot_info);
 }
 // call everytime speed_topic_ get data
-void ROSWrapper::callbackSpeedCommand(const geometry_msgs::Twist &msg) {
+void ROSDriver::callbackSpeedCommand(const geometry_msgs::Twist &msg) {
   double velocity_data[2];
   velocity_data[0] = msg.linear.x;
   velocity_data[1] = msg.angular.z;
@@ -263,41 +249,41 @@ void ROSWrapper::callbackSpeedCommand(const geometry_msgs::Twist &msg) {
   robot_->set_robot_velocity(velocity_data);
 }
 
-void ROSWrapper::callbackInfo(const std_msgs::Bool::ConstPtr &msg) {
+void ROSDriver::callbackInfo(const std_msgs::Bool::ConstPtr &msg) {
   if (msg->data) {
     publishRobotInfo();
   }
 }
 
-void ROSWrapper::callbackEstopTrigger(const std_msgs::Bool::ConstPtr &msg) {
+void ROSDriver::callbackEstopTrigger(const std_msgs::Bool::ConstPtr &msg) {
   if (msg->data == true) {
     estop_state = true;
     robot_->send_estop(estop_state);
   }
 }
 
-void ROSWrapper::callbackEstopReset(const std_msgs::Bool::ConstPtr &msg) {
+void ROSDriver::callbackEstopReset(const std_msgs::Bool::ConstPtr &msg) {
   if (msg->data == true) {
     estop_state = false;
     robot_->send_estop(estop_state);
   }
 }
 
-void ROSWrapper::callbackTrim(const std_msgs::Float32::ConstPtr &msg) {
+void ROSDriver::callbackTrim(const std_msgs::Float32::ConstPtr &msg) {
   robot_->update_drivetrim(msg->data);
 }
 
-ROSWrapper::~ROSWrapper() {}
+ROSDriver::~ROSDriver() {}
 }  // namespace RoverRobotics
 int main(int argc, char **argv) {
   ros::init(argc, argv, "RoverRobotics_Driver_Wrapper_Node");
   ros::NodeHandle nh;
   ros::AsyncSpinner spinner(0);  // Prevent Callback bottleneck
   spinner.start();
-  RoverRobotics::ROSWrapper robot(&nh);
+  RoverRobotics::ROSDriver robot(&nh);
   ROS_INFO("Robot driver is started");
 
   ros::waitForShutdown();
-  // robot.~ROSWrapper();
+  // robot.~ROSDriver();
   return 0;
 }
