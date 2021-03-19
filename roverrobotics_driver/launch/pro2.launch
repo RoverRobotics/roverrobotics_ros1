@@ -15,8 +15,9 @@
         type="roverrobotics_driver_node" 
         name="$(arg driver_node_name)" 
         respawn="false"
-        output="screen">
+        output="screen" >
     </node>
+    <!-- launch-prefix="gdb -ex run - -args" -->
 
     <!--  Twist Mux  -->
     <node pkg="twist_mux" type="twist_mux" name="twist_mux" output="screen">
@@ -27,8 +28,9 @@
     </node>
 
     <!-- Control input manager -->
-    <node pkg="roverrobotics_input_manager" type="control_input_manager.py" name="roverrobotics_input_manager_node" output="log">
+    <node pkg="roverrobotics_input_manager" type="control_input_manager.py" name="roverrobotics_input_manager_node" output="log" >
         <rosparam file="$(find roverrobotics_input_manager)/config/input_topics.yaml" command="load" />
+        
     </node>
 
 </launch>
