@@ -2,9 +2,9 @@
     <arg name="driver_node_name" default="roverrobotics_driver" />
     <arg name="config_locks" default="$(find roverrobotics_driver)/config/twist_mux_locks.yaml" />
     <arg name="config_topics" default="$(find roverrobotics_driver)/config/twist_mux_topics_locks.yaml" />
-    <param name="device_port" value="/dev/rover" />
-    <param name="comm_type" value="serial" />
-    <param name="robot_type" value="pro" />
+    <param name="device_port" value="can0" />
+    <param name="comm_type" value="can" />
+    <param name="robot_type" value="pro2" />
     <param name="status_frequency" value="30" />
     <param name="closed_loop_control" value="false" />
     <param name="Kp" value="0.4" />
