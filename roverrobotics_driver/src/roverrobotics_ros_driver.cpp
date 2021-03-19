@@ -1,8 +1,10 @@
 #include "roverrobotics_ros_driver.hpp"
 namespace RoverRobotics {
 
-ROSDriver::ROSDriver(ros::NodeHandle *nh) {
-  estop_state = false;
+RobotDriver::RobotDriver(ros::NodeHandle *nh) {
+  ROS_INFO("Starting Rover Driver Node");
+  // Robot Parameters
+  estop_state_ = false;
   if (!ros::param::get("device_port", device_port_)) {
     ROS_FATAL("No 'device_port' set, Shutting down Driver Node");
     ros::shutdown();
@@ -11,49 +13,50 @@ ROSDriver::ROSDriver(ros::NodeHandle *nh) {
     ROS_FATAL("No communication method set, Shutting down Driver Node");
     ros::shutdown();
   }
-  if (!ros::param::get("closed_loop_control", closed_loop)) {
+  if (!ros::param::get("closed_loop_control", closed_loop_)) {
     ROS_INFO("no 'closed_loop_control' set; using the default value: 'false'");
-    closed_loop = false;
+    closed_loop_ = false;
   }
-  if (closed_loop) {
+  // PID Control
+  if (closed_loop_) {
     ROS_WARN(
         "Closed Loop Control is ACTIVE. Please make sure your PID is properly "
         "tuned");
   }
-  // TODO update string to update as value change
   if (!ros::param::get("Kp", pidGains_.Kp)) {
     pidGains_.Kp = 0;
     ROS_INFO("no 'Kp' set; using the default value: %f", pidGains_.Kp);
   }
-  if (pidGains_.Kp < pid_p_min) {
-    ROS_WARN("pidGains_.Kp is too low, changing to: %f", pid_p_min);
-    pidGains_.Kp = pid_p_min;
-  } else if (pidGains_.Kp > pid_p_max) {
-    ROS_WARN("pidGains_.Kp is too high, changing to: %f", pid_p_max);
-    pidGains_.Kp = pid_p_max;
+  if (pidGains_.Kp < pid_p_min_) {
+    ROS_WARN("pidGains_.Kp is too low, changing to: %f", pid_p_min_);
+    pidGains_.Kp = pid_p_min_;
+  } else if (pidGains_.Kp > pid_p_max_) {
+    ROS_WARN("pidGains_.Kp is too high, changing to: %f", pid_p_max_);
+    pidGains_.Kp = pid_p_max_;
   }
   if (!ros::param::get("Ki", pidGains_.Ki)) {
     pidGains_.Ki = 0;
     ROS_INFO("no 'Ki' set; using the default value: '.0'");
   }
-  if (pidGains_.Ki < pid_i_min) {
-    ROS_WARN("pidGains_.Ki is too low, changing to: %f", pid_i_min);
-    pidGains_.Ki = pid_i_min;
-  } else if (pidGains_.Ki > pid_i_max) {
-    ROS_WARN("pidGains_.Ki is too high, changing to: %f", pid_i_max);
-    pidGains_.Ki = pid_i_max;
+  if (pidGains_.Ki < pid_i_min_) {
+    ROS_WARN("pidGains_.Ki is too low, changing to: %f", pid_i_min_);
+    pidGains_.Ki = pid_i_min_;
+  } else if (pidGains_.Ki > pid_i_max_) {
+    ROS_WARN("pidGains_.Ki is too high, changing to: %f", pid_i_max_);
+    pidGains_.Ki = pid_i_max_;
   }
   if (!ros::param::get("Kd", pidGains_.Kd)) {
     ROS_INFO("no 'Kd' set; using the default value: '0'");
     pidGains_.Kd = 0;
   }
-  if (pidGains_.Kd < pid_d_min) {
-    ROS_WARN("pidGains_.Kd is too low, changing to: %f", pid_d_min);
-    pidGains_.Kd = pid_d_min;
-  } else if (pidGains_.Kd > pid_d_max) {
-    ROS_WARN("pidGains_.Ki is too high, changing to: %f", pid_d_max);
-    pidGains_.Kd = pid_d_max;
+  if (pidGains_.Kd < pid_d_min_) {
+    ROS_WARN("pidGains_.Kd is too low, changing to: %f", pid_d_min_);
+    pidGains_.Kd = pid_d_min_;
+  } else if (pidGains_.Kd > pid_d_max_) {
+    ROS_WARN("pidGains_.Ki is too high, changing to: %f", pid_d_max_);
+    pidGains_.Kd = pid_d_max_;
   }
+  //~PID Control
   if (!ros::param::get("angular_coef", odom_angular_coef_)) {
     ROS_INFO("no 'angular_coef' set; using the default value: '0'");
     odom_angular_coef_ = 0;
@@ -68,12 +71,15 @@ ROSDriver::ROSDriver(ros::NodeHandle *nh) {
     ros::shutdown();
   } else if (robot_type_ == "pro") {
     robot_ = std::make_unique<ProProtocolObject>(
-        device_port_.c_str(), comm_type_, closed_loop, pidGains_);
+        device_port_.c_str(), comm_type_, closed_loop_, pidGains_);
+  } else if (robot_type_ == "pro2") {
+    robot_ = std::make_unique<Pro2ProtocolObject>(
+        device_port_.c_str(), comm_type_, closed_loop_, pidGains_);
   } else {
     ROS_FATAL("Unknown Robot Type. Shutting down ROS");
     ros::shutdown();
+    return;
   }
-  std::cerr << "successfully setup robot interface" << std::endl;
 
   // Check if launch files have parameters set; Otherwise use hardcoded values
   if (!ros::param::get("trim_topic", trim_topic_)) {
@@ -101,23 +107,23 @@ ROSDriver::ROSDriver(ros::NodeHandle *nh) {
     ROS_INFO("no 'status_topic' set; using the default value: '/robot_status'");
     robot_status_topic_ = "/robot_status";
   }
-  if (!ros::param::get("status_frequency", robot_status_frequency)) {
+  if (!ros::param::get("status_frequency", robot_status_frequency_)) {
     ROS_INFO("no 'status_frequency' set; using the default value: '5.00'");
-    robot_status_frequency = 5.00;
+    robot_status_frequency_ = 5.00;
   }
-  if (robot_status_frequency < robot_status_frequency_min) {
+  if (robot_status_frequency_ < robot_status_frequency_min_) {
     ROS_WARN("status_frequency is too low, changing to default value: %f",
-             robot_status_frequency_min);
-    robot_status_frequency = robot_status_frequency_min;
-  } else if (robot_status_frequency > robot_status_frequency_max) {
+             robot_status_frequency_min_);
+    robot_status_frequency_ = robot_status_frequency_min_;
+  } else if (robot_status_frequency_ > robot_status_frequency_max) {
     ROS_WARN("status_frequency is too high, changing to default value: %f",
              robot_status_frequency_max);
-    robot_status_frequency = robot_status_frequency_max;
+    robot_status_frequency_ = robot_status_frequency_max;
   }
-  if (!ros::param::get("odom_frequency", robot_odom_frequency)) {
-    robot_odom_frequency = 50.00;
+  if (!ros::param::get("odom_frequency", robot_odom_frequency_)) {
+    robot_odom_frequency_ = 50.00;
     ROS_INFO("no 'odom_frequency' set; using the default value: %f",
-             robot_odom_frequency);
+             robot_odom_frequency_);
   }
   if (!ros::param::get("info_request_topic", robot_info_request_topic_)) {
     ROS_INFO(
@@ -131,36 +137,37 @@ ROSDriver::ROSDriver(ros::NodeHandle *nh) {
     robot_info_topic_ = "/robot_unique_info";
   }
   trim_command_subscriber_ =
-      nh->subscribe(trim_topic_, 1, &ROSDriver::callbackTrim, this);
+      nh->subscribe(trim_topic_, 1, &RobotDriver::callbackTrim, this);
   speed_command_subscriber_ =
-      nh->subscribe(speed_topic_, 10, &ROSDriver::callbackSpeedCommand, this);
+      nh->subscribe(speed_topic_, 10, &RobotDriver::callbackSpeedCommand, this);
   estop_trigger_subscriber_ = nh->subscribe(
-      estop_trigger_topic_, 10, &ROSDriver::callbackEstopTrigger, this);
+      estop_trigger_topic_, 10, &RobotDriver::callbackEstopTrigger, this);
   estop_reset_subscriber_ = nh->subscribe(
-      estop_reset_topic_, 10, &ROSDriver::callbackEstopReset, this);
-  robot_info_subscriber =
-      nh->subscribe(robot_info_request_topic_, 10, &ROSDriver::callbackInfo,
+      estop_reset_topic_, 10, &RobotDriver::callbackEstopReset, this);
+  robot_info_subscriber_ =
+      nh->subscribe(robot_info_request_topic_, 10, &RobotDriver::callbackInfo,
                     this);  // listen to robot_info request
-  robot_info_publisher = nh->advertise<std_msgs::Float32MultiArray>(
+  robot_info_publisher_ = nh->advertise<std_msgs::Float32MultiArray>(
       robot_info_topic_, 1);  // publish robot_unique info
 
   robot_status_publisher_ =
       nh->advertise<std_msgs::Float32MultiArray>(robot_status_topic_, 10);
   robot_status_timer_ =
-      nh->createTimer(ros::Duration(1.0 / robot_status_frequency),
-                      &ROSDriver::publishRobotStatus, this);
+      nh->createTimer(ros::Duration(1.0 / robot_status_frequency_),
+                      &RobotDriver::publishRobotStatus, this);
   robot_odom_publisher_ = nh->advertise<nav_msgs::Odometry>("odom", 1);
   odom_publish_timer_ =
-      nh->createTimer(ros::Duration(1.0 / robot_odom_frequency),
-                      &ROSDriver::publishOdometry, this);
+      nh->createTimer(ros::Duration(1.0 / robot_odom_frequency_),
+                      &RobotDriver::publishOdometry, this);
   ROS_INFO("Subscribers and Publishers are running...");
-  ROS_INFO("ROBOT ESTOP STATE %d", estop_state);
+  ROS_INFO("ROBOT ESTOP STATE %d", estop_state_);
 }
 
-void ROSDriver::publishRobotStatus(const ros::TimerEvent &event) {
+void RobotDriver::publishRobotStatus(const ros::TimerEvent &event) {
   if (!robot_->is_connected()) {
     ROS_FATAL(
-        "Unexpectedly disconnected from serial port. Check connection to robot "
+        "Unexpectedly disconnected from serial port. Check connection to "
+        "robot "
         "and reset Estop");
     robot_status_timer_.stop();
     ros::shutdown();
@@ -210,7 +217,7 @@ void ROSDriver::publishRobotStatus(const ros::TimerEvent &event) {
   // ROS_INFO("publishing some robot state");
 }
 
-void ROSDriver::publishOdometry(const ros::TimerEvent &event) {
+void RobotDriver::publishOdometry(const ros::TimerEvent &event) {
   robotData data = robot_->status_request();
   nav_msgs::Odometry odom_msg;
   odom_msg.header.stamp = ros::Time::now();
@@ -221,10 +228,11 @@ void ROSDriver::publishOdometry(const ros::TimerEvent &event) {
   robot_odom_publisher_.publish(odom_msg);
 }
 
-void ROSDriver::publishRobotInfo() {
+void RobotDriver::publishRobotInfo() {
   if (!robot_->is_connected()) {
     ROS_FATAL(
-        "Unexpectedly disconnected from serial port. Check connection to robot "
+        "Unexpectedly disconnected from serial port. Check connection to "
+        "robot "
         "and reset Estop");
     robot_status_timer_.stop();
     ros::shutdown();
@@ -238,10 +246,10 @@ void ROSDriver::publishRobotInfo() {
   robot_info.data.push_back(data.robot_speed_limit);
   robot_info.data.push_back(data.robot_fan_speed);
   robot_info.data.push_back(data.robot_fault_flag);
-  robot_info_publisher.publish(robot_info);
+  robot_info_publisher_.publish(robot_info);
 }
 // call everytime speed_topic_ get data
-void ROSDriver::callbackSpeedCommand(const geometry_msgs::Twist &msg) {
+void RobotDriver::callbackSpeedCommand(const geometry_msgs::Twist &msg) {
   double velocity_data[2];
   velocity_data[0] = msg.linear.x;
   velocity_data[1] = msg.angular.z;
@@ -249,41 +257,41 @@ void ROSDriver::callbackSpeedCommand(const geometry_msgs::Twist &msg) {
   robot_->set_robot_velocity(velocity_data);
 }
 
-void ROSDriver::callbackInfo(const std_msgs::Bool::ConstPtr &msg) {
+void RobotDriver::callbackInfo(const std_msgs::Bool::ConstPtr &msg) {
   if (msg->data) {
     publishRobotInfo();
   }
 }
 
-void ROSDriver::callbackEstopTrigger(const std_msgs::Bool::ConstPtr &msg) {
+void RobotDriver::callbackEstopTrigger(const std_msgs::Bool::ConstPtr &msg) {
   if (msg->data == true) {
-    estop_state = true;
-    robot_->send_estop(estop_state);
+    estop_state_ = true;
+    robot_->send_estop(estop_state_);
   }
 }
 
-void ROSDriver::callbackEstopReset(const std_msgs::Bool::ConstPtr &msg) {
+void RobotDriver::callbackEstopReset(const std_msgs::Bool::ConstPtr &msg) {
   if (msg->data == true) {
-    estop_state = false;
-    robot_->send_estop(estop_state);
+    estop_state_ = false;
+    robot_->send_estop(estop_state_);
   }
 }
 
-void ROSDriver::callbackTrim(const std_msgs::Float32::ConstPtr &msg) {
+void RobotDriver::callbackTrim(const std_msgs::Float32::ConstPtr &msg) {
   robot_->update_drivetrim(msg->data);
 }
 
-ROSDriver::~ROSDriver() {}
+RobotDriver::~RobotDriver() {}
 }  // namespace RoverRobotics
 int main(int argc, char **argv) {
   ros::init(argc, argv, "RoverRobotics_Driver_Wrapper_Node");
   ros::NodeHandle nh;
   ros::AsyncSpinner spinner(0);  // Prevent Callback bottleneck
   spinner.start();
-  RoverRobotics::ROSDriver robot(&nh);
+  RoverRobotics::RobotDriver robot(&nh);
   ROS_INFO("Robot driver is started");
 
   ros::waitForShutdown();
-  // robot.~ROSDriver();
+  // robot.~RobotDriver();
   return 0;
 }
