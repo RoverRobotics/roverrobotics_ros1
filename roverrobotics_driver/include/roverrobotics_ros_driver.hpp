@@ -54,7 +54,6 @@ class RobotDriver {
   // Timer
   ros::Timer robot_status_timer_;
   ros::Timer odom_publish_timer_;
-  PidGains pidGains_ = {0, 0, 0};
   float pid_p_max_ = 1;
   float pid_p_min_ = 0;
   float pid_i_max_ = 1;
@@ -62,7 +61,8 @@ class RobotDriver {
   float pid_d_max_ = 1;
   float pid_d_min_ = 0;
   bool estop_state_ = false;
-  bool closed_loop_;
+  Control::pid_gains pidGains_ = {0, 0, 0};
+  Control::robot_motion_mode_t robot_mode_;
 
  public:
   RobotDriver(ros::NodeHandle *nh);
