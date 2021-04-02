@@ -24,6 +24,8 @@ class ps4_mapper(object):
         self._inputs = rospy.get_param('~inputs')
         self._scales = rospy.get_param('~scales')
         self.buttonpressed = False
+        self.togglebuttonpressed = False
+        self.counter2 = 0
         self.counter = 0
         self._attrs = []
         for attr in Status.__slots__:
@@ -31,17 +33,16 @@ class ps4_mapper(object):
                 self._attrs.append(attr)
 
         self._pub = rospy.Publisher('cmd_vel/joystick', self._cls, queue_size=1)
-        self._pub_squ = rospy.Publisher('/joystick/square', Bool, queue_size=1, latch=True)
+        self._pub_squ = rospy.Publisher('/mode_toggle', Bool, queue_size=1)
         self._pub_triangle = rospy.Publisher('/joystick/triangle', Bool, queue_size=1, latch=True)
         self._pub_circle = rospy.Publisher('/soft_estop/reset', Bool, queue_size=1)  # , latch =True)
         self._pub_cross = rospy.Publisher('/soft_estop/trigger', Bool, queue_size=1)  # , latch =True)
         self._pub_trim = rospy.Publisher('/trim_increment', Float32, queue_size=1)
         self._trim_incre_value = rospy.get_param('~trim_increment_value', 0.01)
-	self._pub_feedback = rospy.Publisher("set_feedback", Feedback, queue_size=1)
+        self._pub_feedback = rospy.Publisher("set_feedback", Feedback, queue_size=1)
         rospy.Subscriber('status', Status, self.cb_status, queue_size=1)
         rospy.loginfo("Linear Scale is at %f" , self._scales["linear"]["x"])
-	self._feedback = Feedback()
-
+        self._feedback = Feedback()
         self._feedback.set_rumble = True
     def cb_status(self, msg):
         """
@@ -77,9 +78,14 @@ class ps4_mapper(object):
             self.buttonpressed = True
         elif self.buttonpressed:  # Debounce
             self.counter += 1
-            if self.counter == 50:
+            if self.counter == 10:
                 self.counter = 0
                 self.buttonpressed = False
+        if self.togglebuttonpressed: # Debounce mode
+            self.counter2 += 1
+            if self.counter2 == 100:
+                self.counter2 = 0
+                self.togglebuttonpressed = False
 		self._feedback.set_rumble = False
 		self._pub_feedback.publish(self._feedback)
 	if (msg.button_dpad_up or msg.button_dpad_down) and self.buttonpressed is False:
@@ -96,17 +102,23 @@ class ps4_mapper(object):
 	    self.buttonpressed = True
         button_msg = Bool()
         button_msg.data = False
-        button2_msg = Bool()
-        button2_msg.data = False
         if msg.button_cross:
             button_msg = Bool()
             button_msg.data = True
             self._pub_cross.publish(button_msg)
+            button_msg.data = False
         if msg.button_circle:
-            button2_msg = Bool()
-            button2_msg.data = True
-            self._pub_circle.publish(button2_msg)
-        self._pub_circle.publish(button2_msg)
+            button_msg = Bool()
+            button_msg.data = True
+            self._pub_circle.publish(button_msg)
+            button_msg.data = False
+        if msg.button_square and self.togglebuttonpressed is False:
+            button_msg = Bool()
+            button_msg.data = True
+            self._pub_squ.publish(button_msg)
+            button_msg.data = False
+            self.togglebuttonpressed = True
+        self._pub_circle.publish(button_msg)
         self._pub_cross.publish(button_msg)
         self._pub.publish(to_pub)
 
