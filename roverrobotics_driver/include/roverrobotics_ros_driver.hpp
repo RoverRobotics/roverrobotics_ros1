@@ -4,12 +4,13 @@
 #include <memory>
 
 #include "geometry_msgs/Twist.h"
+#include "librover/control.hpp"
 #include "librover/protocol_pro.hpp"
 #include "librover/protocol_pro_2.hpp"
-#include "librover/control.hpp"
 #include "nav_msgs/Odometry.h"
 #include "ros/node_handle.h"
 #include "ros/ros.h"
+#include "sensor_msgs/JoyFeedbackArray.h"
 #include "std_msgs/Bool.h"
 #include "std_msgs/Float32.h"
 #include "std_msgs/Float32MultiArray.h"
@@ -23,6 +24,7 @@ class RobotDriver {
   std::unique_ptr<BaseProtocolObject> robot_;
   // Pub Sub
   ros::Subscriber speed_command_subscriber_;  // listen to cmd_vel inputs
+  ros::Subscriber mode_trigger_subscriber_;   // listen to change mode inputs
   ros::Subscriber trim_command_subscriber_;   // listen to trim value broadcast
   ros::Subscriber estop_trigger_subscriber_;  // listen to estop trigger inputs
   ros::Subscriber estop_reset_subscriber_;    // listen to estop reset inputs
@@ -31,11 +33,13 @@ class RobotDriver {
   ros::Publisher robot_info_publisher_;    // publish robot_unique info
 
   ros::Publisher robot_status_publisher_;  // publish robot state (battery,
-                                           // estop_status, speed)
-  ros::Publisher robot_odom_publisher_;    // publish odometry
+  // estop_status, speed)
+  ros::Publisher feedback_publisher_;
+  ros::Publisher robot_odom_publisher_;  // publish odometry
   // parameter variables
   std::string speed_topic_;
   std::string estop_trigger_topic_;
+  std::string mode_trigger_topic_ = "/mode_toggle";
   std::string estop_reset_topic_;
   std::string robot_status_topic_;
   float robot_status_frequency_;
@@ -71,6 +75,7 @@ class RobotDriver {
   void publishRobotStatus(const ros::TimerEvent &event);
   void publishOdometry(const ros::TimerEvent &event);
   void publishRobotInfo();
+  void callbackModeTrigger(const std_msgs::Bool::ConstPtr &msg);
   void callbackSpeedCommand(const geometry_msgs::Twist &msg);
   void callbackTrim(const std_msgs::Float32::ConstPtr &msg);
   void callbackEstopTrigger(const std_msgs::Bool::ConstPtr &msg);

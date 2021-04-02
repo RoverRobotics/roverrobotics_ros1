@@ -148,22 +148,24 @@ RobotDriver::RobotDriver(ros::NodeHandle *nh) {
       nh->subscribe(trim_topic_, 1, &RobotDriver::callbackTrim, this);
   speed_command_subscriber_ =
       nh->subscribe(speed_topic_, 10, &RobotDriver::callbackSpeedCommand, this);
+  mode_trigger_subscriber_ = nh->subscribe(
+      mode_trigger_topic_, 10, &RobotDriver::callbackModeTrigger, this);
   estop_trigger_subscriber_ = nh->subscribe(
       estop_trigger_topic_, 10, &RobotDriver::callbackEstopTrigger, this);
   estop_reset_subscriber_ = nh->subscribe(
       estop_reset_topic_, 10, &RobotDriver::callbackEstopReset, this);
-  robot_info_subscriber_ =
-      nh->subscribe(robot_info_request_topic_, 10, &RobotDriver::callbackInfo,
-                    this);  // listen to robot_info request
+  robot_info_subscriber_ = nh->subscribe(robot_info_request_topic_, 10,
+                                         &RobotDriver::callbackInfo, this);
   robot_info_publisher_ = nh->advertise<std_msgs::Float32MultiArray>(
       robot_info_topic_, 1);  // publish robot_unique info
-
   robot_status_publisher_ =
       nh->advertise<std_msgs::Float32MultiArray>(robot_status_topic_, 10);
   robot_status_timer_ =
       nh->createTimer(ros::Duration(1.0 / robot_status_frequency_),
                       &RobotDriver::publishRobotStatus, this);
   robot_odom_publisher_ = nh->advertise<nav_msgs::Odometry>("odom", 1);
+  // feedback_publisher_ =
+  //     nh->advertise<sensor_msgs::JoyFeedbackArray>("/set_feedback", 1);
   odom_publish_timer_ =
       nh->createTimer(ros::Duration(1.0 / robot_odom_frequency_),
                       &RobotDriver::publishOdometry, this);
@@ -263,6 +265,40 @@ void RobotDriver::callbackSpeedCommand(const geometry_msgs::Twist &msg) {
   velocity_data[1] = msg.angular.z;
   velocity_data[2] = msg.angular.y;
   robot_->set_robot_velocity(velocity_data);
+}
+
+void RobotDriver::callbackModeTrigger(const std_msgs::Bool::ConstPtr &msg) {
+  int mode;
+  sensor_msgs::JoyFeedbackArray a;
+  if (msg->data) {
+    mode = robot_->cycle_robot_mode();
+    ROS_INFO("new mode %d", mode);
+    // switch (mode) {
+    //   case Control::OPEN_LOOP:
+    //     ROS_INFO("Robot Mode : Open Loop");
+    //     a.set_led = true;
+    //     a.led_r = 255;
+    //     a.led_g = 255;
+    //     a.led_b = 0;
+    //     break;
+    //   case Control::TRACTION_CONTROL:
+    //     ROS_INFO("Robot Mode : TRACTION_CONTROL");
+    //     a.set_led = true;
+    //     a.led_r = 255;
+    //     a.led_g = 255;
+    //     a.led_b = 0;
+    //     break;
+    //   case Control::INDEPENDENT_WHEEL:
+    //     ROS_INFO("Robot Mode : INDEPENDENT_WHEEL");
+    //     a.set_led = true;
+    //     a.led_r = 255;
+    //     a.led_g = 255;
+    //     a.led_b = 0;
+    //     break;
+    // }
+  }
+
+  // feedback_publisher_.publish(a);
 }
 
 void RobotDriver::callbackInfo(const std_msgs::Bool::ConstPtr &msg) {
