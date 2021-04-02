@@ -24,7 +24,6 @@ RobotDriver::RobotDriver(ros::NodeHandle *nh) {
     robot_mode_ = Control::INDEPENDENT_WHEEL;
   else
     robot_mode_ = Control::OPEN_LOOP;
-
   // PID Control
   if (robot_mode_ != Control::OPEN_LOOP) {
     ROS_WARN(
@@ -61,7 +60,7 @@ RobotDriver::RobotDriver(ros::NodeHandle *nh) {
     ROS_WARN("pidGains_.Kd is too low, changing to: %f", pid_d_min_);
     pidGains_.kd = pid_d_min_;
   } else if (pidGains_.kd > pid_d_max_) {
-    ROS_WARN("pidGains_.Ki is too high, changing to: %f", pid_d_max_);
+    ROS_WARN("pidGains_.Kd is too high, changing to: %f", pid_d_max_);
     pidGains_.kd = pid_d_max_;
   }
   //~PID Control
@@ -273,29 +272,29 @@ void RobotDriver::callbackModeTrigger(const std_msgs::Bool::ConstPtr &msg) {
   if (msg->data) {
     mode = robot_->cycle_robot_mode();
     ROS_INFO("new mode %d", mode);
-    // switch (mode) {
-    //   case Control::OPEN_LOOP:
-    //     ROS_INFO("Robot Mode : Open Loop");
-    //     a.set_led = true;
-    //     a.led_r = 255;
-    //     a.led_g = 255;
-    //     a.led_b = 0;
-    //     break;
-    //   case Control::TRACTION_CONTROL:
-    //     ROS_INFO("Robot Mode : TRACTION_CONTROL");
-    //     a.set_led = true;
-    //     a.led_r = 255;
-    //     a.led_g = 255;
-    //     a.led_b = 0;
-    //     break;
-    //   case Control::INDEPENDENT_WHEEL:
-    //     ROS_INFO("Robot Mode : INDEPENDENT_WHEEL");
-    //     a.set_led = true;
-    //     a.led_r = 255;
-    //     a.led_g = 255;
-    //     a.led_b = 0;
-    //     break;
-    // }
+    switch (mode) {
+      case Control::OPEN_LOOP:
+        ROS_INFO("Robot Mode : Open Loop");
+        // a.set_led = true;
+        // a.led_r = 255;
+        // a.led_g = 255;
+        // a.led_b = 0;
+        break;
+      case Control::TRACTION_CONTROL:
+        ROS_INFO("Robot Mode : TRACTION_CONTROL");
+        // a.set_led = true;
+        // a.led_r = 255;
+        // a.led_g = 255;
+        // a.led_b = 0;
+        break;
+      case Control::INDEPENDENT_WHEEL:
+        ROS_INFO("Robot Mode : INDEPENDENT_WHEEL");
+        // a.set_led = true;
+        // a.led_r = 255;
+        // a.led_g = 255;
+        // a.led_b = 0;
+        break;
+    }
   }
 
   // feedback_publisher_.publish(a);
