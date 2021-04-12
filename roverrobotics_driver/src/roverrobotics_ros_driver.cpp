@@ -98,7 +98,7 @@ RobotDriver::RobotDriver(ros::NodeHandle *nh) {
     ros::shutdown();
   } else if (robot_type_ == "pro") {
     robot_ = std::make_unique<ProProtocolObject>(
-        device_port_.c_str(), comm_type_, robot_mode_, pidGains_,angular_scaling_params_);
+        device_port_.c_str(), comm_type_, robot_mode_, pidGains_);
   } else if (robot_type_ == "pro2") {
     robot_ = std::make_unique<Pro2ProtocolObject>(
         device_port_.c_str(), comm_type_, robot_mode_, pidGains_,angular_scaling_params_);
