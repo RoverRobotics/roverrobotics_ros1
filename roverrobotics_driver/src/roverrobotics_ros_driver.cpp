@@ -77,15 +77,15 @@ RobotDriver::RobotDriver(ros::NodeHandle *nh) {
     angular_scaling_params_.a_coef=0;
   }
   if (!ros::param::get("angular_b_coef", angular_scaling_params_.angular_b_coef)){
-    ROS_INFO("no 'angular_b_coef' set; using the default value: 1");
+    ROS_INFO("no 'angular_b_coef' set; using the default value: 0");
     angular_scaling_params_.b_coef=1;
   }
   if (!ros::param::get("angular_c_coef", angular_scaling_params_.angular_c_coef)){
-    ROS_INFO("no 'angular_c_coef' set; using the default value: 0");
+    ROS_INFO("no 'angular_c_coef' set; using the default value: 1");
     angular_scaling_params_.c_coef=0;
   }
   if (!ros::param::get("angular_min_scale", angular_scaling_params_.min_scale_val)){
-    ROS_INFO("no 'angular_min_scale' set; using the default value: 0");
+    ROS_INFO("no 'angular_min_scale' set; using the default value: 1");
     angular_scaling_params_.min_scale_val=0;
   }
   if (!ros::param::get("angular_max_scale", angular_scaling_params_.max_scale_val)){
