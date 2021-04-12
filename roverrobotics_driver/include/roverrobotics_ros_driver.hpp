@@ -52,7 +52,6 @@ class RobotDriver {
   std::string trim_topic_;
   float odom_angular_coef_;
   float odom_traction_factor_;
-
   float trimvalue_;
   std::string device_port_;
   std::string comm_type_;
@@ -65,6 +64,9 @@ class RobotDriver {
   float pid_i_min_ = 0;
   float pid_d_max_ = 1;
   float pid_d_min_ = 0;
+  float angular_a_;
+  float angular_b_;
+  float angular_c_;
   bool estop_state_ = false;
   Control::pid_gains pidGains_ = {0, 0, 0};
   Control::robot_motion_mode_t robot_mode_;

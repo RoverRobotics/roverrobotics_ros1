@@ -143,6 +143,18 @@ RobotDriver::RobotDriver(ros::NodeHandle *nh) {
         "no 'info_topic' set; using the default value: '/robot_unique_info'");
     robot_info_topic_ = "/robot_unique_info";
   }
+  if (!ros::param::get("angular_a", angular_a_)){
+    ROS_INFO("no 'angular_a' set; using the default value: 0");
+    angular_a_=0;
+  }
+  if (!ros::param::get("angular_b", angular_b_)){
+    ROS_INFO("no 'angular_b' set; using the default value: 1");
+    angular_b_=1;
+  }
+  if (!ros::param::get("angular_c", angular_c_)){
+    ROS_INFO("no 'angular_c' set; using the default value: 0");
+    angular_c_=0;
+  }
   trim_command_subscriber_ =
       nh->subscribe(trim_topic_, 1, &RobotDriver::callbackTrim, this);
   speed_command_subscriber_ =

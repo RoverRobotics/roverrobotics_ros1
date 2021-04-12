@@ -4,7 +4,7 @@
     <arg name="config_topics" default="$(find roverrobotics_driver)/config/twist_mux_topics_locks.yaml" />
     <param name="device_port" value="can0" />
     <param name="comm_type" value="can" />
-    <param name="robot_type" value="pro2" />
+    <param name="robot_type" value="mini" />
     <param name="robot_mode" value="OPEN_LOOP" />
     <param name="status_frequency" value="30" />
     <param name="Kp" value="0.0005" />
@@ -13,7 +13,7 @@
     <param name="angular_a" value="0" />
     <param name="angular_b" value="1" />
     <param name="angular_c" value="0" />
-
+    
     <!-- RoverRobotics Ros 1 Driver -->
     <node 
         pkg="roverrobotics_driver" 
@@ -21,12 +21,13 @@
         name="$(arg driver_node_name)" 
         respawn="false"
         output="screen" >
-    <!-- launch-prefix="gdb -ex run - -args" -->
+        <!-- launch-prefix="gdb -ex run - -args" -->
     </node>
-
+    
     <!--  Twist Mux  -->
     <node pkg="twist_mux" type="twist_mux" name="twist_mux" output="screen">
         <remap from="cmd_vel_out" to="/cmd_vel/managed" />
+
         <rosparam file="$(arg config_locks)" command="load" />
         <rosparam file="$(arg config_topics)" command="load" />
     </node>
