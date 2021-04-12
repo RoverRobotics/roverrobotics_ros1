@@ -64,12 +64,10 @@ class RobotDriver {
   float pid_i_min_ = 0;
   float pid_d_max_ = 1;
   float pid_d_min_ = 0;
-  float angular_a_;
-  float angular_b_;
-  float angular_c_;
   bool estop_state_ = false;
   Control::pid_gains pidGains_ = {0, 0, 0};
   Control::robot_motion_mode_t robot_mode_;
+  Control::angular_scaling_params angular_scaling_params_ = {0,0,0,0,0};
 
  public:
   RobotDriver(ros::NodeHandle *nh);

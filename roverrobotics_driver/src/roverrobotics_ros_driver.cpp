@@ -72,16 +72,36 @@ RobotDriver::RobotDriver(ros::NodeHandle *nh) {
     ROS_INFO("no 'traction_factor' set; using the default value: '0'");
     odom_traction_factor_ = 0;
   }
+  if (!ros::param::get("angular_a_coef", angular_scaling_params_.a_coef)){
+    ROS_INFO("no 'angular_a_coef' set; using the default value: 0");
+    angular_scaling_params_.a_coef=0;
+  }
+  if (!ros::param::get("angular_b_coef", angular_scaling_params_.angular_b_coef)){
+    ROS_INFO("no 'angular_b_coef' set; using the default value: 1");
+    angular_scaling_params_.b_coef=1;
+  }
+  if (!ros::param::get("angular_c_coef", angular_scaling_params_.angular_c_coef)){
+    ROS_INFO("no 'angular_c_coef' set; using the default value: 0");
+    angular_scaling_params_.c_coef=0;
+  }
+  if (!ros::param::get("angular_min_scale", angular_scaling_params_.min_scale_val)){
+    ROS_INFO("no 'angular_min_scale' set; using the default value: 0");
+    angular_scaling_params_.min_scale_val=0;
+  }
+  if (!ros::param::get("angular_max_scale", angular_scaling_params_.max_scale_val)){
+    ROS_INFO("no 'angular_max_scale' set; using the default value: 1");
+    angular_scaling_params_.max_scale_val=1;
+  }
   if (!ros::param::get("robot_type", robot_type_)) {
     ROS_FATAL(
         "No 'robot_type' found as a parameter. Shutting down Driver Node");
     ros::shutdown();
   } else if (robot_type_ == "pro") {
     robot_ = std::make_unique<ProProtocolObject>(
-        device_port_.c_str(), comm_type_, robot_mode_, pidGains_);
+        device_port_.c_str(), comm_type_, robot_mode_, pidGains_,angular_scaling_params_);
   } else if (robot_type_ == "pro2") {
     robot_ = std::make_unique<Pro2ProtocolObject>(
-        device_port_.c_str(), comm_type_, robot_mode_, pidGains_);
+        device_port_.c_str(), comm_type_, robot_mode_, pidGains_,angular_scaling_params_);
   } else {
     ROS_FATAL("Unknown Robot Type. Shutting down ROS");
     ros::shutdown();
@@ -142,18 +162,6 @@ RobotDriver::RobotDriver(ros::NodeHandle *nh) {
     ROS_INFO(
         "no 'info_topic' set; using the default value: '/robot_unique_info'");
     robot_info_topic_ = "/robot_unique_info";
-  }
-  if (!ros::param::get("angular_a", angular_a_)){
-    ROS_INFO("no 'angular_a' set; using the default value: 0");
-    angular_a_=0;
-  }
-  if (!ros::param::get("angular_b", angular_b_)){
-    ROS_INFO("no 'angular_b' set; using the default value: 1");
-    angular_b_=1;
-  }
-  if (!ros::param::get("angular_c", angular_c_)){
-    ROS_INFO("no 'angular_c' set; using the default value: 0");
-    angular_c_=0;
   }
   trim_command_subscriber_ =
       nh->subscribe(trim_topic_, 1, &RobotDriver::callbackTrim, this);
