@@ -12,7 +12,7 @@
 #include "ros/ros.h"
 #include "sensor_msgs/JoyFeedbackArray.h"
 #include "std_msgs/Bool.h"
-#include "std_msgs/Float32.h"
+#include "std_msgs/Int8.h"
 #include "std_msgs/Float32MultiArray.h"
 #include "tf2_geometry_msgs/tf2_geometry_msgs.h"
 #include "time.h"
@@ -77,7 +77,7 @@ class RobotDriver {
   void publishRobotInfo();
   void callbackModeTrigger(const std_msgs::Bool::ConstPtr &msg);
   void callbackSpeedCommand(const geometry_msgs::Twist &msg);
-  void callbackTrim(const std_msgs::Float32::ConstPtr &msg);
+  void callbackTrim(const std_msgs::Int8::ConstPtr &msg);
   void callbackEstopTrigger(const std_msgs::Bool::ConstPtr &msg);
   void callbackInfo(const std_msgs::Bool::ConstPtr &msg);
   void callbackEstopReset(const std_msgs::Bool::ConstPtr &msg);
