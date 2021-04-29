@@ -9,7 +9,7 @@
 
 import rospy
 from geometry_msgs.msg import Twist, TwistStamped
-from std_msgs.msg import Bool, Int8
+from std_msgs.msg import Bool, Float32
 from ds4_driver.msg import Status, Feedback
 
 
@@ -41,12 +41,17 @@ class ps4_mapper(object):
             '/soft_estop/reset', Bool, queue_size=1)  # , latch =True)
         self._pub_cross = rospy.Publisher(
             '/soft_estop/trigger', Bool, queue_size=1)  # , latch =True)
-        self._pub_trim = rospy.Publisher('/trim_increment', Int8, queue_size=1)
+        self._pub_trim = rospy.Publisher(
+            '/trim_increment', Float32, queue_size=1)
         self._trim_incre_value = rospy.get_param('~trim_increment_value', 0.01)
         self._pub_feedback = rospy.Publisher(
             "set_feedback", Feedback, queue_size=1)
+        
         rospy.Subscriber('status', Status, self.cb_status, queue_size=1)
         rospy.loginfo("Linear Scale is at %f", self._scales["linear"]["x"])
+        self._feedback.set_led =True
+        self._feedback.led_g = 255
+        self._pub_feedback.publish(self._feedback)
 
     def cb_status(self, msg):
         """
@@ -73,13 +78,16 @@ class ps4_mapper(object):
                 val = eval(expr, {}, input_vals)
                 setattr(vel_vec, k, scale * val)
         if (msg.button_l1 or msg.button_r1) and self.buttonpressed is False:
-            trim_msg = Int8()
+            trim_msg = Float32()
             if msg.button_r1:
-                trim_msg = 1
+                trim_msg = .01
             elif msg.button_l1:
-                trim_msg = -1
+                trim_msg = -.01
             self._pub_trim.publish(trim_msg)
             self.buttonpressed = True
+        trim_msg = 0
+        self._pub_trim.publish(trim_msg)
+
         elif self.buttonpressed:  # Debounce
             self.counter += 1
             if self.counter == 10:
@@ -133,6 +141,7 @@ def main():
     rospy.init_node('ps4_mapper')
     ps4_mapper()
     rospy.spin()
+
 
 if __name__ == '__main__':
     main()
