@@ -46,10 +46,11 @@ class ps4_mapper(object):
         self._trim_incre_value = rospy.get_param('~trim_increment_value', 0.01)
         self._pub_feedback = rospy.Publisher(
             "set_feedback", Feedback, queue_size=1)
-        
         rospy.Subscriber('status', Status, self.cb_status, queue_size=1)
         rospy.loginfo("Linear Scale is at %f", self._scales["linear"]["x"])
-        
+        self._feedback.set_led = True
+        self._feedback.led_g = 255
+        self._pub_feedback.publish(self._feedback)
 
     def cb_status(self, msg):
         """
@@ -57,9 +58,7 @@ class ps4_mapper(object):
         :type msg: Status
         :return:
         """
-        self._feedback.set_led =True
-        self._feedback.led_g = 255
-        self._pub_feedback.publish(self._feedback)
+
         input_vals = {}
         for attr in self._attrs:
             input_vals[attr] = getattr(msg, attr)
@@ -88,18 +87,18 @@ class ps4_mapper(object):
             self.buttonpressed = True
         elif self.buttonpressed:  # Debounce
             self.counter += 1
-            if self.counter == 10:
+            if self.counter == 100:
                 self.counter = 0
                 self.buttonpressed = False
         trim_msg = 0
         self._pub_trim.publish(trim_msg)
+        self._feedback.set_rumble = False
+        self._pub_feedback.publish(self._feedback)
         if self.togglebuttonpressed:  # Debounce mode
             self.counter2 += 1
             if self.counter2 == 200:
                 self.counter2 = 0
                 self.togglebuttonpressed = False
-                self._feedback.set_rumble = False
-                self._pub_feedback.publish(self._feedback)
         if (msg.button_dpad_up or msg.button_dpad_down) and self.buttonpressed is False:
             if msg.button_dpad_up and self._scales["linear"].get("x") < 3:
                 self._scales["linear"]["x"] += 0.05
