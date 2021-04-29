@@ -31,7 +31,7 @@ class ps4_mapper(object):
         for attr in Status.__slots__:
             if attr.startswith('axis_') or attr.startswith('button_'):
                 self._attrs.append(attr)
-
+        self._feedback = Feedback()
         self._pub = rospy.Publisher(
             'cmd_vel/joystick', self._cls, queue_size=1)
         self._pub_squ = rospy.Publisher('/mode_toggle', Bool, queue_size=1)
