@@ -399,7 +399,7 @@ namespace RoverRobotics
     }
   }
 
-  void RobotDriver::callbackTrim(const std_msgs::Int8::ConstPtr &msg)
+  void RobotDriver::callbackTrim(const std_msgs::Float32::ConstPtr &msg)
   {
     if (msg->data != 0)
     {
