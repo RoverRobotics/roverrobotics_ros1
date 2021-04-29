@@ -85,14 +85,13 @@ class ps4_mapper(object):
                 trim_msg = -.01
             self._pub_trim.publish(trim_msg)
             self.buttonpressed = True
-        trim_msg = 0
-        self._pub_trim.publish(trim_msg)
-
         elif self.buttonpressed:  # Debounce
             self.counter += 1
             if self.counter == 10:
                 self.counter = 0
                 self.buttonpressed = False
+        trim_msg = 0
+        self._pub_trim.publish(trim_msg)
         if self.togglebuttonpressed:  # Debounce mode
             self.counter2 += 1
             if self.counter2 == 200:
