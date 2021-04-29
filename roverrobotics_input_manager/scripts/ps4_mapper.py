@@ -49,9 +49,7 @@ class ps4_mapper(object):
         
         rospy.Subscriber('status', Status, self.cb_status, queue_size=1)
         rospy.loginfo("Linear Scale is at %f", self._scales["linear"]["x"])
-        _feedback.set_led =True
-        _feedback.led_g = 255
-        self._pub_feedback.publish(self._feedback)
+        
 
     def cb_status(self, msg):
         """
@@ -59,6 +57,9 @@ class ps4_mapper(object):
         :type msg: Status
         :return:
         """
+        self._feedback.set_led =True
+        self._feedback.led_g = 255
+        self._pub_feedback.publish(self._feedback)
         input_vals = {}
         for attr in self._attrs:
             input_vals[attr] = getattr(msg, attr)
