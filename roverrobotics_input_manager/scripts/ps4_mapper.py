@@ -87,13 +87,14 @@ class ps4_mapper(object):
             self.buttonpressed = True
         elif self.buttonpressed:  # Debounce
             self.counter += 1
-            if self.counter == 100:
+            if self.counter == 50:
                 self.counter = 0
                 self.buttonpressed = False
+                self._feedback.set_rumble = False
+                self._pub_feedback.publish(self._feedback)
         trim_msg = 0
         self._pub_trim.publish(trim_msg)
-        self._feedback.set_rumble = False
-        self._pub_feedback.publish(self._feedback)
+
         if self.togglebuttonpressed:  # Debounce mode
             self.counter2 += 1
             if self.counter2 == 200:
