@@ -67,7 +67,7 @@ class RobotDriver {
   bool estop_state_ = false;
   Control::pid_gains pidGains_ = {0, 0, 0};
   Control::robot_motion_mode_t robot_mode_;
-  Control::angular_scaling_params angular_scaling_params_ = {0,0,0,0,0};
+  Control::angular_scaling_params angular_scaling_params_ = {0, 0, 0, 0, 0};
 
  public:
   RobotDriver(ros::NodeHandle *nh);
