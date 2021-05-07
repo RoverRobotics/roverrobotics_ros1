@@ -12,7 +12,7 @@ from geometry_msgs.msg import Twist, TwistStamped
 from std_msgs.msg import Bool, Float32
 from ds4_driver.msg import Status, Feedback
 
-
+trim_delta = 0.01
 class ps4_mapper(object):
     def __init__(self):
         self._stamped = rospy.get_param('~stamped', False)
@@ -80,9 +80,9 @@ class ps4_mapper(object):
         if (msg.button_l1 or msg.button_r1) and self.buttonpressed is False:
             trim_msg = Float32()
             if msg.button_r1:
-                trim_msg = .01
+                trim_msg = trim_delta
             elif msg.button_l1:
-                trim_msg = -.01
+                trim_msg = trim_delta
             self._pub_trim.publish(trim_msg)
             self.buttonpressed = True
         elif self.buttonpressed:  # Debounce

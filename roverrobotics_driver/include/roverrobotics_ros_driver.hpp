@@ -40,17 +40,18 @@ class RobotDriver {
   // parameter variables
   std::string speed_topic_;
   std::string estop_trigger_topic_;
-  std::string mode_trigger_topic_ = "/mode_toggle";
+  std::string mode_trigger_topic_;
   std::string estop_reset_topic_;
   std::string robot_status_topic_;
   float robot_status_frequency_;
-  float robot_status_frequency_max = 60;
-  float robot_status_frequency_min_ = 5;
+  const float robot_status_frequency_max = 60;
+  const float robot_status_frequency_min_ = 5;
   float robot_odom_frequency_;
   std::string robot_info_request_topic_;
   std::string robot_info_topic_;
   std::string robot_type_;
   std::string trim_topic_;
+  std::string mode_name_;
   float odom_angular_coef_;
   float odom_traction_factor_;
   float trimvalue_;
@@ -59,12 +60,12 @@ class RobotDriver {
   // Timer
   ros::Timer robot_status_timer_;
   ros::Timer odom_publish_timer_;
-  float pid_p_max_ = 1;
-  float pid_p_min_ = 0;
-  float pid_i_max_ = 1;
-  float pid_i_min_ = 0;
-  float pid_d_max_ = 1;
-  float pid_d_min_ = 0;
+  const float pid_p_max_ = 1;
+  const float pid_p_min_ = 0;
+  const float pid_i_max_ = 1;
+  const float pid_i_min_ = 0;
+  const float pid_d_max_ = 1;
+  const float pid_d_min_ = 0;
   bool estop_state_ = false;
   Control::pid_gains pidGains_ = {0, 0, 0};
   Control::robot_motion_mode_t robot_mode_;

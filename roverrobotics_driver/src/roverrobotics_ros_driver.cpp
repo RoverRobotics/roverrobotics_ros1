@@ -13,14 +13,14 @@ RobotDriver::RobotDriver(ros::NodeHandle *nh) {
     ROS_FATAL("No communication method set, Shutting down Driver Node");
     ros::shutdown();
   }
-  std::string mode_name = "OPEN_LOOP";
-  if (!ros::param::get("robot_mode", mode_name)) {
+  mode_name_ = "OPEN_LOOP";
+  if (!ros::param::get("robot_mode", mode_name_)) {
     ROS_INFO("no 'robot_mode' set; using the default value: 'OPEN_LOOP'");
   }
 
-  if (mode_name == "TRACTION_CONTROL")
+  if (mode_name_ == "TRACTION_CONTROL")
     robot_mode_ = Control::TRACTION_CONTROL;
-  else if (mode_name == "INDEPENDENT_WHEEL")
+  else if (mode_name_ == "INDEPENDENT_WHEEL")
     robot_mode_ = Control::INDEPENDENT_WHEEL;
   else
     robot_mode_ = Control::OPEN_LOOP;
@@ -170,6 +170,12 @@ RobotDriver::RobotDriver(ros::NodeHandle *nh) {
         "no 'info_topic' set; using the default value: '/robot_unique_info'");
     robot_info_topic_ = "/robot_unique_info";
   }
+  if (!ros::param::get("mode_trigger_topic", mode_trigger_topic_)) {
+    ROS_INFO(
+        "no 'mode_trigger_topic' set; using the default value: '/mode_toggle'");
+    mode_trigger_topic_ = "/mode_toggle";
+  }
+
   trim_command_subscriber_ =
       nh->subscribe(trim_topic_, 1, &RobotDriver::callbackTrim, this);
   speed_command_subscriber_ =
