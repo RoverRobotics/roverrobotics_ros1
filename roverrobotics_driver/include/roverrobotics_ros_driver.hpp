@@ -7,6 +7,7 @@
 #include "librover/control.hpp"
 #include "librover/protocol_pro.hpp"
 #include "librover/protocol_pro_2.hpp"
+#include "librover/protocol_mini.hpp"
 #include "nav_msgs/Odometry.h"
 #include "ros/node_handle.h"
 #include "ros/ros.h"

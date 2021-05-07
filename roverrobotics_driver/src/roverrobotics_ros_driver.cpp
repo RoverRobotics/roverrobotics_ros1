@@ -105,6 +105,10 @@ RobotDriver::RobotDriver(ros::NodeHandle *nh) {
     robot_ = std::make_unique<Pro2ProtocolObject>(
         device_port_.c_str(), comm_type_, robot_mode_, pidGains_,
         angular_scaling_params_);
+  } else if (robot_type_ == "mini") {
+    robot_ = std::make_unique<MiniProtocolObject>(
+        device_port_.c_str(), comm_type_, robot_mode_, pidGains_,
+        angular_scaling_params_);
   } else {
     ROS_FATAL("Unknown Robot Type. Shutting down ROS");
     ros::shutdown();

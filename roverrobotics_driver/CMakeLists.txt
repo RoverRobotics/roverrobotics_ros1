@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.8.0)
 project(roverrobotics_driver)
 
-add_compile_options(-std=c++14)
+add_compile_options(-std=c++17)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy

@@ -11,6 +11,6 @@
         <param name="stamped" value="True" />
     </node>
 
-    <!-- Pro launch -->
-    <include file="$(find roverrobotics_driver)/launch/pro2.launch"/>
+    <!-- Robot launch -->
+    <include file="$(find roverrobotics_driver)/launch/mini.launch"/>
 </launch>
