@@ -13,6 +13,8 @@ from std_msgs.msg import Bool, Float32
 from ds4_driver.msg import Status, Feedback
 
 trim_delta = 0.01
+big_debounce = 200
+small_debounce = 50
 class ps4_mapper(object):
     def __init__(self):
         self._stamped = rospy.get_param('~stamped', False)
@@ -87,7 +89,7 @@ class ps4_mapper(object):
             self.buttonpressed = True
         elif self.buttonpressed:  # Debounce
             self.counter += 1
-            if self.counter == 50:
+            if self.counter == small_debounce:
                 self.counter = 0
                 self.buttonpressed = False
                 self._feedback.set_rumble = False
@@ -97,7 +99,7 @@ class ps4_mapper(object):
 
         if self.togglebuttonpressed:  # Debounce mode
             self.counter2 += 1
-            if self.counter2 == 200:
+            if self.counter2 == big_debounce:
                 self.counter2 = 0
                 self.togglebuttonpressed = False
         if (msg.button_dpad_up or msg.button_dpad_down) and self.buttonpressed is False:
