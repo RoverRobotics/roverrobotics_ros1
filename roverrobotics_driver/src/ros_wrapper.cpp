@@ -256,7 +256,7 @@ void ROSWrapper::publishRobotInfo() {
 }
 // call everytime speed_topic_ get data
 void ROSWrapper::callbackSpeedCommand(const geometry_msgs::Twist &msg) {
-  double velocity_data[2];
+  double velocity_data[3];
   velocity_data[0] = msg.linear.x;
   velocity_data[1] = msg.angular.z;
   velocity_data[2] = msg.angular.y;
