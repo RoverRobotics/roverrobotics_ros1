@@ -44,8 +44,8 @@ class RobotDriver {
   std::string estop_reset_topic_;
   std::string robot_status_topic_;
   float robot_status_frequency_;
-  const float robot_status_frequency_max = 60;
-  const float robot_status_frequency_min_ = 5;
+  const float ROBOT_STATUS_FREQUENCY_MAX = 60;
+  const float ROBOT_STATUS_FREQUENCY_MIN = 5;
   float robot_odom_frequency_;
   std::string robot_info_request_topic_;
   std::string robot_info_topic_;
@@ -60,12 +60,12 @@ class RobotDriver {
   // Timer
   ros::Timer robot_status_timer_;
   ros::Timer odom_publish_timer_;
-  const float pid_p_max_ = 1;
-  const float pid_p_min_ = 0;
-  const float pid_i_max_ = 1;
-  const float pid_i_min_ = 0;
-  const float pid_d_max_ = 1;
-  const float pid_d_min_ = 0;
+  const float PID_P_MAX = 1;
+  const float PID_P_MIN = 0;
+  const float PID_I_MAX = 1;
+  const float PID_I_MIN = 0;
+  const float PID_D_MAX = 1;
+  const float PID_D_MIN = 0;
   bool estop_state_ = false;
   Control::pid_gains pidGains_ = {0, 0, 0};
   Control::robot_motion_mode_t robot_mode_;

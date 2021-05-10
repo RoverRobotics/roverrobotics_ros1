@@ -34,34 +34,34 @@ RobotDriver::RobotDriver(ros::NodeHandle *nh) {
     pidGains_.kp = 0;
     ROS_INFO("no 'Kp' set; using the default value: %f", pidGains_.kp);
   }
-  if (pidGains_.kp < pid_p_min_) {
-    ROS_WARN("pidGains_.Kp is too low, changing to: %f", pid_p_min_);
-    pidGains_.kp = pid_p_min_;
-  } else if (pidGains_.kp > pid_p_max_) {
-    ROS_WARN("pidGains_.Kp is too high, changing to: %f", pid_p_max_);
-    pidGains_.kp = pid_p_max_;
+  if (pidGains_.kp < PID_P_MIN) {
+    ROS_WARN("pidGains_.Kp is too low, changing to: %f", PID_P_MIN);
+    pidGains_.kp = PID_P_MIN;
+  } else if (pidGains_.kp > PID_P_MAX) {
+    ROS_WARN("pidGains_.Kp is too high, changing to: %f", PID_P_MAX);
+    pidGains_.kp = PID_P_MAX;
   }
   if (!ros::param::get("Ki", pidGains_.ki)) {
     pidGains_.ki = 0;
     ROS_INFO("no 'Ki' set; using the default value: '.0'");
   }
-  if (pidGains_.ki < pid_i_min_) {
-    ROS_WARN("pidGains_.Ki is too low, changing to: %f", pid_i_min_);
-    pidGains_.ki = pid_i_min_;
-  } else if (pidGains_.ki > pid_i_max_) {
-    ROS_WARN("pidGains_.Ki is too high, changing to: %f", pid_i_max_);
-    pidGains_.ki = pid_i_max_;
+  if (pidGains_.ki < PID_I_MIN) {
+    ROS_WARN("pidGains_.Ki is too low, changing to: %f", PID_I_MIN);
+    pidGains_.ki = PID_I_MIN;
+  } else if (pidGains_.ki > PID_I_MAX) {
+    ROS_WARN("pidGains_.Ki is too high, changing to: %f", PID_I_MAX);
+    pidGains_.ki = PID_I_MAX;
   }
   if (!ros::param::get("Kd", pidGains_.kd)) {
     ROS_INFO("no 'Kd' set; using the default value: '0'");
     pidGains_.kd = 0;
   }
-  if (pidGains_.kd < pid_d_min_) {
-    ROS_WARN("pidGains_.Kd is too low, changing to: %f", pid_d_min_);
-    pidGains_.kd = pid_d_min_;
-  } else if (pidGains_.kd > pid_d_max_) {
-    ROS_WARN("pidGains_.Kd is too high, changing to: %f", pid_d_max_);
-    pidGains_.kd = pid_d_max_;
+  if (pidGains_.kd < PID_D_MIN) {
+    ROS_WARN("pidGains_.Kd is too low, changing to: %f", PID_D_MIN);
+    pidGains_.kd = PID_D_MIN;
+  } else if (pidGains_.kd > PID_D_MAX) {
+    ROS_WARN("pidGains_.Kd is too high, changing to: %f", PID_D_MAX);
+    pidGains_.kd = PID_D_MAX;
   }
   //~PID Control
   if (!ros::param::get("angular_coef", odom_angular_coef_)) {
@@ -145,14 +145,14 @@ RobotDriver::RobotDriver(ros::NodeHandle *nh) {
     ROS_INFO("no 'status_frequency' set; using the default value: '5.00'");
     robot_status_frequency_ = 5.00;
   }
-  if (robot_status_frequency_ < robot_status_frequency_min_) {
+  if (robot_status_frequency_ < ROBOT_STATUS_FREQUENCY_MIN) {
     ROS_WARN("status_frequency is too low, changing to default value: %f",
-             robot_status_frequency_min_);
-    robot_status_frequency_ = robot_status_frequency_min_;
-  } else if (robot_status_frequency_ > robot_status_frequency_max) {
+             ROBOT_STATUS_FREQUENCY_MIN);
+    robot_status_frequency_ = ROBOT_STATUS_FREQUENCY_MIN;
+  } else if (robot_status_frequency_ > ROBOT_STATUS_FREQUENCY_MAX) {
     ROS_WARN("status_frequency is too high, changing to default value: %f",
-             robot_status_frequency_max);
-    robot_status_frequency_ = robot_status_frequency_max;
+             ROBOT_STATUS_FREQUENCY_MAX);
+    robot_status_frequency_ = ROBOT_STATUS_FREQUENCY_MAX;
   }
   if (!ros::param::get("odom_frequency", robot_odom_frequency_)) {
     robot_odom_frequency_ = 50.00;
