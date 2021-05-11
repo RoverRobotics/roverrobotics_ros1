@@ -43,7 +43,7 @@ RobotDriver::RobotDriver(ros::NodeHandle *nh) {
   }
   if (!ros::param::get("Ki", pidGains_.ki)) {
     pidGains_.ki = PID_I_DEFAULT_;
-    ROS_INFO("no 'Ki' set; using the default value: '.0'");
+    ROS_INFO("no 'Ki' set; using the default value: %f",PID_I_DEFAULT_);
   }
   if (pidGains_.ki < PID_I_MIN_) {
     ROS_WARN("pidGains_.Ki is too low, changing to: %f", PID_I_MIN_);
@@ -53,7 +53,7 @@ RobotDriver::RobotDriver(ros::NodeHandle *nh) {
     pidGains_.ki = PID_I_MAX_;
   }
   if (!ros::param::get("Kd", pidGains_.kd)) {
-    ROS_INFO("no 'Kd' set; using the default value: '0'");
+    ROS_INFO("no 'Kd' set; using the default value: %f", PID_D_DEFAULT_);
     pidGains_.kd = PID_D_DEFAULT_;
   }
   if (pidGains_.kd < PID_D_MIN_) {
