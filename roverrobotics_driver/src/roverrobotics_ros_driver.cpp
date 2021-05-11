@@ -31,68 +31,75 @@ RobotDriver::RobotDriver(ros::NodeHandle *nh) {
         "tuned");
   }
   if (!ros::param::get("Kp", pidGains_.kp)) {
-    pidGains_.kp = 0;
+    pidGains_.kp = PID_P_DEFAULT_;
     ROS_INFO("no 'Kp' set; using the default value: %f", pidGains_.kp);
   }
-  if (pidGains_.kp < PID_P_MIN) {
-    ROS_WARN("pidGains_.Kp is too low, changing to: %f", PID_P_MIN);
-    pidGains_.kp = PID_P_MIN;
-  } else if (pidGains_.kp > PID_P_MAX) {
-    ROS_WARN("pidGains_.Kp is too high, changing to: %f", PID_P_MAX);
-    pidGains_.kp = PID_P_MAX;
+  if (pidGains_.kp < PID_P_MIN_) {
+    ROS_WARN("pidGains_.Kp is too low, changing to: %f", PID_P_MIN_);
+    pidGains_.kp = PID_P_MIN_;
+  } else if (pidGains_.kp > PID_P_MAX_) {
+    ROS_WARN("pidGains_.Kp is too high, changing to: %f", PID_P_MAX_);
+    pidGains_.kp = PID_P_MAX_;
   }
   if (!ros::param::get("Ki", pidGains_.ki)) {
-    pidGains_.ki = 0;
+    pidGains_.ki = PID_I_DEFAULT_;
     ROS_INFO("no 'Ki' set; using the default value: '.0'");
   }
-  if (pidGains_.ki < PID_I_MIN) {
-    ROS_WARN("pidGains_.Ki is too low, changing to: %f", PID_I_MIN);
-    pidGains_.ki = PID_I_MIN;
-  } else if (pidGains_.ki > PID_I_MAX) {
-    ROS_WARN("pidGains_.Ki is too high, changing to: %f", PID_I_MAX);
-    pidGains_.ki = PID_I_MAX;
+  if (pidGains_.ki < PID_I_MIN_) {
+    ROS_WARN("pidGains_.Ki is too low, changing to: %f", PID_I_MIN_);
+    pidGains_.ki = PID_I_MIN_;
+  } else if (pidGains_.ki > PID_I_MAX_) {
+    ROS_WARN("pidGains_.Ki is too high, changing to: %f", PID_I_MAX_);
+    pidGains_.ki = PID_I_MAX_;
   }
   if (!ros::param::get("Kd", pidGains_.kd)) {
     ROS_INFO("no 'Kd' set; using the default value: '0'");
-    pidGains_.kd = 0;
+    pidGains_.kd = PID_D_DEFAULT_;
   }
-  if (pidGains_.kd < PID_D_MIN) {
-    ROS_WARN("pidGains_.Kd is too low, changing to: %f", PID_D_MIN);
-    pidGains_.kd = PID_D_MIN;
-  } else if (pidGains_.kd > PID_D_MAX) {
-    ROS_WARN("pidGains_.Kd is too high, changing to: %f", PID_D_MAX);
-    pidGains_.kd = PID_D_MAX;
+  if (pidGains_.kd < PID_D_MIN_) {
+    ROS_WARN("pidGains_.Kd is too low, changing to: %f", PID_D_MIN_);
+    pidGains_.kd = PID_D_MIN_;
+  } else if (pidGains_.kd > PID_D_MAX_) {
+    ROS_WARN("pidGains_.Kd is too high, changing to: %f", PID_D_MAX_);
+    pidGains_.kd = PID_D_MAX_;
   }
   //~PID Control
   if (!ros::param::get("angular_coef", odom_angular_coef_)) {
-    ROS_INFO("no 'angular_coef' set; using the default value: '0'");
-    odom_angular_coef_ = 0;
+    ROS_INFO("no 'angular_coef' set; using the default value: %f",
+             ODOM_ANGULAR_COEF_DEFAULT_);
+    odom_angular_coef_ = ODOM_ANGULAR_COEF_DEFAULT_;
   }
   if (!ros::param::get("traction_factor", odom_traction_factor_)) {
-    ROS_INFO("no 'traction_factor' set; using the default value: '0'");
-    odom_traction_factor_ = 0;
+    ROS_INFO("no 'traction_factor' set; using the default value: %f",
+             ODOM_TRCTION_FACTOR_DEFAULT_);
+    odom_traction_factor_ = ODOM_TRCTION_FACTOR_DEFAULT_;
   }
   if (!ros::param::get("angular_a_coef", angular_scaling_params_.a_coef)) {
-    ROS_INFO("no 'angular_a_coef' set; using the default value: 0");
-    angular_scaling_params_.a_coef = 0;
+    ROS_INFO("no 'angular_a_coef' set; using the default value: %f",
+             ANGULAR_SCALING_A_DEFAULT_);
+    angular_scaling_params_.a_coef = ANGULAR_SCALING_A_DEFAULT_;
   }
   if (!ros::param::get("angular_b_coef", angular_scaling_params_.b_coef)) {
-    ROS_INFO("no 'angular_b_coef' set; using the default value: 0");
-    angular_scaling_params_.b_coef = 1;
+    ROS_INFO("no 'angular_b_coef' set; using the default value: %f",
+             ANGULAR_SCALING_B_DEFAULT_);
+    angular_scaling_params_.b_coef = ANGULAR_SCALING_B_DEFAULT_;
   }
   if (!ros::param::get("angular_c_coef", angular_scaling_params_.c_coef)) {
-    ROS_INFO("no 'angular_c_coef' set; using the default value: 1");
-    angular_scaling_params_.c_coef = 0;
+    ROS_INFO("no 'angular_c_coef' set; using the default value: %f",
+             ANGULAR_SCALING_C_DEFAULT_);
+    angular_scaling_params_.c_coef = ANGULAR_SCALING_C_DEFAULT_;
   }
   if (!ros::param::get("angular_min_scale",
                        angular_scaling_params_.min_scale_val)) {
-    ROS_INFO("no 'angular_min_scale' set; using the default value: 1");
-    angular_scaling_params_.min_scale_val = 0;
+    ROS_INFO("no 'angular_min_scale' set; using the default value: %f",
+             ANGULAR_SCALING_MIN_DEFAULT_);
+    angular_scaling_params_.min_scale_val = ANGULAR_SCALING_MIN_DEFAULT_;
   }
   if (!ros::param::get("angular_max_scale",
                        angular_scaling_params_.max_scale_val)) {
-    ROS_INFO("no 'angular_max_scale' set; using the default value: 1");
-    angular_scaling_params_.max_scale_val = 1;
+    ROS_INFO("no 'angular_max_scale' set; using the default value: %f",
+             ANGULAR_SCALING_MAX_DEFAULT_);
+    angular_scaling_params_.max_scale_val = ANGULAR_SCALING_MAX_DEFAULT_;
   }
   if (!ros::param::get("robot_type", robot_type_)) {
     ROS_FATAL(
@@ -142,20 +149,21 @@ RobotDriver::RobotDriver(ros::NodeHandle *nh) {
     robot_status_topic_ = "/robot_status";
   }
   if (!ros::param::get("status_frequency", robot_status_frequency_)) {
-    ROS_INFO("no 'status_frequency' set; using the default value: '5.00'");
-    robot_status_frequency_ = 5.00;
+    ROS_INFO("no 'status_frequency' set; using the default value: %f",
+             ROBOT_STATUS_FREQUENCY_DEFAULT_);
+    robot_status_frequency_ = ROBOT_STATUS_FREQUENCY_DEFAULT_;
   }
-  if (robot_status_frequency_ < ROBOT_STATUS_FREQUENCY_MIN) {
+  if (robot_status_frequency_ < ROBOT_STATUS_FREQUENCY_MIN_) {
     ROS_WARN("status_frequency is too low, changing to default value: %f",
-             ROBOT_STATUS_FREQUENCY_MIN);
-    robot_status_frequency_ = ROBOT_STATUS_FREQUENCY_MIN;
-  } else if (robot_status_frequency_ > ROBOT_STATUS_FREQUENCY_MAX) {
+             ROBOT_STATUS_FREQUENCY_MIN_);
+    robot_status_frequency_ = ROBOT_STATUS_FREQUENCY_MIN_;
+  } else if (robot_status_frequency_ > ROBOT_STATUS_FREQUENCY_MAX_) {
     ROS_WARN("status_frequency is too high, changing to default value: %f",
-             ROBOT_STATUS_FREQUENCY_MAX);
-    robot_status_frequency_ = ROBOT_STATUS_FREQUENCY_MAX;
+             ROBOT_STATUS_FREQUENCY_MAX_);
+    robot_status_frequency_ = ROBOT_STATUS_FREQUENCY_MAX_;
   }
   if (!ros::param::get("odom_frequency", robot_odom_frequency_)) {
-    robot_odom_frequency_ = 50.00;
+    robot_odom_frequency_ = ROBOT_ODOM_FREQUENCY_DEFAULT_;
     ROS_INFO("no 'odom_frequency' set; using the default value: %f",
              robot_odom_frequency_);
   }

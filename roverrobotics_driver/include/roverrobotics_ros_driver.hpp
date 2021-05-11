@@ -5,9 +5,9 @@
 
 #include "geometry_msgs/Twist.h"
 #include "librover/control.hpp"
+#include "librover/protocol_mini.hpp"
 #include "librover/protocol_pro.hpp"
 #include "librover/protocol_pro_2.hpp"
-#include "librover/protocol_mini.hpp"
 #include "nav_msgs/Odometry.h"
 #include "ros/node_handle.h"
 #include "ros/ros.h"
@@ -44,8 +44,6 @@ class RobotDriver {
   std::string estop_reset_topic_;
   std::string robot_status_topic_;
   float robot_status_frequency_;
-  const float ROBOT_STATUS_FREQUENCY_MAX = 60;
-  const float ROBOT_STATUS_FREQUENCY_MIN = 5;
   float robot_odom_frequency_;
   std::string robot_info_request_topic_;
   std::string robot_info_topic_;
@@ -60,16 +58,31 @@ class RobotDriver {
   // Timer
   ros::Timer robot_status_timer_;
   ros::Timer odom_publish_timer_;
-  const float PID_P_MAX = 1;
-  const float PID_P_MIN = 0;
-  const float PID_I_MAX = 1;
-  const float PID_I_MIN = 0;
-  const float PID_D_MAX = 1;
-  const float PID_D_MIN = 0;
+
   bool estop_state_ = false;
   Control::pid_gains pidGains_ = {0, 0, 0};
   Control::robot_motion_mode_t robot_mode_;
   Control::angular_scaling_params angular_scaling_params_ = {0, 0, 0, 0, 0};
+  const float PID_P_DEFAULT_ = 0;
+  const float PID_I_DEFAULT_ = 0;
+  const float PID_D_DEFAULT_ = 0;
+  const float PID_P_MAX_ = 1;
+  const float PID_P_MIN_ = 0;
+  const float PID_I_MAX_ = 1;
+  const float PID_I_MIN_ = 0;
+  const float PID_D_MAX_ = 1;
+  const float PID_D_MIN_ = 0;
+  const float ROBOT_STATUS_FREQUENCY_DEFAULT_ = 5;
+  const float ROBOT_STATUS_FREQUENCY_MAX_ = 60;
+  const float ROBOT_STATUS_FREQUENCY_MIN_ = 5;
+  const float ROBOT_ODOM_FREQUENCY_DEFAULT_ = 30.00;
+  const float ODOM_ANGULAR_COEF_DEFAULT_ = 0;
+  const float ODOM_TRCTION_FACTOR_DEFAULT_ = 0;
+  const float ANGULAR_SCALING_A_DEFAULT_ = 0;
+  const float ANGULAR_SCALING_B_DEFAULT_ = 0;
+  const float ANGULAR_SCALING_C_DEFAULT_ = 0;
+  const float ANGULAR_SCALING_MIN_DEFAULT_ = 1;
+  const float ANGULAR_SCALING_MAX_DEFAULT_ = 1;
 
  public:
   RobotDriver(ros::NodeHandle *nh);
