@@ -1,0 +1,42 @@
+<launch>
+    <arg name="driver_node_name" default="roverrobotics_driver" />
+    <arg name="config_locks" default="$(find roverrobotics_driver)/config/twist_mux_locks.yaml" />
+    <arg name="config_topics" default="$(find roverrobotics_driver)/config/twist_mux_topics_locks.yaml" />
+    <param name="device_port" value="can0" />
+    <param name="comm_type" value="can" />
+    <param name="robot_type" value="pro2" />
+    <param name="robot_mode" value="INDEPENDENT_WHEEL" />
+    <param name="status_frequency" value="30" />
+    <param name="Kp" value="0.0005" />
+    <param name="Ki" value="0" />
+    <param name="Kd" value=".00007" />
+    <param name="angular_a_coef" value="0" />
+    <param name="angular_b_coef" value="0" />
+    <param name="angular_c_coef" value="1" />
+    <param name="angular_max_scale" value="1" />
+    <param name="angular_min_scale" value="1" />
+
+    <!-- RoverRobotics Ros 1 Driver -->
+    <node 
+        pkg="roverrobotics_driver" 
+        type="roverrobotics_driver_node" 
+        name="$(arg driver_node_name)" 
+        respawn="false"
+        output="screen" >
+    <!-- launch-prefix="gdb -ex run - -args" -->
+    </node>
+
+    <!--  Twist Mux  -->
+    <node pkg="twist_mux" type="twist_mux" name="twist_mux" output="screen">
+        <remap from="cmd_vel_out" to="/cmd_vel/managed" />
+        <rosparam file="$(arg config_locks)" command="load" />
+        <rosparam file="$(arg config_topics)" command="load" />
+    </node>
+
+    <!-- Control input manager -->
+    <node pkg="roverrobotics_input_manager" type="control_input_manager.py" name="roverrobotics_input_manager_node" output="log" >
+        <rosparam file="$(find roverrobotics_input_manager)/config/input_topics.yaml" command="load" />
+        
+    </node>
+
+</launch>
