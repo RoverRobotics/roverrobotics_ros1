@@ -43,7 +43,7 @@ RobotDriver::RobotDriver(ros::NodeHandle *nh) {
   }
   if (!ros::param::get("Ki", pidGains_.ki)) {
     pidGains_.ki = PID_I_DEFAULT_;
-    ROS_INFO("no 'Ki' set; using the default value: %f",PID_I_DEFAULT_);
+    ROS_INFO("no 'Ki' set; using the default value: %f", PID_I_DEFAULT_);
   }
   if (pidGains_.ki < PID_I_MIN_) {
     ROS_WARN("pidGains_.Ki is too low, changing to: %f", PID_I_MIN_);
@@ -112,6 +112,9 @@ RobotDriver::RobotDriver(ros::NodeHandle *nh) {
     robot_ = std::make_unique<Pro2ProtocolObject>(
         device_port_.c_str(), comm_type_, robot_mode_, pidGains_,
         angular_scaling_params_);
+  } else if (robot_type_ == "zero2") {
+    robot_ = std::make_unique<Zero2ProtocolObject>(
+         device_port_.c_str(), comm_type_, robot_mode_, pidGains_);
   } else if (robot_type_ == "mini") {
     robot_ = std::make_unique<MiniProtocolObject>(
         device_port_.c_str(), comm_type_, robot_mode_, pidGains_,
