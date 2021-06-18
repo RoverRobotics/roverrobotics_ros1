@@ -252,9 +252,9 @@ namespace RoverRobotics
         robot_info_topic_, 1); // publish robot_unique info
     robot_status_publisher_ =
         nh->advertise<std_msgs::Float32MultiArray>(robot_status_topic_, 10);
-    // robot_status_timer_ =
-    //     nh->createTimer(ros::Duration(1.0 / robot_status_frequency_),
-    //                     &RobotDriver::publishRobotStatus, this);
+    robot_status_timer_ =
+        nh->createTimer(ros::Duration(1.0 / robot_status_frequency_),
+                        &RobotDriver::publishRobotStatus, this);
     robot_odom_publisher_ = nh->advertise<nav_msgs::Odometry>("odom", 1);
     // feedback_publisher_ =
     //     nh->advertise<sensor_msgs::JoyFeedbackArray>("/set_feedback", 1);
