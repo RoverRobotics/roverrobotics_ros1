@@ -347,7 +347,7 @@ void RobotDriver::callbackModeTrigger(const std_msgs::Bool::ConstPtr &msg) {
 
 void RobotDriver::callbackInfo(const std_msgs::Bool::ConstPtr &msg) {
   if (msg->data) {
-    // publishRobotInfo();
+    publishRobotInfo();
   }
 }
 
