@@ -8,8 +8,8 @@
     <param name="robot_mode" value="INDEPENDENT_WHEEL" />
     <param name="status_frequency" value="30" />
     <param name="Kp" value="0.0011" />
-    <param name="Ki" value="0.0000015" />
-    <param name="Kd" value="0.00009" />
+    <param name="Ki" value="0.00000" />
+    <param name="Kd" value="0.00008" />
     <param name="angular_a_coef" value="0" />
     <param name="angular_b_coef" value="0" />
     <param name="angular_c_coef" value="1" />
