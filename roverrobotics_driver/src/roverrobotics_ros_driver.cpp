@@ -320,29 +320,17 @@ void RobotDriver::callbackModeTrigger(const std_msgs::Bool::ConstPtr &msg) {
     switch (mode) {
       case Control::OPEN_LOOP:
         ROS_INFO("Robot Mode : Open Loop");
-        // a.set_led = true;
-        // a.led_r = 255;
-        // a.led_g = 255;
-        // a.led_b = 0;
         break;
       case Control::TRACTION_CONTROL:
         ROS_INFO("Robot Mode : TRACTION_CONTROL");
-        // a.set_led = true;
-        // a.led_r = 255;
-        // a.led_g = 255;
-        // a.led_b = 0;
         break;
       case Control::INDEPENDENT_WHEEL:
         ROS_INFO("Robot Mode : INDEPENDENT_WHEEL");
-        // a.set_led = true;
-        // a.led_r = 255;
-        // a.led_g = 255;
-        // a.led_b = 0;
+
         break;
     }
   }
 
-  // feedback_publisher_.publish(a);
 }
 
 void RobotDriver::callbackInfo(const std_msgs::Bool::ConstPtr &msg) {
