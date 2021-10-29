@@ -50,6 +50,8 @@ class ps4_mapper(object):
             "set_feedback", Feedback, queue_size=1)
         rospy.Subscriber('status', Status, self.cb_status, queue_size=1)
         rospy.loginfo("Linear Scale is at %f", self._scales["linear"]["x"])
+        self.default_linear = self._scales["linear"]["x"]
+        self.default_angular = self._scales["angular"]["z"]
         self._feedback.set_led = True
         self._feedback.led_g = 255
         self._pub_feedback.publish(self._feedback)
@@ -115,6 +117,34 @@ class ps4_mapper(object):
                 self._pub_feedback.publish(self._feedback)
             rospy.loginfo('Linear Scale is at %f', self._scales["linear"]["x"])
             self.buttonpressed = True
+        if (msg.button_dpad_left or msg.button_dpad_right) and self.buttonpressed is False:
+            if msg.button_dpad_right and self._scales["angular"].get("z") < 3.14:
+                self._scales["angular"]["z"] += 0.05
+            elif msg.button_dpad_left and self._scales["angular"].get("z") > 0.05:
+                self._scales["angular"]["z"] -= 0.05
+            elif self._scales["angular"].get("z") <= 0.06 or self._scales["angular"].get("z") >= 3.14:
+                self._feedback.set_rumble = True
+                rospy.loginfo("Limit Reach %f",
+                              self._scales["angular"].get("z"))
+                self._feedback.rumble_big = 1
+                self._pub_feedback.publish(self._feedback)
+            rospy.loginfo('Angular Scale is at %f', self._scales["angular"]["z"])
+            self.buttonpressed = True
+        if msg.button_l3 and self.buttonpressed is False:
+            self._scales["linear"]["x"] = self.default_linear
+            self._feedback.set_rumble = True
+            self._feedback.rumble_big = 1
+            self._pub_feedback.publish(self._feedback)
+            self.buttonpressed = True
+
+        if msg.button_r3 and self.buttonpressed is False:
+            self._scales["angular"]["z"] = self.default_angular
+            self._feedback.set_rumble = True
+            self._feedback.rumble_big = 1
+            self._pub_feedback.publish(self._feedback)
+            self.buttonpressed = True
+
+
         button_msg = Bool()
         button_msg.data = False
         if msg.button_cross:
