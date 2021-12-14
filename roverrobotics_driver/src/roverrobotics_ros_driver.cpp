@@ -277,8 +277,8 @@ void RobotDriver::publishOdometry(const ros::TimerEvent &event) {
   odom_msg.header.stamp = ros::Time::now();
   odom_msg.header.frame_id = "odom";
   odom_msg.child_frame_id = "base_link";
-  odom_msg.twist.twist.linear.x = data.linear_vel;
-  odom_msg.twist.twist.angular.z = data.angular_vel;
+  odom_msg.twist.twist.linear.x = odom_traction_factor_ * data.linear_vel;
+  odom_msg.twist.twist.angular.z = odom_angular_coef_ * data.angular_vel;
   robot_odom_publisher_.publish(odom_msg);
 }
 
