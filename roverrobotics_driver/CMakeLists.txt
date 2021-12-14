@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   tf2
   pluginlib
   nav_msgs
+  tf2_geometry_msgs
 )
 
 catkin_package(
