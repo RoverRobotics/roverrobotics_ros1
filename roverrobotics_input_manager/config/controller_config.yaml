@@ -12,5 +12,5 @@ scales:
   linear:
     x: 1
   angular:
-    y: 0.5
-    z: 6.28
+    y: 50
+    z: 1.57

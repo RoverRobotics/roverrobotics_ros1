@@ -16,7 +16,8 @@
         pkg="roverrobotics_driver" 
         type="roverrobotics_driver_node" 
         name="$(arg driver_node_name)" 
-        respawn="false"
+        respawn="true"
+        repsnaw_delay="30"
         output="screen">
     </node>
 
