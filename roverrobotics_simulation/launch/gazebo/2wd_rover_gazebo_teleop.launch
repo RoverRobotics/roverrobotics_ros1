@@ -1,8 +1,8 @@
 <launch>
 
   <!-- Controller Components -->
-  <arg name="config_locks"  default="$(find rr_rover_zero_driver)/config/twist_mux_locks.yaml"/>
-  <arg name="config_topics" default="$(find rr_rover_zero_driver)/config/twist_mux_topics.yaml"/>
+  <arg name="config_locks"  default="$(find roverrobotics_driver)/config/twist_mux_locks.yaml"/>
+  <arg name="config_topics" default="$(find roverrobotics_driver)/config/twist_mux_topics_locks.yaml"/>
 
   <!-- Xbox 360 Controller Button Mapping -->
     <node pkg="roverrobotics_input_manager" type="ps4_mapper.py" name="rr_ps4_mapper_node" output="screen" >
@@ -39,7 +39,12 @@
     <node pkg="joy" type="joy_node" name="joy_node" output="screen" respawn="true" >
         <param name="autorepeat_rate" value="10" />
         <remap from="/joy" to="/joystick" />
-        <param name="dev" value="/dev/input/jsX"/>
+        <param name="dev" value="/dev/input/js0"/>
+    </node>
+
+    <node pkg="teleop_twist_joy" name="teleop_twist_joy" type="teleop_node">        
+        <remap from="joy" to="/joystick" />
+        <remap from="cmd_vel" to="/managed/joy" />
     </node>
 
     <!-- Gazebo Components -->
