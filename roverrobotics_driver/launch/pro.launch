@@ -17,7 +17,7 @@
         type="roverrobotics_driver_node" 
         name="$(arg driver_node_name)" 
         respawn="true"
-        repsnaw_delay="30"
+        respawn_delay="30"
         output="screen">
     </node>
 
