@@ -274,12 +274,60 @@ void RobotDriver::publishRobotStatus(const ros::TimerEvent &event) {
 void RobotDriver::publishOdometry(const ros::TimerEvent &event) {
   robotData data = robot_->status_request();
   nav_msgs::Odometry odom_msg;
+  static double pos_x = 0;
+  static double pos_y = 0;
+  static double theta = 0;
+  static double past_time = 0;
+  double now_time = 0;
+  double dt = 0;
+  float odom_covariance_0_ = 0.01;
+  float odom_covariance_35_ = 0.03;
+  tf2::Quaternion q_new;
+
   odom_msg.header.stamp = ros::Time::now();
   odom_msg.header.frame_id = "odom";
   odom_msg.child_frame_id = "base_link";
-  odom_msg.pose.pose.orientation.w = 1.0;
+
+  // Calculate time
+  ros::Time ros_now_time = ros::Time::now();
+  now_time = ros_now_time.toSec();
+
+  dt = now_time - past_time;
+  past_time = now_time;
+
+  // Calculate position
+  if (past_time != 0)
+  {
+    pos_x = pos_x + data.linear_vel * cos(theta) * dt;
+    pos_y = pos_y + data.linear_vel * sin(theta) * dt;
+    theta = (theta + data.angular_vel * dt);
+
+    q_new.setRPY(0, 0, theta);
+    tf2::convert(q_new, odom_msg.pose.pose.orientation);
+  }
+
+  odom_msg.pose.pose.position.x = pos_x;
+  odom_msg.pose.pose.position.y = pos_y;
+
   odom_msg.twist.twist.linear.x = data.linear_vel;
   odom_msg.twist.twist.angular.z = data.angular_vel;
+
+  // Covariance: 
+  // If not moving, trust the encoders completely
+  // Otherwise set them to the ROS param
+  if (data.linear_vel == 0 && data.angular_vel == 0)
+  {
+    odom_msg.twist.covariance[0] = odom_covariance_0_ / 1e3;
+    odom_msg.twist.covariance[7] = odom_covariance_0_ / 1e3;
+    odom_msg.twist.covariance[35] = odom_covariance_35_ / 1e6;
+  }
+  else
+  {
+    odom_msg.twist.covariance[0] = odom_covariance_0_;
+    odom_msg.twist.covariance[7] = odom_covariance_0_;
+    odom_msg.twist.covariance[35] = odom_covariance_35_;
+  }
+
   robot_odom_publisher_.publish(odom_msg);
 }
 
