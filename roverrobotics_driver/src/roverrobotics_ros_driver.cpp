@@ -298,8 +298,8 @@ void RobotDriver::publishOdometry(const ros::TimerEvent &event) {
   tf2::Quaternion q_new;
 
   odom_msg.header.stamp = ros::Time::now();
-  odom_msg.header.frame_id = "odom";
-  odom_msg.child_frame_id = "base_link";
+  odom_msg.header.frame_id = odom_frame_id_;
+  odom_msg.child_frame_id = odom_child_frame_id_;
 
   // Calculate time
   ros::Time ros_now_time = ros::Time::now();
