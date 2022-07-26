@@ -44,6 +44,8 @@ class RobotDriver {
   std::string mode_trigger_topic_;
   std::string estop_reset_topic_;
   std::string robot_status_topic_;
+  std::string odom_frame_id_;
+  std::string odom_child_frame_id;
   float robot_status_frequency_;
   float robot_odom_frequency_;
   std::string robot_info_request_topic_;
@@ -79,6 +81,8 @@ class RobotDriver {
   const float ROBOT_ODOM_FREQUENCY_DEFAULT_ = 30.00;
   const float ODOM_ANGULAR_COEF_DEFAULT_ = 0;
   const float ODOM_TRCTION_FACTOR_DEFAULT_ = 0;
+  const std::string ODOM_FRAME_ID_DEFAULT_ = "odom";
+  const std::string ODOM_CHILD_FRAME_ID_DEFAULT_ = "base_link";
   const float ANGULAR_SCALING_A_DEFAULT_ = 0;
   const float ANGULAR_SCALING_B_DEFAULT_ = 0;
   const float ANGULAR_SCALING_C_DEFAULT_ = 0;
