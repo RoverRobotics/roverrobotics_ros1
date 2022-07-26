@@ -125,6 +125,19 @@ RobotDriver::RobotDriver(ros::NodeHandle *nh) {
     ros::shutdown();
     return;
   }
+  
+  // Odom frame and Child frame params
+  if (!ros::param::get("odom_frame", odom_frame_id_)) {
+    ROS_INFO("no 'odom_frame_id_' set; using the default value: %f",
+             ODOM_FRAME_ID_DEFAULT_);
+    odom_frame_id_ = ODOM_FRAME_ID_DEFAULT_;
+  }
+  if (!ros::param::get("odom_child_frame", odom_child_frame_id_)) {
+    ROS_INFO("no 'odom_child_frame_id_' set; using the default value: %f",
+             ODOM_CHILD_FRAME_ID_DEFAULT_);
+    odom__child_frame_id_ = ODOM_CHILD_FRAME_ID_DEFAULT_;
+  }
+
 
   // Check if launch files have parameters set; Otherwise use hardcoded values
   if (!ros::param::get("trim_topic", trim_topic_)) {
