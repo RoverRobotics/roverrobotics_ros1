@@ -45,7 +45,7 @@ class RobotDriver {
   std::string estop_reset_topic_;
   std::string robot_status_topic_;
   std::string odom_frame_id_;
-  std::string odom_child_frame_id;
+  std::string odom_child_frame_id_;
   float robot_status_frequency_;
   float robot_odom_frequency_;
   std::string robot_info_request_topic_;
