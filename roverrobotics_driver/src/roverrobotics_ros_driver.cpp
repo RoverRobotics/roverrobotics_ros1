@@ -135,7 +135,7 @@ RobotDriver::RobotDriver(ros::NodeHandle *nh) {
   if (!ros::param::get("odom_child_frame", odom_child_frame_id_)) {
     ROS_INFO("no 'odom_child_frame_id_' set; using the default value: %f",
              ODOM_CHILD_FRAME_ID_DEFAULT_);
-    odom__child_frame_id_ = ODOM_CHILD_FRAME_ID_DEFAULT_;
+    odom_child_frame_id_ = ODOM_CHILD_FRAME_ID_DEFAULT_;
   }
 
 
