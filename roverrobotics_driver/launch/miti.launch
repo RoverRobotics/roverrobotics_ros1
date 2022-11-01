@@ -4,7 +4,7 @@
     <arg name="config_topics" default="$(find roverrobotics_driver)/config/twist_mux_topics_locks.yaml" />
     <param name="device_port" value="can0" />
     <param name="comm_type" value="can" />
-    <param name="robot_type" value="mini" />
+    <param name="robot_type" value="miti" />
     <param name="robot_mode" value="INDEPENDENT_WHEEL" />
     <param name="status_frequency" value="30" />
     <param name="Kp" value="0.00025" />

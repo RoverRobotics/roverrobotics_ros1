@@ -6,6 +6,7 @@
 #include "geometry_msgs/Twist.h"
 #include "librover/control.hpp"
 #include "librover/protocol_mini.hpp"
+#include "librover/protocol_mega.hpp"
 #include "librover/protocol_zero_2.hpp"
 #include "librover/protocol_pro.hpp"
 #include "librover/protocol_pro_2.hpp"
