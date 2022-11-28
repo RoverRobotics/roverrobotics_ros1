@@ -1,18 +1,18 @@
 jobs:
-  build-melodic:
+  build-noetic:
     working_directory: /catkin_ws/src
     docker:
-      - image: ros:melodic-ros-core-bionic
+      - image: ros:noetic-ros-core-focal
     steps:
       - checkout
       - run:
           command: |
             apt-get update
             apt-get install -y build-essential
-            apt-get install -y ros-melodic-tf
+            apt-get install -y ros-noetic-tf
       - run:
           command: |
-            source /opt/ros/melodic/setup.bash
+            source /opt/ros/noetic/setup.bash
             catkin_init_workspace
             cd ..
             catkin_make run_tests
@@ -24,10 +24,10 @@ workflows:
   version: 2
   build-and-test:
     jobs:
-      - build-melodic:
+      - build-noetic:
           filters:
             branches:
               only:
                 - master
                 - develop
-                - melodic-devel
+                - noetic-devel
