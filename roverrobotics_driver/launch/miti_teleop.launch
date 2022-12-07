@@ -12,5 +12,5 @@
     </node>
 
     <!-- Robot launch -->
-    <include file="$(find roverrobotics_driver)/launch/mini.launch"/>
+    <include file="$(find roverrobotics_driver)/launch/miti.launch"/>
 </launch>
