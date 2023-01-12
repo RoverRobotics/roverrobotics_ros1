@@ -118,11 +118,11 @@ class ps4_mapper(object):
             rospy.loginfo('Linear Scale is at %f', self._scales["linear"]["x"])
             self.buttonpressed = True
         if (msg.button_dpad_left or msg.button_dpad_right) and self.buttonpressed is False:
-            if msg.button_dpad_right and self._scales["angular"].get("z") < 3.14:
+            if msg.button_dpad_right and self._scales["angular"].get("z") < 4.71:
                 self._scales["angular"]["z"] += 0.05
             elif msg.button_dpad_left and self._scales["angular"].get("z") > 0.05:
                 self._scales["angular"]["z"] -= 0.05
-            elif self._scales["angular"].get("z") <= 0.06 or self._scales["angular"].get("z") >= 3.14:
+            elif self._scales["angular"].get("z") <= 0.06 or self._scales["angular"].get("z") >= 4.71:
                 self._feedback.set_rumble = True
                 rospy.loginfo("Limit Reach %f",
                               self._scales["angular"].get("z"))
