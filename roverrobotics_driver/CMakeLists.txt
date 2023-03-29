@@ -31,16 +31,21 @@ catkin_package(
 ###########
 ## Build ##
 ###########
+include(GNUInstallDirs)
 
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
 )
 
+if(NOT DEFINED LIBROVER_INSTALL_PREFIX)
+    set(LIBROVER_INSTALL_PREFIX "/usr")
+endif(NOT DEFINED LIBROVER_INSTALL_PREFIX)
+
 add_library(librover SHARED IMPORTED)
 set_target_properties(librover PROPERTIES
-  IMPORTED_LOCATION "/usr/lib/liblibrover.so"
-  INTERFACE_INCLUDE_DIRECTORIES "/usr/include/librover")
+  IMPORTED_LOCATION "${LIBROVER_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/liblibrover.so"
+  INTERFACE_INCLUDE_DIRECTORIES "${LIBROVER_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}/librover")
 add_executable(roverrobotics_driver_node src/roverrobotics_ros_driver.cpp)
 ##add_dependencies(roverrobotics_driver_node roverrobotics_driver_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
 
